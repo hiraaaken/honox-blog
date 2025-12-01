@@ -1,0 +1,100 @@
+---
+title: "レスポンシブデザインの実装テクニック"
+publishedAt: 2025-09-21
+updatedAt: 2025-09-21
+tags: ["CSS", "レスポンシブ", "モバイル", "UI/UX"]
+description: "モバイルファーストなレスポンシブデザインの実装方法とベストプラクティスを紹介します。"
+image: /assets/sample.jpg
+---
+
+# レスポンシブデザインの実装テクニック
+
+現代のWeb開発において必須のレスポンシブデザインの実装方法を学びましょう。
+
+## メディアクエリの基本
+
+```css
+/* モバイルファースト */
+.container {
+  width: 100%;
+  padding: 16px;
+}
+
+/* タブレット */
+@media (min-width: 768px) {
+  .container {
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+}
+
+/* デスクトップ */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1200px;
+    padding: 32px;
+  }
+}
+```
+
+## フレキシブルレイアウト
+
+```css
+.flex-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.flex-item {
+  flex: 1 1 300px; /* 最小幅300px */
+}
+
+/* CSS Grid でのレスポンシブ */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+```
+
+## 画像の最適化
+
+```css
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* srcset属性の活用 */
+```
+
+```html
+<img 
+  src="image-800w.jpg"
+  srcset="
+    image-400w.jpg 400w,
+    image-800w.jpg 800w,
+    image-1200w.jpg 1200w
+  "
+  sizes="(max-width: 768px) 100vw, 50vw"
+  alt="レスポンシブ画像"
+>
+```
+
+## タイポグラフィのスケーリング
+
+```css
+:root {
+  --font-size-base: clamp(14px, 2.5vw, 18px);
+  --font-size-lg: clamp(18px, 3vw, 24px);
+  --font-size-xl: clamp(24px, 4vw, 36px);
+}
+
+h1 { font-size: var(--font-size-xl); }
+h2 { font-size: var(--font-size-lg); }
+p { font-size: var(--font-size-base); }
+```
+
+レスポンシブデザインは、ユーザー体験を向上させる重要な要素です。

@@ -1,0 +1,101 @@
+---
+title: "SQLデータベース設計の基礎"
+publishedAt: 2025-09-23
+updatedAt: 2025-09-23
+tags: ["SQL", "データベース", "設計", "正規化"]
+description: "リレーショナルデータベースの設計原則とSQLの基本的なクエリについて解説します。"
+image: /assets/sample.jpg
+---
+
+# SQLデータベース設計の基礎
+
+効率的なデータベース設計とSQLクエリの書き方を学びましょう。
+
+## テーブル設計の基本
+
+```sql
+-- ユーザーテーブル
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 投稿テーブル
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  title VARCHAR(255) NOT NULL,
+  content TEXT,
+  status VARCHAR(20) DEFAULT 'draft',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- タグテーブル（多対多関係）
+CREATE TABLE tags (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE post_tags (
+  post_id INTEGER REFERENCES posts(id),
+  tag_id INTEGER REFERENCES tags(id),
+  PRIMARY KEY (post_id, tag_id)
+);
+```
+
+## 基本的なクエリ
+
+```sql
+-- 基本的なSELECT
+SELECT id, name, email FROM users WHERE created_at > '2025-01-01';
+
+-- JOIN操作
+SELECT 
+  u.name,
+  p.title,
+  p.created_at
+FROM users u
+INNER JOIN posts p ON u.id = p.user_id
+WHERE p.status = 'published'
+ORDER BY p.created_at DESC;
+
+-- 集計関数
+SELECT 
+  u.name,
+  COUNT(p.id) as post_count
+FROM users u
+LEFT JOIN posts p ON u.id = p.user_id
+GROUP BY u.id, u.name
+HAVING COUNT(p.id) > 5;
+```
+
+## インデックスの最適化
+
+```sql
+-- よく検索される列にインデックス
+CREATE INDEX idx_posts_user_id ON posts(user_id);
+CREATE INDEX idx_posts_status ON posts(status);
+CREATE INDEX idx_posts_created_at ON posts(created_at);
+
+-- 複合インデックス
+CREATE INDEX idx_posts_user_status ON posts(user_id, status);
+```
+
+## トランザクション
+
+```sql
+BEGIN;
+
+INSERT INTO users (email, name) VALUES ('user@example.com', 'New User');
+
+INSERT INTO posts (user_id, title, content) 
+VALUES (LASTVAL(), 'First Post', 'Hello World');
+
+COMMIT;
+```
+
+適切なデータベース設計により、スケーラブルなアプリケーションを構築できます。

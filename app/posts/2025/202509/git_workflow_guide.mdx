@@ -1,0 +1,73 @@
+---
+title: "Git開発フローの基本"
+publishedAt: 2025-09-20
+updatedAt: 2025-09-20
+tags: ["Git", "バージョン管理", "開発フロー", "チーム開発"]
+description: "Gitを使った効率的な開発フローについて、ブランチ戦略やコミット規約を中心に解説します。"
+image: /assets/sample.jpg
+---
+
+# Git開発フローの基本
+
+チーム開発において重要なGitワークフローについて解説します。
+
+## Git Flow
+
+```bash
+# 新機能開発
+git checkout -b feature/user-auth
+git add .
+git commit -m "feat: ユーザー認証機能を追加"
+git push origin feature/user-auth
+
+# プルリクエスト作成後、マージ
+git checkout main
+git pull origin main
+git branch -d feature/user-auth
+```
+
+## コミットメッセージ規約
+
+```bash
+# 種類: 簡潔な説明
+
+feat: 新機能の追加
+fix: バグ修正
+docs: ドキュメント更新
+style: コードスタイルの修正
+refactor: リファクタリング
+test: テスト追加・修正
+chore: その他の変更
+```
+
+## ブランチ戦略
+
+```
+main (本番環境)
+├── develop (開発環境)
+    ├── feature/login
+    ├── feature/dashboard
+    └── hotfix/critical-bug
+```
+
+## 便利なGitコマンド
+
+```bash
+# ステージングエリアの確認
+git status
+
+# 差分確認
+git diff
+
+# ログ確認
+git log --oneline --graph
+
+# ブランチ一覧
+git branch -a
+
+# リモートの変更取得
+git fetch
+git pull
+```
+
+適切なGitワークフローを導入することで、チーム開発の効率が大幅に向上します。

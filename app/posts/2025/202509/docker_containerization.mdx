@@ -1,0 +1,129 @@
+---
+title: "Dockerコンテナ化入門"
+publishedAt: 2025-09-24
+updatedAt: 2025-09-24
+tags: ["Docker", "コンテナ", "DevOps", "インフラ"]
+description: "Dockerを使ったアプリケーションのコンテナ化について、基本概念から実践的な使い方まで解説します。"
+image: /assets/sample.jpg
+---
+
+# Dockerコンテナ化入門
+
+Dockerを使ってアプリケーションを効率的にコンテナ化する方法を学びましょう。
+
+## Dockerfileの基本
+
+```dockerfile
+# Node.jsアプリケーションの例
+FROM node:18-alpine
+
+WORKDIR /app
+
+# 依存関係をコピー
+COPY package*.json ./
+RUN npm ci --only=production
+
+# アプリケーションコードをコピー
+COPY . .
+
+# ポートを公開
+EXPOSE 3000
+
+# 非rootユーザーで実行
+USER node
+
+CMD ["npm", "start"]
+```
+
+## docker-composeでの開発環境
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - database
+
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+```
+
+## 基本的なDockerコマンド
+
+```bash
+# イメージをビルド
+docker build -t myapp .
+
+# コンテナを起動
+docker run -p 3000:3000 myapp
+
+# バックグラウンドで起動
+docker run -d -p 3000:3000 --name myapp-container myapp
+
+# コンテナの状態確認
+docker ps
+
+# ログの確認
+docker logs myapp-container
+
+# コンテナに入る
+docker exec -it myapp-container sh
+
+# docker-composeの使用
+docker-compose up -d
+docker-compose logs -f
+docker-compose down
+```
+
+## マルチステージビルド
+
+```dockerfile
+# ビルドステージ
+FROM node:18 AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# 本番ステージ
+FROM node:18-alpine
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+Dockerを活用することで、開発から本番まで一貫した環境を構築できます。

@@ -1,0 +1,74 @@
+---
+title: "React Hooksの基本的な使い方"
+publishedAt: 2025-09-17
+updatedAt: 2025-09-17
+tags: ["React", "Hooks", "JavaScript", "フロントエンド"]
+description: "React Hooksの基本的な使い方について、useState、useEffect、useContextを中心に解説します。"
+image: /assets/sample.jpg
+---
+
+# React Hooksの基本的な使い方
+
+React Hooksは関数コンポーネントでstateやライフサイクルメソッドを使用できるようにする機能です。
+
+## useState
+
+```jsx
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+    </div>
+  )
+}
+```
+
+## useEffect
+
+```jsx
+import { useEffect, useState } from 'react'
+
+function DataFetcher() {
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/data')
+      .then(res => res.json())
+      .then(setData)
+  }, []) // 空の依存配列で初回のみ実行
+
+  return <div>{data ? JSON.stringify(data) : 'Loading...'}</div>
+}
+```
+
+## useContext
+
+```jsx
+import { createContext, useContext } from 'react'
+
+const ThemeContext = createContext('light')
+
+function App() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Button />
+    </ThemeContext.Provider>
+  )
+}
+
+function Button() {
+  const theme = useContext(ThemeContext)
+  return <button className={theme}>Click me</button>
+}
+```
+
+## まとめ
+
+React Hooksを使うことで、クラスコンポーネントを使わずに状態管理やライフサイクル処理が可能になります。

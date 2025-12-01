@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* CSS変数の定義 */
+:root {
+  color-scheme: light;
+  /* Color Palette */
+  --color-neutral-50: oklch(0.985 0 0);
+  --color-neutral-100: oklch(0.97 0 0);
+  --color-neutral-200: oklch(0.922 0 0);
+  --color-neutral-300: oklch(0.87 0 0);
+  --color-neutral-400: oklch(0.708 0 0);
+  --color-neutral-500: oklch(0.556 0 0);
+  --color-neutral-600: oklch(0.439 0 0);
+  --color-neutral-700: oklch(0.371 0 0);
+  --color-neutral-750: oklch(0.32 0 0);
+  --color-neutral-800: oklch(0.269 0 0);
+  --color-neutral-900: oklch(0.205 0 0);
+  --color-neutral-950: oklch(0.145 0 0);
+
+  --color-lime-50: oklch(0.986 0.031 120.757);
+  --color-lime-100: oklch(0.967 0.067 122.328);
+  --color-lime-200: oklch(0.938 0.127 124.321);
+  --color-lime-300: oklch(0.897 0.196 126.665);
+  --color-lime-400: oklch(0.841 0.238 128.85);
+  --color-lime-500: oklch(0.768 0.233 130.85);
+  --color-lime-600: oklch(0.648 0.2 131.684);
+  --color-lime-700: oklch(0.532 0.157 131.589);
+  --color-lime-800: oklch(0.453 0.124 130.933);
+  --color-lime-900: oklch(0.405 0.101 131.063);
+  --color-lime-950: oklch(0.274 0.072 132.109);
+
+  --color-light-300: oklch(98% 0.002 0);
+  --color-light-500: oklch(100% 0 0);
+  --color-light-700: oklch(95% 0.003 0);
+
+  --color-dark-300: oklch(45% 0.01 0);
+  --color-dark-500: oklch(25% 0.01 0);
+  --color-dark-700: oklch(15% 0.01 0);
+
+  /* Size Scale */
+  --size-25: .0625rem;
+  --size-50: .125rem;
+  --size-75: .1875rem;
+  --size-100: .25rem;
+  --size-150: .375rem;
+  --size-200: .5rem;
+  --size-250: .625rem;
+  --size-300: .75rem;
+  --size-350: .875rem;
+  --size-400: 1rem;
+  --size-450: 1.125rem;
+  --size-500: 1.25rem;
+  --size-600: 1.5rem;
+  --size-700: 1.75rem;
+  --size-800: 2rem;
+  --size-900: 2.25rem;
+  --size-1000: 2.5rem;
+  --size-1200: 3rem;
+  --size-1400: 3.5rem;
+  --size-1600: 4rem;
+
+  /* Window Size */
+  --window-sm: 480px;
+  --window-md: 768px;
+  --window-lg: 1024px;
+  --window-xl: 1280px;
+
+  /* Contents Size */
+  --content-max-width: 1000px;
+  --content-min-width: 320px;
+
+  /* Typography */
+  --font-sans: "Jost", system-ui, sans-serif;
+  --text-sm: var(--size-350);
+  --text-base: var(--size-400);
+  --text-lg: var(--size-500);
+  --text-xl: var(--size-700);
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+   /* Color */
+  --color-primary: var(--color-lime-300);
+  --color-primary-lighten: var(--color-lime-200);
+  --color-primary-darken: var(--color-lime-400);
+
+  --color-background: light-dark(var(--color-neutral-200), var(--color-neutral-900));
+  --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+
+  --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+  --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-300));
+  --color-shadow-light: var(--color-neutral-300);
+  --color-shadow-dark: var(--color-neutral-700);
+
+  /* Shape */
+  --round-sm: var(--size-100);
+  --round-md: var(--size-200);
+  --round-lg: var(--size-300);
+  --round-xl: var(--size-400);
+  --round-pill: 999em;
+  --round-full: 9999px;
+
+  /* Border */
+  --border-width-thin: 1px;
+  --border-width-thick: 2px;
+  --border-1: var(--border-width-thin) solid var(--color-border);
+  --border-2: var(--border-width-thick) solid var(--color-border);
+  --border-dark-1: var(--border-width-thin) solid var(--color-neutral-800);
+  --border-dark-2: var(--border-width-thick) solid var(--color-neutral-800);
+  --border-light-1: var(--border-width-thin) solid var(--color-neutral-100);
+  --border-light-2: var(--border-width-thick) solid var(--color-neutral-100);
+
+  /* Spacing */
+  --spacing-xs: var(--size-100);
+  --spacing-sm: var(--size-200);
+  --spacing-md: var(--size-400);
+  --spacing-lg: var(--size-600);
+  --spacing-xl: var(--size-800);
+
+  /* Shadow */
+  --shadow-sm: 0 1.5px 3px var(--color-shadow-dark);
+  --shadow-md: 0 3.5px 7px var(--color-shadow-dark);
+  --shadow-lg: 0 7px 15px var(--color-shadow-dark);
+
+  /* Header */
+  --color-header-background: var(--color-neutral-800);
+  --color-header-foreground: var(--color-light-500);
+  --header-shadow: 0 1.5px 0 var(--color-shadow);
+
+  /* Card */
+  --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+  --card-shadow: 0 1.5px 0 var(--color-shadow);
+  --card-shadow-hover: 0 3.5px 0 var(--color-shadow);
+
+  /* Tag */
+  --color-tag-background: var(--color-primary);
+  --color-tag-foreground: var(--color-neutral-800);
+  --tag-shadow: 0 .5px 0 var(--color-shadow-dark);
+  --tag-shadow-hover: 0 1px 0 var(--color-shadow);
+}
+
+/* Dark Mode */
+.dark, 
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ベーススタイル */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1 {
+  font-size: var(--size-700);
+  font-weight: var(--font-bold);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: var(--size-600);
+  font-weight: var(--font-semibold);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h3 {
+  font-size: var(--size-500);
+  font-weight: var(--font-medium);
+  margin: 0;
+}
+

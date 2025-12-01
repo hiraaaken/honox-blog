@@ -1,0 +1,71 @@
+---
+title: "Node.js + Expressでサーバー構築入門"
+publishedAt: 2025-09-19
+updatedAt: 2025-09-19
+tags: ["Node.js", "Express", "サーバー", "バックエンド"]
+description: "Node.jsとExpressフレームワークを使った基本的なWebサーバーの構築方法を解説します。"
+image: /assets/sample.jpg
+---
+
+# Node.js + Expressでサーバー構築入門
+
+Node.jsとExpressを使って、シンプルなWebサーバーを構築する方法を学びましょう。
+
+## セットアップ
+
+```bash
+npm init -y
+npm install express
+```
+
+## 基本的なサーバー
+
+```javascript
+const express = require('express')
+const app = express()
+const port = 3000
+
+app.use(express.json())
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.get('/api/users', (req, res) => {
+  res.json([
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' }
+  ])
+})
+
+app.post('/api/users', (req, res) => {
+  const { name } = req.body
+  const newUser = { id: Date.now(), name }
+  res.status(201).json(newUser)
+})
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`)
+})
+```
+
+## ミドルウェアの活用
+
+```javascript
+// ログ出力ミドルウェア
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`)
+  next()
+})
+
+// 静的ファイル配信
+app.use(express.static('public'))
+
+// エラーハンドリング
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).send('Something broke!')
+})
+```
+
+Expressの豊富な機能を活用して、スケーラブルなWebアプリケーションを構築できます。

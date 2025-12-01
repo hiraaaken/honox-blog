@@ -1,0 +1,176 @@
+---
+title: "REST API設計のベストプラクティス"
+publishedAt: 2025-09-25
+updatedAt: 2025-09-25
+tags: ["API", "REST", "設計", "HTTP"]
+description: "RESTful APIの設計原則と実装時のベストプラクティスについて詳しく解説します。"
+image: /assets/sample.jpg
+---
+
+# REST API設計のベストプラクティス
+
+優れたREST APIを設計するための原則と実践的なテクニックを学びましょう。
+
+## RESTful設計の基本原則
+
+```
+GET    /api/users         # ユーザー一覧取得
+GET    /api/users/123     # 特定ユーザー取得
+POST   /api/users         # ユーザー作成
+PUT    /api/users/123     # ユーザー更新（全体）
+PATCH  /api/users/123     # ユーザー更新（部分）
+DELETE /api/users/123     # ユーザー削除
+
+# リソースの関係性
+GET    /api/users/123/posts      # ユーザーの投稿一覧
+POST   /api/users/123/posts      # ユーザーが投稿作成
+GET    /api/posts/456/comments   # 投稿のコメント一覧
+```
+
+## HTTPステータスコードの適切な使用
+
+```javascript
+// Express.jsでの実装例
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+    
+    if (!user) {
+      return res.status(404).json({ 
+        error: 'User not found' 
+      })
+    }
+    
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Internal server error' 
+    })
+  }
+})
+
+app.post('/api/users', async (req, res) => {
+  try {
+    const { email, name } = req.body
+    
+    // バリデーション
+    if (!email || !name) {
+      return res.status(400).json({
+        error: 'Email and name are required'
+      })
+    }
+    
+    const user = await User.create({ email, name })
+    res.status(201).json(user)
+  } catch (error) {
+    if (error.code === 11000) { // 重複エラー
+      return res.status(409).json({
+        error: 'Email already exists'
+      })
+    }
+    
+    res.status(500).json({ 
+      error: 'Internal server error' 
+    })
+  }
+})
+```
+
+## ページネーションとフィルタリング
+
+```javascript
+app.get('/api/posts', async (req, res) => {
+  const { 
+    page = 1, 
+    limit = 10, 
+    category, 
+    author,
+    search 
+  } = req.query
+  
+  const filters = {}
+  if (category) filters.category = category
+  if (author) filters.author = author
+  if (search) {
+    filters.$text = { $search: search }
+  }
+  
+  const posts = await Post.find(filters)
+    .limit(limit * 1)
+    .skip((page - 1) * limit)
+    .sort({ createdAt: -1 })
+  
+  const total = await Post.countDocuments(filters)
+  
+  res.json({
+    posts,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total,
+      pages: Math.ceil(total / limit)
+    }
+  })
+})
+```
+
+## エラーレスポンスの統一
+
+```javascript
+// エラーレスポンスのフォーマット
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed",
+    "details": [
+      {
+        "field": "email",
+        "message": "Email is required"
+      },
+      {
+        "field": "password",
+        "message": "Password must be at least 8 characters"
+      }
+    ]
+  }
+}
+```
+
+## API認証とセキュリティ
+
+```javascript
+// JWT認証ミドルウェア
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  
+  if (!token) {
+    return res.status(401).json({ 
+      error: 'Access token required' 
+    })
+  }
+  
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ 
+        error: 'Invalid token' 
+      })
+    }
+    
+    req.user = user
+    next()
+  })
+}
+
+// レート制限
+const rateLimit = require('express-rate-limit')
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分
+  max: 100 // 最大100リクエスト
+})
+
+app.use('/api/', limiter)
+```
+
+適切なAPI設計により、保守性と拡張性に優れたシステムを構築できます。

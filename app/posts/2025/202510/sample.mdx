@@ -1,0 +1,47 @@
+---
+title: "TypeScriptにおける構造的部分型とは？"
+publishedAt: 2025-10-16
+updatedAt: 2025-10-16
+tags: ["TypeScript", "型システム", "部分型", "構造的型付け"]
+description: "TypeScriptが採用している構造的部分型について、コード例を交えて解説します。"
+image: /assets/sample.jpg
+---
+
+# TypeScriptにおける構造的部分型とは？
+
+TypeScript の型システムは **構造的型付け (structural typing)** に基づいています。  
+これは **名前** ではなく **構造（プロパティやメソッドの形）** で互換性を判断する方式です。
+
+
+## 例: オブジェクトの互換性
+
+```ts
+type Person = {
+  name: string
+}
+
+type User = {
+  name: string
+  age: number
+}
+
+const u: User = { name: "Alice", age: 20 }
+
+// User型はPerson型の構造を満たしているので代入可能
+const p: Person = u
+
+## 関数の例
+```typescript
+type Logger = (msg: string) => void
+type DetailedLogger = (msg: string, level: number) => void
+
+// 引数が少ない関数を、多い関数に代入するのはOK
+const log1: Logger = (msg) => console.log(msg)
+const log2: DetailedLogger = log1
+```
+
+## まとめ
+
+- TypeScript は **構造的部分型** を採用している
+- 名前ではなく **型の形（構造）** で互換性を判断
+- オブジェクトや関数の代入チェックに大きく影響する
