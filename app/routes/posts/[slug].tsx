@@ -1,25 +1,25 @@
 import { createRoute } from "honox/factory";
 import { getPostBySlug } from "../../lib/post";
 import { Tag } from "../../components/Tag";
-import { css } from 'hono/css'
+import { css } from "hono/css";
 
 const postArticle = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 7rem var(--size-600) 0;
+  padding: 8rem var(--size-600) 0;
   box-sizing: border-box;
   width: 100%;
   
-  @media (max-width: 768px) {
-    padding: 5rem var(--size-400) 0;
+  @media (max-width: var(--window-md)) {
+    padding: 6rem var(--size-500) 0;
     max-width: 100vw;
     overflow-x: hidden;
   }
   
-  @media (max-width: 480px) {
+  @media (max-width: var(--window-sm)) {
     padding: 4rem var(--size-300) 0;
   }
-`
+`;
 
 const postHeader = css`
   margin-bottom: var(--size-800);
@@ -31,7 +31,7 @@ const postHeader = css`
     margin-bottom: var(--size-200);
     line-height: 1.2;
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       font-size: clamp(var(--size-500), 5vw, var(--size-600));
     }
   }
@@ -68,7 +68,7 @@ const postHeader = css`
       display: block;
     }
   }
-`
+`;
 
 const postContent = css`
   font-size: clamp(var(--text-base), 2.5vw, var(--text-lg));
@@ -90,7 +90,7 @@ const postContent = css`
       margin-top: 0;
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       margin-top: var(--size-600);
       margin-bottom: var(--size-300);
     }
@@ -103,7 +103,7 @@ const postContent = css`
     transition: color 0.2s ease;
     position: relative;
     
-    @media (hover: hover) {
+    @media (hover: hover) and (min-width: calc(var(--window-md) + 1px)) {
       &:hover {
         color: light-dark(var(--color-lime-600), var(--color-lime-400));
         
@@ -117,12 +117,18 @@ const postContent = css`
         }
       }
     }
+    
+    @media (hover: hover) and (max-width: var(--window-md)) {
+      &:hover {
+        color: light-dark(var(--color-lime-600), var(--color-lime-400));
+      }
+    }
   }
   
   h1 { 
     font-size: clamp(var(--size-600), 4vw, var(--size-900)); 
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       font-size: clamp(var(--size-500), 5vw, var(--size-600));
     }
   }
@@ -131,21 +137,21 @@ const postContent = css`
     padding-bottom: var(--size-150);
     border-bottom: 2px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       font-size: clamp(var(--size-400), 4vw, var(--size-500));
     }
   }
   h3 { 
     font-size: clamp(var(--size-450), 3vw, var(--size-700)); 
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       font-size: clamp(var(--size-350), 3.5vw, var(--size-450));
     }
   }
   h4 { 
     font-size: clamp(var(--size-400), 2.5vw, var(--size-600)); 
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       font-size: clamp(var(--size-300), 3vw, var(--size-400));
     }
   }
@@ -154,7 +160,7 @@ const postContent = css`
     margin-bottom: var(--size-600);
     text-align: justify;
     
-    @media (max-width: 640px) {
+    @media (max-width: var(--window-sm)) {
       text-align: left;
     }
   }
@@ -177,7 +183,7 @@ const postContent = css`
     margin-bottom: var(--size-600);
     padding-left: var(--size-600);
     
-    @media (max-width: 640px) {
+    @media (max-width: var(--window-sm)) {
       padding-left: var(--size-500);
     }
   }
@@ -199,7 +205,7 @@ const postContent = css`
     border-radius: 0 var(--round-md) var(--round-md) 0;
     color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
     
-    @media (max-width: 640px) {
+    @media (max-width: var(--window-sm)) {
       padding-left: var(--size-400);
       margin: var(--size-600) 0;
     }
@@ -223,7 +229,7 @@ const postContent = css`
     margin: var(--size-800) 0;
     border: 1px solid var(--color-border);
     
-    @media (max-width: 640px) {
+    @media (max-width: var(--window-sm)) {
       padding: var(--size-400);
       margin: var(--size-600) 0;
       border-radius: var(--round-sm);
@@ -255,7 +261,7 @@ const postContent = css`
     white-space: nowrap;
     max-width: 100%;
     
-    @media (max-width: 768px) {
+    @media (max-width: var(--window-md)) {
       font-size: var(--text-sm);
       margin: var(--size-400) -var(--size-300);
       width: calc(100% + var(--size-600));
@@ -279,7 +285,7 @@ const postContent = css`
     background: linear-gradient(to right, transparent, var(--color-primary), transparent);
     margin: var(--size-800) 0;
   }
-`
+`;
 
 export default createRoute(async (c) => {
   const slug = c.req.param("slug");
@@ -289,7 +295,8 @@ export default createRoute(async (c) => {
     return c.notFound();
   }
 
-  const { title, description, publishedAt, updatedAt, tags, image, Content } = post;
+  const { title, description, publishedAt, updatedAt, tags, image, Content } =
+    post;
 
   return c.render(
     <>
@@ -298,11 +305,15 @@ export default createRoute(async (c) => {
           <h1>{title}</h1>
           <p class="description">{description}</p>
           <div class="meta">
-            <time dateTime={publishedAt}>Published at: {new Date(publishedAt).toLocaleDateString("ja-JP")}</time>
+            <time dateTime={publishedAt}>
+              Published at: {new Date(publishedAt).toLocaleDateString("ja-JP")}
+            </time>
             {updatedAt && (
               <>
                 {" | "}
-                <time dateTime={updatedAt}>Updated at: {new Date(updatedAt).toLocaleDateString("ja-JP")}</time>
+                <time dateTime={updatedAt}>
+                  Updated at: {new Date(updatedAt).toLocaleDateString("ja-JP")}
+                </time>
               </>
             )}
           </div>
@@ -321,7 +332,6 @@ export default createRoute(async (c) => {
           <Content />
         </section>
       </article>
-    </>
-  )
-})
-
+    </>,
+  );
+});
