@@ -12,6 +12,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Package Management**
 - This project uses `pnpm` as the package manager
+- `pnpm install` - Install dependencies
+
+**Docker Development**
+- `docker-compose up` - Start development server in Docker container (runs on port 5173)
 
 ## Architecture
 
@@ -37,6 +41,7 @@ This is a **HonoX** application - a full-stack framework built on Hono that runs
 
 ### Styling System
 - **CSS-in-JS**: Uses `css` from `hono/css` for component styles (styled-components pattern)
+- **Tailwind CSS**: Uses Tailwind v4 for utility-first styling via Vite plugin
 - **Global Styles**: `app/base-styles.css` with CSS custom properties for theming
 - **Theme System**: Light/dark mode via CSS variables that switch based on `data-theme` attribute
 - **Responsive Design**: Container queries with `@container (max-width: 800px)` pattern
@@ -74,6 +79,13 @@ const componentClass = css`
 - **SSG**: Static site generation enabled for better performance
 
 ### Development Setup
-- **TypeScript**: Configured for ESNext with Hono JSX
-- **MDX**: Frontmatter processing with remark plugins
+- **TypeScript**: Configured for ESNext with Hono JSX (`jsxImportSource: "hono/jsx"`)
+- **MDX**: Frontmatter processing with remark plugins + Shiki syntax highlighting (GitHub Dark theme)
 - **Alias**: `@/` maps to `app/` directory
+- **No Testing Framework**: This project doesn't include test configurations
+
+### Blog Post Structure
+- **Location**: `app/posts/YYYY/YYYYMM/slug.mdx` format
+- **Frontmatter Required**: `title`, `description`, `publishedAt`, `tags[]`
+- **Auto-discovery**: Uses `import.meta.glob()` for dynamic import
+- **Sorting**: Posts sorted by `publishedAt` descending

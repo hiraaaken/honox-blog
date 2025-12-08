@@ -9,9 +9,13 @@
   },
   "private": true,
   "dependencies": {
+    "@shikijs/rehype": "^3.18.0",
     "hono": "^4.9.8",
     "honox": "^0.1.47",
-    "lineicons": "^1.3.2"
+    "lineicons": "^1.3.2",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "shiki": "^3.18.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
