@@ -6,6 +6,9 @@ import mdx from '@mdx-js/rollup'
 import ssg from '@hono/vite-ssg'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
+import rehypeShiki from '@shikijs/rehype'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 
 const entry = "/app/server.ts"
 
@@ -24,7 +27,19 @@ export default defineConfig({
     ssg({ entry }),
     mdx({
       jsxImportSource: 'hono/jsx',
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter]
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+      rehypePlugins: [
+        rehypeSlug,
+        [rehypeAutolinkHeadings, {
+          behavior: 'wrap',
+          properties: {
+            className: ['heading-link']
+          }
+        }],
+        [rehypeShiki, {
+          theme: 'github-dark'
+        }]
+      ]
     }),
   ]
 })
