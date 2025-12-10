@@ -144,9 +144,9 @@
 /* Mobile Typography */
 @media (max-width: 768px) {
   :root {
-    --text-sm: var(--size-300);
-    --text-base: var(--size-350);
-    --text-lg: var(--size-450);
+    --text-sm: var(--size-350);
+    --text-base: var(--size-400);
+    --text-lg: var(--size-500);
   }
   
   h1 {
@@ -160,6 +160,10 @@
   h3 {
     font-size: var(--size-450);
   }
+}
+
+@view-transition {
+  navigation: auto;
 }
 
 /* Dark Mode */

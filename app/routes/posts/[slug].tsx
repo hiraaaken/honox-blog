@@ -1,17 +1,17 @@
 import { createRoute } from "honox/factory";
-import { getPostBySlug } from "../../lib/post";
+import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
 import { css } from "hono/css";
 
 const postArticle = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 8rem var(--size-600) 0;
+  padding: 8rem var(--size-600) 2rem;
   box-sizing: border-box;
   width: 100%;
   
   @media (max-width: var(--window-md)) {
-    padding: 6rem var(--size-500) 0;
+    padding: 6rem var(--size-500) 2rem;
     max-width: 100vw;
     overflow-x: hidden;
   }
@@ -57,10 +57,11 @@ const postHeader = css`
   }
   
   .hero-image {
-    margin-top: var(--size-600);
+    margin: 0 auto var(--size-600) auto;
     border-radius: var(--round-md);
     overflow: hidden;
     box-shadow: 0 4px 20px light-dark(var(--color-shadow-light), var(--color-shadow-dark));
+    max-width: 600px;
     
     img {
       width: 100%;
@@ -71,8 +72,6 @@ const postHeader = css`
 `;
 
 const postContent = css`
-  font-size: clamp(var(--text-base), 2.5vw, var(--text-lg));
-  line-height: 1.75;
   color: var(--color-foreground);
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -133,7 +132,7 @@ const postContent = css`
     }
   }
   h2 { 
-    font-size: clamp(var(--size-500), 3.5vw, var(--size-800));
+    font-size: clamp(var(--size-500), 3.5vw, var(--size-700));
     padding-bottom: var(--size-150);
     border-bottom: 2px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
     
@@ -189,7 +188,6 @@ const postContent = css`
   }
   
   li {
-    margin-bottom: var(--size-200);
     line-height: 1.6;
   }
   
@@ -216,21 +214,23 @@ const postContent = css`
     color: light-dark(var(--color-neutral-800), var(--color-neutral-200));
     padding: var(--size-50) var(--size-150);
     border-radius: var(--round-sm);
-    font-size: 0.9em;
+    font-size: 1em;
     font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
     border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
   }
   
   pre {
     background: var(--color-dark-700) !important;
-    padding: var(--size-600);
+    padding: var(--size-700);
     border-radius: var(--round-md);
     overflow-x: auto;
     margin: var(--size-800) 0;
     border: 1px solid var(--color-border);
+    line-height: 1.6;
+    font-size: 1em;
     
     @media (max-width: var(--window-sm)) {
-      padding: var(--size-400);
+      padding: var(--size-500);
       margin: var(--size-600) 0;
       border-radius: var(--round-sm);
     }
@@ -242,6 +242,8 @@ const postContent = css`
     border: none;
     color: inherit;
     font-family: inherit;
+    font-size: 1.2em;
+    line-height: inherit;
   }
   
   img {
@@ -287,6 +289,70 @@ const postContent = css`
   }
 `;
 
+const postNavigation = css`
+  margin-top: var(--size-1000);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--size-600);
+  
+  @media (max-width: var(--window-md)) {
+    flex-direction: column;
+    gap: var(--size-500);
+  }
+  
+  .nav-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    padding: var(--size-300);
+    background-color: var(--color-card-background);
+    border: 2px solid var(--color-border);
+    border-radius: 1rem;
+    box-shadow: var(--card-shadow);
+    transform: translateY(0) scale(1);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    flex: 1;
+    color: inherit;
+    
+    &.prev {
+      text-align: left;
+    }
+    
+    &.next {
+      text-align: right;
+    }
+    
+    @media (hover: hover) {
+      &:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: var(--card-shadow-hover);
+      }
+    }
+    
+    .nav-direction {
+      font-size: var(--text-sm);
+      color: light-dark(var(--color-neutral-500), var(--color-neutral-400));
+      margin-bottom: var(--size-200);
+      font-weight: var(--font-medium);
+    }
+    
+    .nav-title {
+      font-size: var(--text-base);
+      color: var(--color-foreground);
+      font-weight: var(--font-semibold);
+      line-height: 1.4;
+      
+      @media (max-width: var(--window-sm)) {
+        font-size: var(--text-sm);
+      }
+    }
+  }
+  
+  .nav-placeholder {
+    flex: 1;
+  }
+`;
+
 export default createRoute(async (c) => {
   const slug = c.req.param("slug");
   const post = await getPostBySlug(slug);
@@ -298,10 +364,17 @@ export default createRoute(async (c) => {
   const { title, description, publishedAt, updatedAt, tags, image, Content } =
     post;
 
+  const { prev, next } = await getAdjacentPosts(slug);
+
   return c.render(
     <>
       <article class={postArticle}>
         <header class={postHeader}>
+          {image && (
+            <div class="hero-image">
+              <img src={image} alt={title} />
+            </div>
+          )}
           <h1>{title}</h1>
           <p class="description">{description}</p>
           <div class="meta">
@@ -322,15 +395,28 @@ export default createRoute(async (c) => {
               <Tag tag={tag} size="sm" key={tag} />
             ))}
           </div>
-          {image && (
-            <div class="hero-image">
-              <img src={image} alt={title} />
-            </div>
-          )}
         </header>
         <section class={postContent}>
           <Content />
         </section>
+        <nav class={postNavigation}>
+          {prev ? (
+            <a href={`/posts/${prev.slug}`} class="nav-link prev">
+              <div class="nav-direction">← 前の記事</div>
+              <div class="nav-title">{prev.title}</div>
+            </a>
+          ) : (
+            <div class="nav-placeholder"></div>
+          )}
+          {next ? (
+            <a href={`/posts/${next.slug}`} class="nav-link next">
+              <div class="nav-direction">次の記事 →</div>
+              <div class="nav-title">{next.title}</div>
+            </a>
+          ) : (
+            <div class="nav-placeholder"></div>
+          )}
+        </nav>
       </article>
     </>,
   );
