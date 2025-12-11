@@ -1,6 +1,7 @@
 import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
+import { Breadcrumb } from "../../components/Breadcrumb";
 import { css } from "hono/css";
 
 const postArticle = css`
@@ -369,6 +370,13 @@ export default createRoute(async (c) => {
   return c.render(
     <>
       <article class={postArticle}>
+        <Breadcrumb
+          items={[
+            { label: 'ホーム', href: '/' },
+            { label: '記事一覧', href: '/posts' },
+            { label: title },
+          ]}
+        />
         <header class={postHeader}>
           {image && (
             <div class="hero-image">
