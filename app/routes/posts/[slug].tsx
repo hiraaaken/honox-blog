@@ -10,33 +10,29 @@ const postArticle = css`
   box-sizing: border-box;
   width: 100%;
   
-  @media (max-width: var(--window-md)) {
+  @media (max-width: 768px) {
     padding: 6rem var(--size-500) 2rem;
     max-width: 100vw;
     overflow-x: hidden;
-  }
-  
-  @media (max-width: var(--window-sm)) {
-    padding: 4rem var(--size-300) 0;
   }
 `;
 
 const postHeader = css`
   margin-bottom: var(--size-800);
   
-  h1 {
+  >.title {
     font-size: clamp(var(--size-600), 4vw, var(--size-1000));
     font-weight: var(--font-bold);
     color: var(--color-foreground);
     margin-bottom: var(--size-200);
     line-height: 1.2;
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       font-size: clamp(var(--size-500), 5vw, var(--size-600));
     }
   }
   
-  .description {
+  >.description {
     font-size: var(--text-lg);
     color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
     margin-bottom: var(--size-400);
@@ -89,45 +85,60 @@ const postContent = css`
       margin-top: 0;
     }
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       margin-top: var(--size-600);
       margin-bottom: var(--size-300);
     }
   }
   
-  .heading-link {
+  :is(h1, h2, h3, h4, h5, h6) .heading-link {
     color: inherit;
     text-decoration: none;
     border: none;
+    border-bottom: none;
     transition: color 0.2s ease;
     position: relative;
-    
-    @media (hover: hover) and (min-width: calc(var(--window-md) + 1px)) {
-      &:hover {
-        color: light-dark(var(--color-lime-600), var(--color-lime-400));
-        
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+      
+      &::before,
+      &::after {
+        position: absolute;
+        font-weight: normal;
+        color: inherit;
+      }
+      
+      /* 768px以上の場合：左に表示 */
+      @container style(--inline-size-md: var(--window-md)) {
         &::before {
           content: '#';
-          position: absolute;
-          left: -1.2em;
-          font-weight: normal;
-          color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-          opacity: 0.8;
+          left: -0.8em;
+        }
+        &::after {
+          content: none;
+        }
+      }
+      
+      /* 768px未満の場合：右に表示 */
+      @container style(--inline-size-md: 100vi) {
+        &::before {
+          content: none;
+        }
+        &::after {
+          content: '#';
+          right: -0.8em;
         }
       }
     }
-    
-    @media (hover: hover) and (max-width: var(--window-md)) {
-      &:hover {
-        color: light-dark(var(--color-lime-600), var(--color-lime-400));
-      }
-    }
+  }
   }
   
   h1 { 
     font-size: clamp(var(--size-600), 4vw, var(--size-900)); 
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       font-size: clamp(var(--size-500), 5vw, var(--size-600));
     }
   }
@@ -136,21 +147,21 @@ const postContent = css`
     padding-bottom: var(--size-150);
     border-bottom: 2px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       font-size: clamp(var(--size-400), 4vw, var(--size-500));
     }
   }
   h3 { 
     font-size: clamp(var(--size-450), 3vw, var(--size-700)); 
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       font-size: clamp(var(--size-350), 3.5vw, var(--size-450));
     }
   }
   h4 { 
     font-size: clamp(var(--size-400), 2.5vw, var(--size-600)); 
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       font-size: clamp(var(--size-300), 3vw, var(--size-400));
     }
   }
@@ -159,21 +170,19 @@ const postContent = css`
     margin-bottom: var(--size-600);
     text-align: justify;
     
-    @media (max-width: var(--window-sm)) {
+    @media (max-width: 480px) {
       text-align: left;
     }
   }
   
   a {
-    color: light-dark(var(--color-lime-600), var(--color-lime-400));
-    text-decoration: none;
-    border-bottom: 1px solid currentColor;
+    color: light-dark(var(--color-secondary), var(--color-secondary-lighten));
+    text-decoration: underline;
     transition: all 0.2s ease;
     
     @media (hover: hover) {
       &:hover {
-        color: light-dark(var(--color-lime-700), var(--color-lime-300));
-        border-bottom-width: 2px;
+        text-decoration: none;
       }
     }
   }
@@ -182,7 +191,7 @@ const postContent = css`
     margin-bottom: var(--size-600);
     padding-left: var(--size-600);
     
-    @media (max-width: var(--window-sm)) {
+    @media (max-width: 480px) {
       padding-left: var(--size-500);
     }
   }
@@ -203,7 +212,7 @@ const postContent = css`
     border-radius: 0 var(--round-md) var(--round-md) 0;
     color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
     
-    @media (max-width: var(--window-sm)) {
+    @media (max-width: 480px) {
       padding-left: var(--size-400);
       margin: var(--size-600) 0;
     }
@@ -220,7 +229,7 @@ const postContent = css`
   }
   
   pre {
-    background: var(--color-dark-700) !important;
+    background: var(--color-dark-700);
     padding: var(--size-700);
     border-radius: var(--round-md);
     overflow-x: auto;
@@ -228,11 +237,14 @@ const postContent = css`
     border: 1px solid var(--color-border);
     line-height: 1.6;
     font-size: 1em;
+    max-width: 100%;
+    box-sizing: border-box;
     
-    @media (max-width: var(--window-sm)) {
+    @media (max-width: 480px) {
       padding: var(--size-500);
       margin: var(--size-600) 0;
       border-radius: var(--round-sm);
+      font-size: 0.9em;
     }
   }
   
@@ -254,19 +266,25 @@ const postContent = css`
     box-shadow: 0 4px 12px light-dark(var(--color-shadow-light), var(--color-shadow-dark));
   }
   
+  .table-wrapper {
+    overflow-x: auto;
+    margin: var(--size-600) 0;
+    border-radius: var(--round-md);
+    border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    
+    @media (max-width: 768px) {
+      margin: var(--size-400) 0;
+    }
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: var(--size-600) 0;
-    overflow-x: auto;
-    display: block;
-    white-space: nowrap;
-    max-width: 100%;
+    margin: 0;
+    min-width: max-content;
     
-    @media (max-width: var(--window-md)) {
+    @media (max-width: 768px) {
       font-size: var(--text-sm);
-      margin: var(--size-400) -var(--size-300);
-      width: calc(100% + var(--size-600));
     }
   }
   
@@ -295,7 +313,7 @@ const postNavigation = css`
   justify-content: space-between;
   gap: var(--size-600);
   
-  @media (max-width: var(--window-md)) {
+  @media (max-width: 768px) {
     flex-direction: column;
     gap: var(--size-500);
   }
@@ -342,7 +360,7 @@ const postNavigation = css`
       font-weight: var(--font-semibold);
       line-height: 1.4;
       
-      @media (max-width: var(--window-sm)) {
+      @media (max-width: 480px) {
         font-size: var(--text-sm);
       }
     }
@@ -375,7 +393,7 @@ export default createRoute(async (c) => {
               <img src={image} alt={title} />
             </div>
           )}
-          <h1>{title}</h1>
+          <h1 class="title">{title}</h1>
           <p class="description">{description}</p>
           <div class="meta">
             <time dateTime={publishedAt}>
