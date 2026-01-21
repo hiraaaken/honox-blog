@@ -181,7 +181,7 @@
   --header-shadow: 0 1.5px 0 var(--color-shadow);
 
   /* Card */
-  --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
+  --color-card-background: light-dark(var(--color-neutral-50), var(--color-neutral-700));
   --card-shadow: 0 2px 0 var(--color-shadow);
   --card-shadow-hover: 0 4px 0 var(--color-shadow);
 
