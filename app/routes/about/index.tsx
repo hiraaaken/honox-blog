@@ -18,7 +18,7 @@ const aboutHeader = css`
 const aboutCard = css`
   border: 2px solid var(--color-border);
   border-radius: 1rem;
-  box-shadow: 1.5px 3px 0 var(--color-card-shadow);
+  box-shadow: 1.5px 3px 0 var(--color-shadow);
   padding: 2rem;
   background-color: var(--color-card-background);
   color: var(--color-card-foreground);
@@ -41,7 +41,7 @@ const profileImage = css`
   height: 5rem;
   border-radius: 9999px;
   border: 2px solid var(--color-border);
-  box-shadow: 1px 2px 0 var(--color-card-shadow);
+  box-shadow: 1px 2px 0 var(--color-shadow);
 `;
 
 const profileInfo = css`
