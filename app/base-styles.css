@@ -133,12 +133,14 @@
 
   --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-950));
   --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-900));
+  --color-shadow-light: var(--color-neutral-600);
   --color-shadow-dark: var(--color-neutral-700);
 
   /* Shape */
   --round-sm: var(--size-100);
   --round-md: var(--size-200);
   --round-lg: var(--size-300);
+  --round-xl: var(--size-400);
   --round-pill: 999em;
   --round-full: 9999px;
 
