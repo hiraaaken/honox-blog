@@ -6,8 +6,8 @@ const postCardClass = css`
   display: grid;
   grid-template-rows: subgrid;
   grid-row: span 3;
-  gap: var(--size-200);
-  padding: var(--size-600);
+  gap: var(--size-100);
+  padding: var(--size-350);
   background-color: var(--color-card-background);
   border: 2px solid var(--color-border);
   border-radius: 1rem;
@@ -27,20 +27,21 @@ const postCardClass = css`
     display: inline-block;
     flex: 1;
   }
-`
+`;
 
 const postCardTitleClass = css`
   display: inline;
   box-decoration-break: clone;
   background: var(--color-primary);
   color: var(--color-neutral-800);
-  padding: 0 var(--size-200);
-`
+  font-size: var(--text-lg);
+  padding: 0 0.5rem;
+`;
 
 const postCardDescriptionClass = css`
   margin-bottom: 1rem;
-  font-size: 0.875rem;
-`
+  font-size: var(--text-body-sm);
+`;
 
 const footerClass = css`
   display: flex;
@@ -59,24 +60,34 @@ const footerClass = css`
     position: relative;
     z-index: 2;
   }
-`
+
+  & time {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    text-align: right;
+  }
+`;
 
 const cardLinkClass = css`
   color: inherit;
   text-decoration: none;
+  text-wrap: balance;
 
   &::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 1;
   }
-`
+`;
 
-export const PostCard = ({ slug, title, image, tags, description, publishedAt }: PostSummary) => {
+export const PostCard = ({
+  slug,
+  title,
+  tags,
+  description,
+  publishedAt,
+}: PostSummary) => {
   return (
     <article class={postCardClass}>
       <header>
@@ -96,5 +107,5 @@ export const PostCard = ({ slug, title, image, tags, description, publishedAt }:
         <time>{new Date(publishedAt).toLocaleDateString("ja-JP")}</time>
       </div>
     </article>
-  )
-}
+  );
+};

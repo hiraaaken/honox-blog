@@ -33,7 +33,7 @@ const postHeader = css`
   }
   
   >.description {
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
     color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
     margin-bottom: var(--size-400);
     line-height: 1.6;

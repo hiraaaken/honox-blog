@@ -20,7 +20,7 @@ const profileSectionClass = css`
   }
   
   h3 {
-    font-size: 1.125rem;
+    font-size: var(--text-body-lg);
     font-weight: bold;
     margin: 0;
     color: var(--color-foreground);
@@ -35,7 +35,7 @@ const aboutCardClass = css`
   padding: var(--size-600);
 `
 const aboutTextClass = css`
-  font-size: 0.875rem;
+  font-size: var(--text-body-sm);
   line-height: 1.5;
   margin-bottom: 1rem;
   opacity: 0.8;

@@ -26,24 +26,25 @@ This is a **HonoX** application - a full-stack framework built on Hono that runs
 - **Client Entry**: `app/client.ts` - Client-side hydration entry point
 - **Routing**: File-based routing in `app/routes/` directory
 - **Renderer**: `app/routes/_renderer.tsx` - Global JSX renderer with HTML layout
-- **Islands Architecture**: Interactive components in `app/islands/`
+- **Islands Architecture**: Interactive components in `app/islands/` use React-like hooks (`useState`, `useEffect`) from `hono/jsx`
+- **Static Components**: Regular components in `app/components/` are server-rendered only
 
 ### Key Patterns
 - **Route Files**: Use `createRoute()` from `honox/factory` for route handlers
 - **JSX**: Uses Hono's JSX runtime (`hono/jsx`) instead of React
 - **MDX Blog Posts**: Blog posts stored as MDX files in `app/posts/YYYY/YYYYMM/` structure with frontmatter metadata
-- **Post Management**: `app/lib/post.ts` handles dynamic imports and sorting of MDX files
 
 ### Deployment Target
 - **Platform**: Cloudflare Workers
 - **Config**: `wrangler.jsonc` with Node.js compatibility enabled
 - **Assets**: Served from `dist/` directory after build
+- **SSG**: Static site generation via `@hono/vite-ssg`
 
 ### Styling System
 - **CSS-in-JS**: Uses `css` from `hono/css` for component styles (styled-components pattern)
 - **Tailwind CSS**: Uses Tailwind v4 for utility-first styling via Vite plugin
 - **Global Styles**: `app/base-styles.css` with CSS custom properties for theming
-- **Theme System**: Light/dark mode via CSS variables that switch based on `data-theme` attribute
+- **Theme System**: Light/dark mode via `data-theme` attribute on `<html>` and `light-dark()` CSS function
 - **Responsive Design**: Container queries with `@container (max-width: 800px)` pattern
 - **Hover Interactions**: Use `@media (hover: hover)` to prevent sticky hover on touch devices
 
@@ -68,24 +69,36 @@ const componentClass = css`
 `
 ```
 
-**Post Management:**
-- Use `import.meta.glob()` in `lib/post.ts` for dynamic MDX file discovery
-- Posts auto-sorted by `publishedAt` in descending order
-- Slug extracted from filename pattern: `([^\/]+)\.mdx$`
+### Blog Post System
+
+**File Structure:**
+- **Location**: `app/posts/YYYY/YYYYMM/slug.mdx` format
+- **Frontmatter Required**: `title`, `description`, `publishedAt`, `tags[]`
+- **Frontmatter Optional**: `updatedAt`, `image`
+
+**Post API (`app/lib/post.ts`):**
+```tsx
+import { getPosts, getPostBySlug, getAllTags, getPostsByTag, getArchives, getAdjacentPosts } from '@/lib/post'
+
+const posts = await getPosts()           // All posts sorted by publishedAt desc
+const post = await getPostBySlug('slug') // Returns { frontmatter, Content } or null
+const tags = await getAllTags()          // [{ tag, count }] sorted alphabetically
+const filtered = await getPostsByTag('tag')
+const archives = await getArchives()     // [{ year, month, yearMonth, count }]
+const { prev, next } = await getAdjacentPosts('current-slug')
+```
+
+**MDX Processing:**
+- Frontmatter via `remark-frontmatter` and `remark-mdx-frontmatter`
+- Syntax highlighting with Shiki (GitHub Dark theme)
+- Auto-generated heading IDs via `rehype-slug`
+- Heading anchor links via `rehype-autolink-headings` (wraps headings with `.heading-link` class)
 
 ### Build Process
 - **Dual Build**: Client bundle must be built before server (`vite build --mode client && vite build`)
 - **Assets**: Served from `dist/` directory after build
-- **SSG**: Static site generation enabled for better performance
 
 ### Development Setup
 - **TypeScript**: Configured for ESNext with Hono JSX (`jsxImportSource: "hono/jsx"`)
-- **MDX**: Frontmatter processing with remark plugins + Shiki syntax highlighting (GitHub Dark theme)
 - **Alias**: `@/` maps to `app/` directory
 - **No Testing Framework**: This project doesn't include test configurations
-
-### Blog Post Structure
-- **Location**: `app/posts/YYYY/YYYYMM/slug.mdx` format
-- **Frontmatter Required**: `title`, `description`, `publishedAt`, `tags[]`
-- **Auto-discovery**: Uses `import.meta.glob()` for dynamic import
-- **Sorting**: Posts sorted by `publishedAt` descending

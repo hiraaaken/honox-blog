@@ -1,9 +1,9 @@
-import { useState, useLayoutEffect } from 'hono/jsx'
+import { useState, useLayoutEffect } from "hono/jsx";
 import { MoonIcon } from "@/components/ui/MoonIcon";
 import { SunIcon } from "@/components/ui/SunIcon";
-import { css } from 'hono/css';
+import { css } from "hono/css";
 
-type Theme = 'light' | 'dark'
+type Theme = "light" | "dark";
 
 const themeToggleClass = css`
   position: relative;
@@ -13,7 +13,7 @@ const themeToggleClass = css`
   height: fit-content;
   cursor: pointer;
   border-radius: var(--round-pill);
-`
+`;
 
 const toggleSwitchClass = css`
   --toggle-switch-size: var(--size-1000);
@@ -50,7 +50,7 @@ const toggleSwitchClass = css`
     content: "";
     transform: translateX(calc(var(--toggle-switch-size) * .9)) scale(0.75);
   }
-`
+`;
 
 const toggleIconClass = css`
   position: absolute;
@@ -68,47 +68,67 @@ const toggleIconClass = css`
   &[data-hidden="true"]{
     opacity: 0;
   }
-`
+`;
 
 export function ThemeToggle({ initialTheme }: { initialTheme: Theme }) {
-  const [theme, setTheme] = useState<Theme>(initialTheme)
+  const [theme, setTheme] = useState<Theme>(initialTheme);
 
   useLayoutEffect(() => {
+    // ブラウザ環境でのみ実行
+    if (typeof document === "undefined") return;
+
     // 初期表示時にクッキーやデータ属性からテーマを取得
     const savedTheme = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('theme='))
-      ?.split('=')[1] as Theme | undefined;
+      .split("; ")
+      .find((row) => row.startsWith("theme="))
+      ?.split("=")[1] as Theme | undefined;
 
-    const currentTheme = savedTheme || document.documentElement.dataset.theme || 'light';
+    const currentTheme =
+      savedTheme || document.documentElement.dataset.theme || "light";
     setTheme(currentTheme as Theme);
 
     // HTML要素にテーマを適用
     document.documentElement.dataset.theme = currentTheme;
-    document.documentElement.className = currentTheme === 'dark' ? 'dark' : '';
+    document.documentElement.className = currentTheme === "dark" ? "dark" : "";
   }, []);
 
   const toggleTheme = () => {
-    const newTheme: Theme = theme === 'light' ? 'dark' : 'light'
-    document.cookie = `theme = ${newTheme}; path =/; max-age=31536000; SameSite=Lax`
-    setTheme(newTheme)
+    if (typeof document === "undefined") return;
+
+    const newTheme: Theme = theme === "light" ? "dark" : "light";
+    document.cookie = `theme = ${newTheme}; path =/; max-age=31536000; SameSite=Lax`;
+    setTheme(newTheme);
 
     // 既存のダークモード切り替えロジックを保持
-    document.documentElement.dataset.theme = newTheme
-    document.documentElement.className = newTheme === 'dark' ? 'dark' : ''
-  }
+    document.documentElement.dataset.theme = newTheme;
+    document.documentElement.className = newTheme === "dark" ? "dark" : "";
+  };
 
   return (
     <>
       <label class={themeToggleClass}>
-        <input type="checkbox" class={toggleSwitchClass} aria-label="ダークモード切替" onChange={toggleTheme} checked={theme === "light"} />
-        <span class={toggleIconClass} data-icon="moon" data-hidden={theme === "light" ? "true" : "false"}>
+        <input
+          type="checkbox"
+          class={toggleSwitchClass}
+          aria-label="ダークモード切替"
+          onChange={toggleTheme}
+          checked={theme === "light"}
+        />
+        <span
+          class={toggleIconClass}
+          data-icon="moon"
+          data-hidden={theme === "light" ? "true" : "false"}
+        >
           <MoonIcon />
         </span>
-        <span class={toggleIconClass} data-icon="sun" data-hidden={theme === "dark" ? "true" : "false"}>
+        <span
+          class={toggleIconClass}
+          data-icon="sun"
+          data-hidden={theme === "dark" ? "true" : "false"}
+        >
           <SunIcon color="var(--color-primary)" />
         </span>
       </label>
     </>
-  )
+  );
 }

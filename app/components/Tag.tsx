@@ -1,4 +1,4 @@
-import { css } from 'hono/css'
+import { css } from "hono/css";
 
 const tagClass = css`
   display: inline-block;
@@ -11,6 +11,7 @@ const tagClass = css`
   transform: scale(1);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
   border: 1px solid var(--color-border);
+  box-shadow: var(--tag-shadow);
   
   @media (hover: hover) {
     &:hover {
@@ -20,22 +21,22 @@ const tagClass = css`
   }
   
   &[data-size="sm"] {
-    font-size: var(--size-300);
+    font-size: var(--text-label);
     padding: 0.125rem 0.75rem;
   }
   
   &[data-size="md"] {
-    font-size: var(--size-400);
+    font-size: var(--text-body-sm);
     padding: 0.25rem 0.75rem;
   }
   
   &[data-size="lg"] {
-    font-size: var(--size-500);
+    font-size: var(--text-body);
     padding: 0.375rem 0.75rem;
   }
-`
+`;
 
-type TagSize = 'sm' | 'md' | 'lg'
+type TagSize = "sm" | "md" | "lg";
 
 interface TagProps {
   tag: string;
@@ -43,10 +44,11 @@ interface TagProps {
   count?: number | null;
 }
 
-export const Tag = ({ tag, size = 'md', count = null }: TagProps) => {
+export const Tag = ({ tag, size = "md", count = null }: TagProps) => {
   return (
     <a href={`/tags/${tag}`} class={tagClass} data-size={size}>
-      # {tag} {count !== null ? `（${count}）` : ''}
+      # {tag} {count !== null ? `（${count}）` : ""}
     </a>
-  )
-}
+  );
+};
+

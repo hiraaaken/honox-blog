@@ -23,6 +23,7 @@
   --color-neutral-700: oklch(0.371 0 0);
   --color-neutral-750: oklch(0.32 0 0);
   --color-neutral-800: oklch(0.269 0 0);
+  --color-neutral-850: oklch(0.230 0 0);
   --color-neutral-900: oklch(0.205 0 0);
   --color-neutral-950: oklch(0.145 0 0);
 
@@ -89,15 +90,36 @@
   --inline-size-md: min(var(--window-md), 100vi);
 
   /* Contents Size */
-  --content-max-width: 1000px;
+  --content-max-width: 900px;
   --content-min-width: 320px;
 
   /* Typography */
   --font-sans: "Jost", system-ui, sans-serif;
-  --text-sm: var(--size-350);
-  --text-base: var(--size-400);
-  --text-lg: var(--size-500);
-  --text-xl: var(--size-700);
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3rem;
+
+  --text-body: var(--text-md);
+  --text-body-sm: var(--text-sm);
+  --text-body-lg: var(--text-lg);
+
+  --text-heading-xl: var(--text-4xl);
+  --text-heading-lg: var(--text-3xl);
+  --text-heading-md: var(--text-2xl);
+  --text-heading-sm: var(--text-xl);
+
+  --text-label: var(--text-xs);
+  --text-caption: var(--text-xs);
+  --text-button: var(--text-sm);
+
+  --text-hero: var(--text-5xl);
+  --text-code: var(--text-sm);
 
   --font-normal: 400;
   --font-medium: 500;
@@ -113,11 +135,13 @@
   --color-secondary-lighten: var(--color-violet-400);
   --color-secondary-darken: var(--color-violet-700);
 
-  --color-background: light-dark(var(--color-neutral-200), var(--color-neutral-900));
+  --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+
+  --color-background: light-dark(var(--color-neutral-200), var(--color-neutral-800));
   --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
 
-  --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-  --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-300));
+  --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-950));
+  --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-900));
   --color-shadow-light: var(--color-neutral-300);
   --color-shadow-dark: var(--color-neutral-700);
 
@@ -134,8 +158,8 @@
   --border-width-thick: 2px;
   --border-1: var(--border-width-thin) solid var(--color-border);
   --border-2: var(--border-width-thick) solid var(--color-border);
-  --border-dark-1: var(--border-width-thin) solid var(--color-neutral-800);
-  --border-dark-2: var(--border-width-thick) solid var(--color-neutral-800);
+  --border-dark-1: var(--border-width-thin) solid var(--color-neutral-950);
+  --border-dark-2: var(--border-width-thick) solid var(--color-neutral-950);
   --border-light-1: var(--border-width-thin) solid var(--color-neutral-100);
   --border-light-2: var(--border-width-thick) solid var(--color-neutral-100);
 
@@ -152,20 +176,20 @@
   --shadow-lg: 0 7px 15px var(--color-shadow-dark);
 
   /* Header */
-  --color-header-background: var(--color-neutral-800);
+  --color-header-background: var(--color-neutral-750);
   --color-header-foreground: var(--color-light-500);
   --header-shadow: 0 1.5px 0 var(--color-shadow);
 
   /* Card */
-  --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
-  --card-shadow: 0 1.5px 0 var(--color-shadow);
-  --card-shadow-hover: 0 3.5px 0 var(--color-shadow);
+  --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
+  --card-shadow: 0 2px 0 var(--color-shadow);
+  --card-shadow-hover: 0 4px 0 var(--color-shadow);
 
   /* Tag */
   --color-tag-background: var(--color-primary);
   --color-tag-foreground: var(--color-neutral-800);
-  --tag-shadow: 0 .5px 0 var(--color-shadow-dark);
-  --tag-shadow-hover: 0 1px 0 var(--color-shadow);
+  --tag-shadow: 0 1px 0 var(--color-shadow-dark);
+  --tag-shadow-hover: 0 1.5px 0 var(--color-shadow);
 }
 
 /* Mobile Typography */
@@ -205,9 +229,13 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-background);
   color: var(--color-foreground);
-  transition: background-color 0.3s, color 0.3s;
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 a {
