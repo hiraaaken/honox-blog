@@ -51,12 +51,7 @@
   --color-violet-900: oklch(0.38 0.189 293.745);
   --color-violet-950: oklch(0.283 0.141 291.089);
 
-  --color-light-300: oklch(98% 0.002 0);
   --color-light-500: oklch(100% 0 0);
-  --color-light-700: oklch(95% 0.003 0);
-
-  --color-dark-300: oklch(45% 0.01 0);
-  --color-dark-500: oklch(25% 0.01 0);
   --color-dark-700: oklch(15% 0.01 0);
 
   /* Size Scale */
@@ -82,16 +77,12 @@
   --size-1600: 4rem;
 
   /* Window Size */
-  --window-sm: 480px;
   --window-md: 768px;
-  --window-lg: 1024px;
-  --window-xl: 1280px;
 
   --inline-size-md: min(var(--window-md), 100vi);
 
   /* Contents Size */
   --content-max-width: 900px;
-  --content-min-width: 320px;
 
   /* Typography */
   --font-sans: "Jost", system-ui, sans-serif;
@@ -142,26 +133,14 @@
 
   --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-950));
   --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-900));
-  --color-shadow-light: var(--color-neutral-300);
   --color-shadow-dark: var(--color-neutral-700);
 
   /* Shape */
   --round-sm: var(--size-100);
   --round-md: var(--size-200);
   --round-lg: var(--size-300);
-  --round-xl: var(--size-400);
   --round-pill: 999em;
   --round-full: 9999px;
-
-  /* Border */
-  --border-width-thin: 1px;
-  --border-width-thick: 2px;
-  --border-1: var(--border-width-thin) solid var(--color-border);
-  --border-2: var(--border-width-thick) solid var(--color-border);
-  --border-dark-1: var(--border-width-thin) solid var(--color-neutral-950);
-  --border-dark-2: var(--border-width-thick) solid var(--color-neutral-950);
-  --border-light-1: var(--border-width-thin) solid var(--color-neutral-100);
-  --border-light-2: var(--border-width-thick) solid var(--color-neutral-100);
 
   /* Spacing */
   --spacing-xs: var(--size-100);
@@ -171,7 +150,6 @@
   --spacing-xl: var(--size-800);
 
   /* Shadow */
-  --shadow-sm: 0 1.5px 3px var(--color-shadow-dark);
   --shadow-md: 0 3.5px 7px var(--color-shadow-dark);
   --shadow-lg: 0 7px 15px var(--color-shadow-dark);
 
@@ -182,6 +160,7 @@
 
   /* Card */
   --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
+  --color-card-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
   --card-shadow: 0 2px 0 var(--color-shadow);
   --card-shadow-hover: 0 4px 0 var(--color-shadow);
 

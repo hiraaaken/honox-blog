@@ -29,7 +29,7 @@ const archiveHeader = css`
 const noPostsCard = css`
   border: 2px solid var(--color-border);
   border-radius: 1rem;
-  box-shadow: 1.5px 3px 0 var(--color-card-shadow);
+  box-shadow: 1.5px 3px 0 var(--color-shadow);
   padding: 3rem;
   background-color: var(--color-card-background);
   color: var(--color-card-foreground);
@@ -58,12 +58,12 @@ const backLink = css`
   border-radius: 0.5rem;
   font-weight: 500;
   border: 2px solid var(--color-border);
-  box-shadow: 1px 2px 0 var(--color-card-shadow);
+  box-shadow: 1px 2px 0 var(--color-shadow);
   transition: all 0.3s ease-in-out;
-  
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 2px 4px 0 var(--color-card-shadow);
+    box-shadow: 2px 4px 0 var(--color-shadow);
   }
 `;
 
