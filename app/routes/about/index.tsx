@@ -16,7 +16,7 @@ const aboutHeader = css`
 `;
 
 const aboutCard = css`
-  border: 2px solid var(--color-border);
+  border: var(--card-border);
   border-radius: 1rem;
   box-shadow: 1.5px 3px 0 var(--color-card-shadow);
   padding: 2rem;

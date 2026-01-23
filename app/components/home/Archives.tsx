@@ -8,7 +8,7 @@ const archiveClass = css`
 `
 
 const archiveListClass = css`
-  border: 2px solid var(--color-border);
+  border: var(--card-border);
   border-radius: var(--round-xl);
   box-shadow: var(--card-shadow);
   background-color: var(--color-card-background);

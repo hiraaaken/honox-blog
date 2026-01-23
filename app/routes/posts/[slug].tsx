@@ -324,7 +324,7 @@ const postNavigation = css`
     text-decoration: none;
     padding: var(--size-300);
     background-color: var(--color-card-background);
-    border: 2px solid var(--color-border);
+    border: var(--card-border);
     border-radius: 1rem;
     box-shadow: var(--card-shadow);
     transform: translateY(0) scale(1);

@@ -18,7 +18,7 @@ const headerClass = css`
   right: 0;
   margin-inline: auto;
   border-radius: var(--round-lg);
-  border: var(--border-dark-1);
+  border: var(--header-border);
   padding: var(--size-300) var(--size-800);
   display: flex;
   align-items: center;

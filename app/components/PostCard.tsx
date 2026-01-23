@@ -9,13 +9,13 @@ const postCardClass = css`
   gap: var(--size-100);
   padding: var(--size-350);
   background-color: var(--color-card-background);
-  border: 2px solid var(--color-border);
+  border: var(--card-border);
   border-radius: 1rem;
   box-shadow: var(--card-shadow);
   position: relative;
   transform: translateY(0) scale(1);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  
+
   @media (hover: hover) {
     &:hover {
       transform: translateY(-4px) scale(1.02);

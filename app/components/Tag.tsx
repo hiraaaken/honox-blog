@@ -10,7 +10,7 @@ const tagClass = css`
   font-weight: 500;
   transform: scale(1);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  border: 1px solid var(--color-border);
+  border: var(--tag-border);
   box-shadow: var(--tag-shadow);
   
   @media (hover: hover) {

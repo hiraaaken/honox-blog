@@ -29,7 +29,7 @@ const profileSectionClass = css`
 
 const aboutCardClass = css`
   background-color: var(--color-card-background);
-  border: 2px solid var(--color-border);
+  border: var(--card-border);
   border-radius: var(--round-xl);
   box-shadow: var(--card-shadow);
   padding: var(--size-600);

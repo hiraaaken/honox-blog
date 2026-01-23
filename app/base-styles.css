@@ -140,9 +140,9 @@
   --color-background: light-dark(var(--color-neutral-200), var(--color-neutral-800));
   --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
 
-  --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-950));
-  --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-900));
-  --color-shadow-light: var(--color-neutral-300);
+  --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-400));
+  --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-400));
+  --color-shadow-light: var(--color-neutral-400);
   --color-shadow-dark: var(--color-neutral-700);
 
   /* Shape */
@@ -178,18 +178,27 @@
   /* Header */
   --color-header-background: var(--color-neutral-750);
   --color-header-foreground: var(--color-light-500);
-  --header-shadow: 0 1.5px 0 var(--color-shadow);
+  --color-header-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
+  --color-header-shadow: var(--color-header-border);
+  --header-border: var(--border-width-thick) solid var(--color-header-border);
+  --header-shadow: 0 2px 0 var(--color-header-shadow);
 
   /* Card */
   --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
-  --card-shadow: 0 2px 0 var(--color-shadow);
-  --card-shadow-hover: 0 4px 0 var(--color-shadow);
+  --color-card-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
+  --color-card-shadow: var(--color-card-border);
+  --card-border: var(--border-width-thick) solid var(--color-card-border);
+  --card-shadow: 0 2px 0 var(--color-card-shadow);
+  --card-shadow-hover: 0 4px 0 var(--color-card-shadow);
 
   /* Tag */
   --color-tag-background: var(--color-primary);
   --color-tag-foreground: var(--color-neutral-800);
-  --tag-shadow: 0 1px 0 var(--color-shadow-dark);
-  --tag-shadow-hover: 0 1.5px 0 var(--color-shadow);
+  --color-tag-border: var(--color-neutral-400);
+  --color-tag-shadow: var(--color-tag-border);
+  --tag-border: var(--border-width-thin) solid var(--color-tag-border);
+  --tag-shadow: 0 1px 0 var(--color-tag-shadow);
+  --tag-shadow-hover: 0 1.5px 0 var(--color-tag-shadow);
 }
 
 /* Mobile Typography */
