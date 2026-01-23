@@ -1,20 +1,35 @@
 import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
+import { TableOfContents } from "../../islands/TableOfContents";
 import { css } from "hono/css";
 
-const postArticle = css`
+const postLayout = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 8rem var(--size-600) 2rem;
   box-sizing: border-box;
   width: 100%;
-  
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--size-800);
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
   @media (max-width: 768px) {
     padding: 6rem var(--size-500) 2rem;
     max-width: 100vw;
     overflow-x: hidden;
   }
+`;
+
+const postArticle = css`
+  min-width: 0;
+  box-sizing: border-box;
 `;
 
 const postHeader = css`
@@ -385,7 +400,7 @@ export default createRoute(async (c) => {
   const { prev, next } = await getAdjacentPosts(slug);
 
   return c.render(
-    <>
+    <div class={postLayout}>
       <article class={postArticle}>
         <header class={postHeader}>
           {image && (
@@ -436,6 +451,7 @@ export default createRoute(async (c) => {
           )}
         </nav>
       </article>
-    </>,
+      <TableOfContents />
+    </div>,
   );
 });
