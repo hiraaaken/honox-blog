@@ -10,14 +10,18 @@ const postLayout = css`
   padding: 8rem var(--size-600) 2rem;
   box-sizing: border-box;
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: var(--size-800);
-  align-items: start;
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    gap: 0;
+  /* Single column by default, 2 columns only when TOC exists */
+  &:has(nav[aria-label="Table of Contents"]) {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--size-800);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
   }
 
   @media (max-width: 768px) {
