@@ -1,20 +1,39 @@
 import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
+import { TableOfContents } from "../../islands/TableOfContents";
 import { css } from "hono/css";
 
-const postArticle = css`
+const postLayout = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: 8rem var(--size-600) 2rem;
   box-sizing: border-box;
   width: 100%;
-  
+
+  /* Single column by default, 2 columns only when TOC exists */
+  &:has(nav[aria-label="Table of Contents"]) {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--size-800);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+
   @media (max-width: 768px) {
     padding: 6rem var(--size-500) 2rem;
     max-width: 100vw;
     overflow-x: hidden;
   }
+`;
+
+const postArticle = css`
+  min-width: 0;
+  box-sizing: border-box;
 `;
 
 const postHeader = css`
@@ -80,14 +99,16 @@ const postContent = css`
     color: var(--color-foreground);
     line-height: 1.3;
     word-wrap: break-word;
-    
+    scroll-margin-top: 6rem;
+
     &:first-child {
       margin-top: 0;
     }
-    
+
     @media (max-width: 768px) {
       margin-top: var(--size-600);
       margin-bottom: var(--size-300);
+      scroll-margin-top: 5rem;
     }
   }
   
@@ -385,7 +406,7 @@ export default createRoute(async (c) => {
   const { prev, next } = await getAdjacentPosts(slug);
 
   return c.render(
-    <>
+    <div class={postLayout}>
       <article class={postArticle}>
         <header class={postHeader}>
           {image && (
@@ -436,6 +457,7 @@ export default createRoute(async (c) => {
           )}
         </nav>
       </article>
-    </>,
+      <TableOfContents />
+    </div>,
   );
 });
