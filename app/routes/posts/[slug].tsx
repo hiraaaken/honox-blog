@@ -99,14 +99,16 @@ const postContent = css`
     color: var(--color-foreground);
     line-height: 1.3;
     word-wrap: break-word;
-    
+    scroll-margin-top: 6rem;
+
     &:first-child {
       margin-top: 0;
     }
-    
+
     @media (max-width: 768px) {
       margin-top: var(--size-600);
       margin-bottom: var(--size-300);
+      scroll-margin-top: 5rem;
     }
   }
   
