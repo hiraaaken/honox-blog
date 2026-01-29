@@ -77,7 +77,8 @@ export default createRoute(async (c) => {
 
   const yearNum = parseInt(year);
   const monthNum = parseInt(month);
-  const posts = await getPostsByYearMonth(yearNum, monthNum);
+  const yearMonth = `${year}-${month.padStart(2, "0")}`;
+  const posts = await getPostsByYearMonth(yearMonth);
   const pageTitle = `${yearNum}年${monthNum}月の記事`;
 
   return c.render(
