@@ -46,14 +46,14 @@ const profileImage = css`
 
 const profileInfo = css`
   flex: 1;
-  
+
   h2 {
-    font-size: var(--text-heading-md);
+    font-size: var(--text-2xl);
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: var(--color-foreground);
   }
-  
+
   p {
     margin-bottom: 0;
     opacity: 0.8;

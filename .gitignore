@@ -39,5 +39,8 @@ lerna-debug.log*
 # Playwright MCP
 .playwright-mcp/
 
+# Serena
+.serena/
+
 # Documentation (local only)
 docs/

@@ -2,7 +2,7 @@ import { css } from 'hono/css'
 
 const heroSectionClass = css`
   height: clamp(280px, 50vw, 420px);
-  padding-top: var(--size-1200);
+  padding-top: 3rem;
   width: 100%;
   background-color: var(--color-primary);
   color: var(--color-neutral-800);
