@@ -73,10 +73,16 @@
   --size-800: 2rem;
   --size-900: 2.25rem;
   --size-1000: 2.5rem;
+  --size-1200: 3rem;
   --size-1600: 4rem;
 
   /* --- Window Size --- */
+  --window-xs: 320px;
+  --window-sm: 480px;
   --window-md: 768px;
+  --window-lg: 1024px;
+  --window-xl: 1280px;
+  --window-2xl: 1536px;
 
   /* ═══════════════════════════════════════════════════════════
      Layer 2: Semantic Tokens（意味的な用途）
@@ -107,6 +113,18 @@
   --text-body-lg: var(--text-lg);
   --text-label: var(--text-xs);
 
+  /* 見出しサイズ */
+  --text-heading-xl: var(--text-4xl);
+  --text-heading-lg: var(--text-3xl);
+  --text-heading-md: var(--text-2xl);
+  --text-heading-sm: var(--text-xl);
+
+  /* 用途別サイズ */
+  --text-hero: var(--text-5xl);
+  --text-code: var(--text-sm);
+  --text-button: var(--text-sm);
+  --text-caption: var(--text-xs);
+
   /* --- Color: Brand --- */
   --color-primary: var(--color-lime-300);
   --color-primary-lighten: var(--color-lime-200);
@@ -122,8 +140,12 @@
   --color-shadow-dark: var(--color-neutral-700);
 
   /* --- Spacing --- */
+  --spacing-xs: var(--size-100);
+  --spacing-sm: var(--size-200);
+  --spacing-md: var(--size-400);
   --spacing-lg: var(--size-600);
   --spacing-xl: var(--size-800);
+  --spacing-2xl: var(--size-1000);
 
   /* --- Shape: Border Radius --- */
   --round-sm: var(--size-100);
@@ -138,7 +160,10 @@
   --border-width-thick: 2px;
 
   /* --- Shadow --- */
+  --shadow-sm: 0 1px 2px var(--color-shadow-dark);
   --shadow-md: 0 3.5px 7px var(--color-shadow-dark);
+  --shadow-lg: 0 10px 25px var(--color-shadow-dark);
+  --shadow-xl: 0 20px 40px var(--color-shadow-dark);
 
   /* --- Layout --- */
   --inline-size-md: min(var(--window-md), 100vi);
