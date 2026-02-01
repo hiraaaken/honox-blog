@@ -250,7 +250,7 @@ const postContent = css`
   }
   
   pre {
-    background: var(--color-dark-700);
+    background: light-dark(var(--color-neutral-100), var(--color-neutral-900));
     padding: var(--size-700);
     border-radius: var(--round-md);
     overflow-x: auto;

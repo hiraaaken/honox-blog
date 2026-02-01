@@ -1,11 +1,23 @@
-import { FrontMatter } from "@/types";
+import type {
+  MDXModule,
+  PostSummary,
+  PostWithContent,
+  TagCount,
+  Archive,
+  AdjacentPosts,
+  GetPosts,
+  GetPostBySlug,
+  GetPostsByTag,
+  GetPostsByYearMonth,
+  GetAllTags,
+  GetArchives,
+  GetAdjacentPosts,
+} from "@/types";
 
-export const getPosts = async () => {
-  const modules = import.meta.glob<{ frontmatter: FrontMatter }>(
-    "/app/posts/**/*.mdx",
-  );
+export const getPosts: GetPosts = async () => {
+  const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
-  const posts = await Promise.all(
+  const posts: PostSummary[] = await Promise.all(
     Object.entries(modules).map(async ([path, resolver]) => {
       const mod = await resolver();
       const slug = path.match(/([^\/]+)\.mdx$/)?.[1] || "";
@@ -22,10 +34,8 @@ export const getPosts = async () => {
   );
 };
 
-export const getPostBySlug = async (slug: string) => {
-  const modules = import.meta.glob<{ frontmatter: FrontMatter; default: any }>(
-    "/app/posts/**/*.mdx",
-  );
+export const getPostBySlug: GetPostBySlug = async (slug) => {
+  const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
   const entry = Object.entries(modules).find(([path]) =>
     path.endsWith(`${slug}.mdx`),
@@ -38,14 +48,20 @@ export const getPostBySlug = async (slug: string) => {
   const [, resolver] = entry;
   const mod = await resolver();
 
-  return {
+  if (!mod.default) {
+    return null;
+  }
+
+  const post: PostWithContent = {
     ...mod.frontmatter,
     slug,
     Content: mod.default,
   };
+
+  return post;
 };
 
-export const getAllTags = async () => {
+export const getAllTags: GetAllTags = async () => {
   const posts = await getPosts();
   const tagCounts = new Map<string, number>();
 
@@ -55,17 +71,19 @@ export const getAllTags = async () => {
     });
   });
 
-  return Array.from(tagCounts.entries())
+  const tags: TagCount[] = Array.from(tagCounts.entries())
     .map(([tag, count]) => ({ tag, count }))
     .sort((a, b) => a.tag.localeCompare(b.tag));
+
+  return tags;
 };
 
-export const getPostsByTag = async (tag: string) => {
+export const getPostsByTag: GetPostsByTag = async (tag) => {
   const posts = await getPosts();
   return posts.filter((post) => post.tags.includes(tag));
 };
 
-export const getArchives = async () => {
+export const getArchives: GetArchives = async () => {
   const posts = await getPosts();
   const archiveMap = new Map<string, number>();
 
@@ -77,7 +95,7 @@ export const getArchives = async () => {
     archiveMap.set(key, (archiveMap.get(key) || 0) + 1);
   });
 
-  return Array.from(archiveMap.entries())
+  const archives: Archive[] = Array.from(archiveMap.entries())
     .map(([yearMonth, count]) => {
       const [year, month] = yearMonth.split("-");
       return {
@@ -88,17 +106,22 @@ export const getArchives = async () => {
       };
     })
     .sort((a, b) => b.yearMonth.localeCompare(a.yearMonth));
+
+  return archives;
 };
 
-export const getPostsByYearMonth = async (year: number, month: number) => {
+export const getPostsByYearMonth: GetPostsByYearMonth = async (yearMonth) => {
   const posts = await getPosts();
   return posts.filter((post) => {
     const date = new Date(post.publishedAt);
-    return date.getFullYear() === year && date.getMonth() + 1 === month;
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const postYearMonth = `${year}-${month.toString().padStart(2, "0")}`;
+    return postYearMonth === yearMonth;
   });
 };
 
-export const getAdjacentPosts = async (currentSlug: string) => {
+export const getAdjacentPosts: GetAdjacentPosts = async (currentSlug) => {
   const posts = await getPosts();
   const currentIndex = posts.findIndex((post) => post.slug === currentSlug);
 
@@ -106,8 +129,10 @@ export const getAdjacentPosts = async (currentSlug: string) => {
     return { prev: null, next: null };
   }
 
-  return {
+  const adjacentPosts: AdjacentPosts = {
     prev: currentIndex > 0 ? posts[currentIndex - 1] : null,
     next: currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null,
   };
+
+  return adjacentPosts;
 };

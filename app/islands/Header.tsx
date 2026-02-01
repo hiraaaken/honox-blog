@@ -159,12 +159,12 @@ const hamburgerButtonClass = css`
 `
 
 const hamburgerMenuClass = css`
-  border: var(--border-dark-2);
+  border: var(--border-width-thick) solid var(--color-neutral-950);
   border-radius: var(--round-md);
   width: 200px;
   height: 190px;
   margin: 0 auto;
-  transition: 
+  transition:
     translate .2s ease-out,
     display .2s ease-out allow-discrete,
     overlay .2s ease-out allow-discrete;
