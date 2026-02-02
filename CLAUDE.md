@@ -1,8 +1,17 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## プロジェクト概要
+Honox を用いた個人技術ブログ。
 
-## Commands
+## 技術スタック:
+- フレームワーク: HonoX（Hono 4.x ベース）
+- ランタイム: Cloudflare Workers
+- ビルドツール: Vite (7.x)
+- コンテンツ: MDX（Markdown + JSX）
+- スタイリング: CSS-in-JS（hono/css）+ CSS Custom Properties
+- デプロイ: Cloudflare Workers（Wrangler）
+
+## 開発コマンド
 
 - `pnpm run dev` - 開発サーバー起動（0.0.0.0でホストバインド）
 - `pnpm run build` - 本番ビルド（クライアント→サーバーの順で実行）
@@ -10,11 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm run deploy` - ビルド後Cloudflare Workersにデプロイ
 - `docker-compose up` - Docker開発環境（ポート5173）
 
-## Architecture
-
-**HonoX**アプリケーション - Cloudflare Workersで動作するファイルベースルーティングのフルスタックフレームワーク。
-
-### Core Structure
+### ディレクトリ構成
 - `app/server.ts` - Honoアプリインスタンス作成
 - `app/client.ts` - クライアントサイドハイドレーション
 - `app/routes/` - ファイルベースルーティング
@@ -22,68 +27,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `app/islands/` - インタラクティブコンポーネント（`useState`, `useEffect`使用）
 - `app/components/` - サーバーレンダリング専用コンポーネント
 
-### Key Patterns
+## 設計方針
+- CSS-in-JS（`hono/css`）とCSS Custom Propertiesでスタイリング
+- MDXでブログ記事を作成（Markdown + JSX）
+- オブジェクト・関数は型定義を先行させ、実装を後に書く（Type-First）
+- 関数は可能な限り純粋関数として設計し、副作用を最小限に抑える
 
-**ルート作成:**
-```tsx
-import { createRoute } from 'honox/factory'
-export default createRoute((c) => {
-  return c.render(<Component />)
-})
-```
+## 詳細ドキュメント
 
-**スタイリング（CSS-in-JS + テーマ対応）:**
-```tsx
-import { css } from 'hono/css'
-const componentClass = css`
-  /* light-dark()でテーマ対応 */
-  color: light-dark(#333, #fff);
-  background: light-dark(#fff, #1a1a1a);
+- コーディング規約: ./.claude/rules/coding-standards.md
+- デザインシステム: ./.claude/rules/design-system.md
 
-  /* タッチデバイスでのホバー状態回避 */
-  @media (hover: hover) {
-    &:hover { opacity: 0.8; }
-  }
-
-  /* コンテナクエリでレスポンシブ対応 */
-  @container (max-width: 800px) {
-    font-size: 14px;
-  }
-`
-```
-
-### Styling System
-- **CSS-in-JS**: `hono/css`の`css`テンプレートリテラル
-- **テーマ**: `<html data-theme="light|dark">`と`light-dark()` CSS関数
-- **グローバルスタイル**: `app/base-styles.css`（CSS custom properties）
-
-### Blog Post System
-
-**ファイル構造:** `app/posts/YYYY/YYYYMM/slug.mdx`
-
-**Frontmatter:**
-- 必須: `title`, `description`, `publishedAt`, `tags[]`
-- 任意: `updatedAt`, `image`
-
-**Post API (`app/lib/post.ts`):**
-```tsx
-import { getPosts, getPostBySlug, getAllTags, getPostsByTag, getArchives, getAdjacentPosts } from '@/lib/post'
-
-const posts = await getPosts()           // publishedAt降順
-const post = await getPostBySlug('slug') // { frontmatter, Content } | null
-const tags = await getAllTags()          // [{ tag, count }]
-const archives = await getArchives()     // [{ year, month, yearMonth, count }]
-const { prev, next } = await getAdjacentPosts('current-slug')
-```
-
-**MDX処理:**
-- Shikiによるシンタックスハイライト（GitHub Dark）
-- `rehype-slug`で見出しIDを自動生成
-- `rehype-autolink-headings`で見出しアンカーリンク（`.heading-link`クラス）
-
-### Development Setup
-- **JSX**: `hono/jsx`（Reactではない）
-- **Alias**: `@/` → `app/`
-- **Platform**: Cloudflare Workers（`wrangler.jsonc`でNode.js互換有効）
-- **SSG**: `@hono/vite-ssg`
-- **テストフレームワーク**: なし
