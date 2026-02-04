@@ -30,12 +30,28 @@ const postCardClass = css`
 `;
 
 const postCardTitleClass = css`
-  display: inline;
-  box-decoration-break: clone;
-  background: var(--color-primary);
+  display: block;
   color: var(--color-tag-foreground);
-  font-size: var(--text-lg);
-  padding: 0 0.5rem;
+  font-size: var(--text-xl);
+  position: relative;
+  text-wrap: balance;
+
+  &::before {
+    content: attr(data-title);
+    color: var(--color-primary);
+    position: absolute;
+    inset: 0;
+		-webkit-text-stroke: .4rem var(--color-primary);
+		z-index: -1;
+  }
+  &::after {
+    content: attr(data-title);
+    color: black;
+    position: absolute;
+    inset: 0;
+		-webkit-text-stroke: .5rem black;
+		z-index: -2;
+  }
 `;
 
 const postCardDescriptionClass = css`
@@ -91,7 +107,7 @@ export const PostCard = ({
   return (
     <article class={postCardClass}>
       <header>
-        <h2 class={postCardTitleClass}>
+        <h2 class={postCardTitleClass} data-title={title}>
           <a href={`/posts/${slug}`} class={cardLinkClass}>
             {title}
           </a>
