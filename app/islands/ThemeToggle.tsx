@@ -16,7 +16,7 @@ const themeToggleClass = css`
 `;
 
 const toggleSwitchClass = css`
-  --toggle-switch-size: var(--size-1000);
+  --toggle-switch-size: var(--toggle-size);
   appearance: none;
   outline: none;
   margin: 0;
@@ -24,7 +24,7 @@ const toggleSwitchClass = css`
   width: calc(var(--toggle-switch-size) * 1.9);
   height: var(--toggle-switch-size);
   border-radius: var(--round-pill);
-  background-color: var(--color-neutral-800);
+  background-color: var(--color-toggle-bg);
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
   cursor: inherit;
 
@@ -33,14 +33,14 @@ const toggleSwitchClass = css`
       box-shadow: inset 0 0 2px var(--color-primary);
     }
   }
-  
+
   &::before {
     content: "";
     display: block;
     width: var(--toggle-switch-size);
     height: var(--toggle-switch-size);
     transform: scale(0.75);
-    background-color: var(--color-neutral-600);
+    background-color: var(--color-toggle-knob);
     box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     transition: transform 0.3s ease;

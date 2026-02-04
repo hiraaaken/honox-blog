@@ -2,10 +2,10 @@ import { css } from 'hono/css'
 
 const heroSectionClass = css`
   height: clamp(280px, 50vw, 420px);
-  padding-top: var(--size-1200);
+  padding-top: var(--hero-padding-top);
   width: 100%;
   background-color: var(--color-primary);
-  color: var(--color-neutral-800);
+  color: var(--color-hero-foreground);
   border-bottom: 2px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -15,13 +15,13 @@ const heroSectionClass = css`
 const heroContentClass = css`
   width: fit-content;
   text-align: left;
-  padding: 0 var(--size-400);
+  padding: 0 var(--spacing-md);
 `
 
 const heroTitleClass = css`
-  font-size: clamp(var(--size-800), 8vw, var(--size-1600));
+  font-size: var(--hero-title-font-size);
   font-weight: bold;
-  letter-spacing: calc(var(--size-50) / 3 * -1);
+  letter-spacing: var(--hero-letter-spacing);
 
   span {
       display: block;
@@ -30,7 +30,7 @@ const heroTitleClass = css`
 
 const heroDescriptionClass = css`
   font-weight: var(--font-bold);
-  letter-spacing: calc(var(--size-50) / 3 * -1);
+  letter-spacing: var(--hero-letter-spacing);
 `
 
 export const Hero = () => {

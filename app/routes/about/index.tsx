@@ -6,7 +6,7 @@ const aboutSection = css`
   padding: 6rem 1rem 2rem;
   max-width: var(--content-max-width);
   display: grid;
-  gap: var(--size-300);
+  gap: var(--spacing-base);
 `;
 
 const aboutHeader = css`

@@ -13,7 +13,7 @@ const mainClass = css`
 const footerClass = css`
   text-align: center;
   border-top: 2px solid var(--color-border);
-  padding: var(--size-300);
+  padding: var(--spacing-base);
   margin-top: auto;
   font-size: var(--text-body-sm);
   color: var(--color-muted);

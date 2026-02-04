@@ -10,12 +10,12 @@ const popularTagsSectionClass = css`
 const tagsClass = css`
   display: flex;
   flex-wrap: wrap;
-  gap: var(--size-300);
+  gap: var(--spacing-base);
 `
 
 const footerClass = css`
   text-align: right;
-  font-size: var(--size-600);
+  font-size: var(--text-2xl);
 `
 
 interface TagData {

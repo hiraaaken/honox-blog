@@ -13,13 +13,12 @@ const headerClass = css`
   z-index: 50;
   box-shadow: var(--header-shadow);
   position: fixed;
-  top: var(--size-300);
+  top: var(--spacing-base);
   left: 0;
   right: 0;
   margin-inline: auto;
   border-radius: var(--round-lg);
-  border: var(--header-border);
-  padding: var(--size-300) var(--size-800);
+  padding: var(--spacing-base) var(--spacing-xl);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -28,7 +27,7 @@ const headerClass = css`
     opacity 0.3s ease-in-out;
 
   @media (max-width: 1100px) {
-    margin-inline: var(--size-400);
+    margin-inline: var(--spacing-md);
   }
 `
 const navClass = css`
@@ -75,7 +74,7 @@ const blandLinkClass = css`
 
 const navLinkListClass = css`
   display: flex;
-  gap: var(--size-700);
+  gap: var(--spacing-lg-xl);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -159,7 +158,7 @@ const hamburgerButtonClass = css`
 `
 
 const hamburgerMenuClass = css`
-  border: var(--border-width-thick) solid var(--color-neutral-950);
+  border: var(--border-width-thick) solid var(--color-hamburger-border);
   border-radius: var(--round-md);
   width: 200px;
   height: 190px;
@@ -187,8 +186,8 @@ const hamburgerMenuClass = css`
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: var(--size-400);
-    padding: var(--size-400);
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
     font-size: clamp(var(--text-md), 2.5vw, var(--text-lg));
     font-weight: var(--font-semibold);
     margin: auto 0;
@@ -221,8 +220,8 @@ const hamburgerMenuClass = css`
 
 const closeButtonClass = css`
   position: absolute;
-  top: var(--size-400);
-  right: var(--size-400);
+  top: var(--spacing-md);
+  right: var(--spacing-md);
   background: none;
   border: none;
   filter: grayscale(100);

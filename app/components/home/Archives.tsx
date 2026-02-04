@@ -4,7 +4,7 @@ import { css } from "hono/css";
 const archiveClass = css`
   display: flex;
   flex-direction: column;
-  gap: var(--size-600);
+  gap: var(--spacing-lg);
 `
 
 const archiveListClass = css`
@@ -12,10 +12,10 @@ const archiveListClass = css`
   border-radius: var(--round-xl);
   box-shadow: var(--card-shadow);
   background-color: var(--color-card-background);
-  padding: var(--size-600);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--size-400);
+  gap: var(--spacing-md);
 `
 
 const archiveLinkClass = css`
