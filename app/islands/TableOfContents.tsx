@@ -12,7 +12,7 @@ const tocContainer = css`
   top: 8rem;
   max-height: calc(100vh - 10rem);
   overflow-y: auto;
-  padding: var(--size-600);
+  padding: var(--toc-padding);
   background: var(--color-card-background);
   border: var(--card-border);
   border-radius: var(--round-md);
@@ -27,9 +27,9 @@ const tocTitle = css`
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
   color: var(--color-foreground);
-  margin-bottom: var(--size-400);
-  padding-bottom: var(--size-200);
-  border-bottom: 2px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  margin-bottom: var(--toc-title-margin-bottom);
+  padding-bottom: var(--toc-title-padding-bottom);
+  border-bottom: 2px solid var(--color-toc-border);
 `;
 
 const tocList = css`
@@ -39,11 +39,11 @@ const tocList = css`
 `;
 
 const tocItemH2 = css`
-  margin-bottom: var(--size-100);
+  margin-bottom: var(--spacing-xs);
 
   a {
     display: block;
-    padding: var(--size-150) var(--size-200);
+    padding: var(--toc-item-padding);
     color: var(--color-foreground);
     text-decoration: none;
     font-size: var(--text-sm);
@@ -55,7 +55,7 @@ const tocItemH2 = css`
     @media (hover: hover) {
       &:hover {
         color: var(--color-primary);
-        background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+        background: var(--color-hover-background);
       }
     }
   }
@@ -65,17 +65,17 @@ const tocNestedList = css`
   list-style: none;
   padding: 0;
   margin: 0;
-  margin-left: var(--size-300);
-  border-left: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  margin-left: var(--toc-nested-margin-left);
+  border-left: 1px solid var(--color-toc-border);
 `;
 
 const tocItemH3 = css`
-  margin-bottom: var(--size-50);
+  margin-bottom: var(--spacing-2xs);
 
   a {
     display: block;
-    padding: var(--size-100) var(--size-200);
-    color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+    padding: var(--toc-nested-item-padding);
+    color: var(--color-muted);
     text-decoration: none;
     font-size: var(--text-xs);
     line-height: 1.5;
@@ -85,7 +85,7 @@ const tocItemH3 = css`
     @media (hover: hover) {
       &:hover {
         color: var(--color-primary);
-        background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+        background: var(--color-hover-background);
       }
     }
   }

@@ -7,27 +7,29 @@ import { css } from "hono/css";
 const postLayout = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 8rem var(--size-600) 2rem;
+  padding: 8rem var(--spacing-lg) 2rem;
   box-sizing: border-box;
   width: 100%;
 
-  /* Single column by default, 2 columns only when TOC exists */
+  @media (max-width: 768px) {
+    padding: 6rem var(--spacing-md-lg) 2rem;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+`;
+
+const contentArea = css`
+  /* グリッドレイアウト: メインコンテンツとTOCを横並び */
   &:has(nav[aria-label="Table of Contents"]) {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: var(--size-800);
+    grid-template-columns: 1fr 220px;
+    gap: var(--spacing-lg);
     align-items: start;
 
     @media (max-width: 1024px) {
       grid-template-columns: 1fr;
       gap: 0;
     }
-  }
-
-  @media (max-width: 768px) {
-    padding: 6rem var(--size-500) 2rem;
-    max-width: 100vw;
-    overflow-x: hidden;
   }
 `;
 
@@ -37,42 +39,42 @@ const postArticle = css`
 `;
 
 const postHeader = css`
-  margin-bottom: var(--size-800);
-  
+  margin-bottom: var(--spacing-xl);
+
   >.title {
-    font-size: clamp(var(--size-600), 4vw, var(--size-1000));
+    font-size: var(--text-responsive-title);
     font-weight: var(--font-bold);
     color: var(--color-foreground);
-    margin-bottom: var(--size-200);
+    margin-bottom: var(--spacing-sm);
     line-height: 1.2;
-    
+
     @media (max-width: 768px) {
-      font-size: clamp(var(--size-500), 5vw, var(--size-600));
+      font-size: var(--text-responsive-title-mobile);
     }
   }
-  
+
   >.description {
     font-size: var(--text-base);
-    color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-    margin-bottom: var(--size-400);
+    color: var(--color-muted);
+    margin-bottom: var(--spacing-md);
     line-height: 1.6;
   }
-  
+
   .meta {
     font-size: var(--text-sm);
-    color: light-dark(var(--color-neutral-500), var(--color-neutral-500));
-    margin-bottom: var(--size-300);
+    color: var(--color-muted-light);
+    margin-bottom: var(--spacing-base);
   }
-  
+
   .tags {
-    margin-top: var(--size-400);
+    margin-top: var(--spacing-md);
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-200);
+    gap: var(--spacing-sm);
   }
-  
+
   .hero-image {
-    margin: 0 auto var(--size-600) auto;
+    margin: 0 auto var(--spacing-lg) auto;
     border-radius: var(--round-md);
     overflow: hidden;
     box-shadow: 0 4px 20px light-dark(var(--color-shadow-light), var(--color-shadow-dark));
@@ -93,8 +95,8 @@ const postContent = css`
   box-sizing: border-box;
   
   h1, h2, h3, h4, h5, h6 {
-    margin-top: var(--size-800);
-    margin-bottom: var(--size-400);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
     font-weight: var(--font-bold);
     color: var(--color-foreground);
     line-height: 1.3;
@@ -106,8 +108,8 @@ const postContent = css`
     }
 
     @media (max-width: 768px) {
-      margin-top: var(--size-600);
-      margin-bottom: var(--size-300);
+      margin-top: var(--spacing-lg);
+      margin-bottom: var(--spacing-base);
       scroll-margin-top: 5rem;
     }
   }
@@ -156,41 +158,41 @@ const postContent = css`
   }
   }
   
-  h1 { 
-    font-size: clamp(var(--size-600), 4vw, var(--size-900)); 
-    
+  h1 {
+    font-size: var(--text-responsive-h1);
+
     @media (max-width: 768px) {
-      font-size: clamp(var(--size-500), 5vw, var(--size-600));
+      font-size: var(--text-responsive-h1-mobile);
     }
   }
-  h2 { 
-    font-size: clamp(var(--size-500), 3.5vw, var(--size-700));
-    padding-bottom: var(--size-150);
-    border-bottom: 2px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    
+  h2 {
+    font-size: var(--text-responsive-h2);
+    padding-bottom: var(--heading-h2-padding-bottom);
+    border-bottom: var(--heading-border-width) solid var(--color-heading-border);
+
     @media (max-width: 768px) {
-      font-size: clamp(var(--size-400), 4vw, var(--size-500));
+      font-size: var(--text-responsive-h2-mobile);
     }
   }
-  h3 { 
-    font-size: clamp(var(--size-450), 3vw, var(--size-700)); 
-    
+  h3 {
+    font-size: var(--text-responsive-h3);
+
     @media (max-width: 768px) {
-      font-size: clamp(var(--size-350), 3.5vw, var(--size-450));
+      font-size: var(--text-responsive-h3-mobile);
     }
   }
-  h4 { 
-    font-size: clamp(var(--size-400), 2.5vw, var(--size-600)); 
-    
+  h4 {
+    font-size: var(--text-responsive-h4);
+
     @media (max-width: 768px) {
-      font-size: clamp(var(--size-300), 3vw, var(--size-400));
+      font-size: var(--text-responsive-h4-mobile);
     }
   }
   
   p {
-    margin-bottom: var(--size-600);
+    margin-bottom: var(--spacing-lg);
     text-align: justify;
-    
+
     @media (max-width: 480px) {
       text-align: left;
     }
@@ -209,11 +211,11 @@ const postContent = css`
   }
   
   ul, ol {
-    margin-bottom: var(--size-600);
-    padding-left: var(--size-600);
-    
+    margin-bottom: var(--spacing-lg);
+    padding-left: var(--spacing-lg);
+
     @media (max-width: 480px) {
-      padding-left: var(--size-500);
+      padding-left: var(--spacing-md-lg);
     }
   }
   
@@ -223,47 +225,44 @@ const postContent = css`
   
   blockquote {
     border-left: 4px solid var(--color-primary);
-    padding-left: var(--size-600);
-    padding-right: var(--size-400);
-    padding-top: var(--size-400);
-    padding-bottom: var(--size-400);
-    margin: var(--size-800) 0;
+    padding: var(--blockquote-padding-y) var(--blockquote-padding-y) var(--blockquote-padding-y) var(--blockquote-padding-x);
+    margin: var(--spacing-xl) 0;
     font-style: italic;
-    background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+    background: var(--color-blockquote-bg);
     border-radius: 0 var(--round-md) var(--round-md) 0;
-    color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-    
+    color: var(--color-blockquote-fg);
+
     @media (max-width: 480px) {
-      padding-left: var(--size-400);
-      margin: var(--size-600) 0;
+      padding-left: var(--blockquote-padding-x-mobile);
+      margin: var(--spacing-lg) 0;
     }
   }
   
   code {
-    background: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-    color: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-    padding: var(--size-50) var(--size-150);
+    background: var(--color-code-inline-bg);
+    color: var(--color-code-inline-fg);
+    padding: var(--code-inline-padding);
     border-radius: var(--round-sm);
     font-size: 1em;
     font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
-    border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+    border: 1px solid var(--color-code-inline-border);
   }
   
   pre {
-    background: light-dark(var(--color-neutral-100), var(--color-neutral-900));
-    padding: var(--size-700);
+    background: var(--color-code-block-bg);
+    padding: var(--code-block-padding);
     border-radius: var(--round-md);
     overflow-x: auto;
-    margin: var(--size-800) 0;
+    margin: var(--spacing-xl) 0;
     border: 1px solid var(--color-border);
     line-height: 1.6;
     font-size: 1em;
     max-width: 100%;
     box-sizing: border-box;
-    
+
     @media (max-width: 480px) {
-      padding: var(--size-500);
-      margin: var(--size-600) 0;
+      padding: var(--code-block-padding-mobile);
+      margin: var(--spacing-lg) 0;
       border-radius: var(--round-sm);
       font-size: 0.9em;
     }
@@ -283,18 +282,18 @@ const postContent = css`
     max-width: 100%;
     height: auto;
     border-radius: var(--round-md);
-    margin: var(--size-600) 0;
+    margin: var(--spacing-lg) 0;
     box-shadow: 0 4px 12px light-dark(var(--color-shadow-light), var(--color-shadow-dark));
   }
-  
+
   .table-wrapper {
     overflow-x: auto;
-    margin: var(--size-600) 0;
+    margin: var(--spacing-lg) 0;
     border-radius: var(--round-md);
-    border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    
+    border: 1px solid var(--color-table-border);
+
     @media (max-width: 768px) {
-      margin: var(--size-400) 0;
+      margin: var(--spacing-md) 0;
     }
   }
 
@@ -310,40 +309,40 @@ const postContent = css`
   }
   
   th, td {
-    border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
-    padding: var(--size-300) var(--size-400);
+    border: 1px solid var(--color-table-border);
+    padding: var(--table-cell-padding);
     text-align: left;
   }
-  
+
   th {
-    background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+    background: var(--color-table-header-bg);
     font-weight: var(--font-semibold);
   }
-  
+
   hr {
     border: none;
     height: 2px;
     background: linear-gradient(to right, transparent, var(--color-primary), transparent);
-    margin: var(--size-800) 0;
+    margin: var(--spacing-xl) 0;
   }
 `;
 
 const postNavigation = css`
-  margin-top: var(--size-1000);
+  margin-top: var(--spacing-2xl);
   display: flex;
   justify-content: space-between;
-  gap: var(--size-600);
-  
+  gap: var(--post-nav-gap);
+
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: var(--size-500);
+    gap: var(--post-nav-gap-mobile);
   }
-  
+
   .nav-link {
     display: flex;
     flex-direction: column;
     text-decoration: none;
-    padding: var(--size-300);
+    padding: var(--post-nav-link-padding);
     background-color: var(--color-card-background);
     border: var(--card-border);
     border-radius: 1rem;
@@ -370,8 +369,8 @@ const postNavigation = css`
     
     .nav-direction {
       font-size: var(--text-sm);
-      color: light-dark(var(--color-neutral-500), var(--color-neutral-400));
-      margin-bottom: var(--size-200);
+      color: var(--color-muted);
+      margin-bottom: var(--spacing-sm);
       font-weight: var(--font-medium);
     }
     
@@ -407,57 +406,59 @@ export default createRoute(async (c) => {
 
   return c.render(
     <div class={postLayout}>
-      <article class={postArticle}>
-        <header class={postHeader}>
-          {image && (
-            <div class="hero-image">
-              <img src={image} alt={title} />
-            </div>
-          )}
-          <h1 class="title">{title}</h1>
-          <p class="description">{description}</p>
-          <div class="meta">
-            <time dateTime={publishedAt}>
-              Published at: {new Date(publishedAt).toLocaleDateString("ja-JP")}
-            </time>
-            {updatedAt && (
-              <>
-                {" | "}
-                <time dateTime={updatedAt}>
-                  Updated at: {new Date(updatedAt).toLocaleDateString("ja-JP")}
-                </time>
-              </>
+      <div class={contentArea}>
+        <article class={postArticle}>
+          <header class={postHeader}>
+            {image && (
+              <div class="hero-image">
+                <img src={image} alt={title} />
+              </div>
             )}
-          </div>
-          <div class="tags">
-            {tags.map((tag) => (
-              <Tag tag={tag} size="sm" key={tag} />
-            ))}
-          </div>
-        </header>
-        <section class={postContent}>
-          <Content />
-        </section>
-        <nav class={postNavigation}>
-          {prev ? (
-            <a href={`/posts/${prev.slug}`} class="nav-link prev">
-              <div class="nav-direction">← 前の記事</div>
-              <div class="nav-title">{prev.title}</div>
-            </a>
-          ) : (
-            <div class="nav-placeholder"></div>
-          )}
-          {next ? (
-            <a href={`/posts/${next.slug}`} class="nav-link next">
-              <div class="nav-direction">次の記事 →</div>
-              <div class="nav-title">{next.title}</div>
-            </a>
-          ) : (
-            <div class="nav-placeholder"></div>
-          )}
-        </nav>
-      </article>
-      <TableOfContents />
+            <h1 class="title">{title}</h1>
+            <p class="description">{description}</p>
+            <div class="meta">
+              <time dateTime={publishedAt}>
+                Published at: {new Date(publishedAt).toLocaleDateString("ja-JP")}
+              </time>
+              {updatedAt && (
+                <>
+                  {" | "}
+                  <time dateTime={updatedAt}>
+                    Updated at: {new Date(updatedAt).toLocaleDateString("ja-JP")}
+                  </time>
+                </>
+              )}
+            </div>
+            <div class="tags">
+              {tags.map((tag) => (
+                <Tag tag={tag} size="sm" key={tag} />
+              ))}
+            </div>
+          </header>
+          <section class={postContent}>
+            <Content />
+          </section>
+        </article>
+        <TableOfContents />
+      </div>
+      <nav class={postNavigation}>
+        {prev ? (
+          <a href={`/posts/${prev.slug}`} class="nav-link prev">
+            <div class="nav-direction">← 前の記事</div>
+            <div class="nav-title">{prev.title}</div>
+          </a>
+        ) : (
+          <div class="nav-placeholder"></div>
+        )}
+        {next ? (
+          <a href={`/posts/${next.slug}`} class="nav-link next">
+            <div class="nav-direction">次の記事 →</div>
+            <div class="nav-title">{next.title}</div>
+          </a>
+        ) : (
+          <div class="nav-placeholder"></div>
+        )}
+      </nav>
     </div>,
   );
 });

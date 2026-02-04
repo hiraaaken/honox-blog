@@ -6,8 +6,8 @@ const postCardClass = css`
   display: grid;
   grid-template-rows: subgrid;
   grid-row: span 3;
-  gap: var(--size-100);
-  padding: var(--size-350);
+  gap: var(--spacing-xs);
+  padding: var(--card-padding-compact);
   background-color: var(--color-card-background);
   border: var(--card-border);
   border-radius: 1rem;
@@ -33,7 +33,7 @@ const postCardTitleClass = css`
   display: inline;
   box-decoration-break: clone;
   background: var(--color-primary);
-  color: var(--color-neutral-800);
+  color: var(--color-tag-foreground);
   font-size: var(--text-lg);
   padding: 0 0.5rem;
 `;

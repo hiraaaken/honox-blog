@@ -23,12 +23,12 @@ const homeContainerClass = css`
 
 const mainContentClass = css`
   display: grid;
-  gap: var(--size-1000);
+  gap: var(--spacing-2xl);
 `
 
 const sideMenuClass = css`
   display: grid;
-  gap: var(--size-1000);
+  gap: var(--spacing-2xl);
   grid-template-columns: 1fr;
   grid-template-rows: auto;
   align-content: start;

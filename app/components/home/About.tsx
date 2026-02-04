@@ -4,13 +4,13 @@ import { Link } from '@/components/ui/Link'
 const aboutClass = css`
   display: flex;
   flex-direction: column;
-  gap: var(--size-400);
+  gap: var(--spacing-md);
 `
 
 const profileSectionClass = css`
   display: flex;
   align-items: center;
-  gap: var(--size-400);
+  gap: var(--spacing-md);
   
   img {
     width: 3rem;
@@ -32,7 +32,7 @@ const aboutCardClass = css`
   border: var(--card-border);
   border-radius: var(--round-xl);
   box-shadow: var(--card-shadow);
-  padding: var(--size-600);
+  padding: var(--spacing-lg);
 `
 const aboutTextClass = css`
   font-size: var(--text-body-sm);

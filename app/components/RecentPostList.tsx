@@ -6,18 +6,18 @@ import { Link } from "./ui/Link";
 const recentPostListSectionClass = css`
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--size-400);
+  gap: var(--spacing-md);
 `;
 
 const postListClass = css`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--size-400);
+  gap: var(--spacing-md);
 `;
 
 const footerClass = css`
   text-align: right;
-  font-size: var(--size-600);
+  font-size: var(--text-2xl);
 `;
 
 export const RecentPostList = ({ posts }: { posts: PostSummary[] }) => {
