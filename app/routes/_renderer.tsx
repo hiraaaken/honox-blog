@@ -48,7 +48,7 @@ export default jsxRenderer(({ children }, c) => {
           `,
           }}
         />
-        <Link href="/app/base-styles.css" rel="stylesheet" />
+        <Link href="/app/styles/index.css" rel="stylesheet" />
         <Script src="/app/client.ts" async />
         <Style />
       </head>
