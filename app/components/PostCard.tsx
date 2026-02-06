@@ -31,11 +31,12 @@ const postCardClass = css`
 
 const postCardTitleClass = css`
   display: inline;
-  box-decoration-break: clone;
-  background: var(--color-primary);
   color: var(--color-tag-foreground);
-  font-size: var(--text-lg);
+  font-size: var(--card-title-font-size);
   padding: 0 0.5rem;
+  text-wrap: balance;
+  font-weight: var(--font-bold);
+  text-shadow: var(--card-title-outline);
 `;
 
 const postCardDescriptionClass = css`

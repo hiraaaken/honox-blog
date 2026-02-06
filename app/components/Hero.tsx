@@ -1,7 +1,7 @@
 import { css } from 'hono/css'
 
 const heroSectionClass = css`
-  height: clamp(280px, 50vw, 420px);
+  height: clamp(300px, 50vw, 420px);
   padding-top: var(--hero-padding-top);
   width: 100%;
   background-color: var(--color-primary);
@@ -24,13 +24,16 @@ const heroTitleClass = css`
   letter-spacing: var(--hero-letter-spacing);
 
   span {
-      display: block;
+    display: block;
+    line-height: 1.2;
   }
 `
 
 const heroDescriptionClass = css`
   font-weight: var(--font-bold);
   letter-spacing: var(--hero-letter-spacing);
+  font-size: var(--hero-description-font-size);
+  margin: 0;
 `
 
 export const Hero = () => {
@@ -42,7 +45,7 @@ export const Hero = () => {
           <span>I'm Hiraaaken.</span>
         </h1>
         <p class={heroDescriptionClass}>
-          I'm a software engineer working in Kyoto, Japan.<br />
+          I'm a software engineer working in Kyoto.<br />
           I'll write about my experiences and learnings in software engineering.
         </p>
       </div>
