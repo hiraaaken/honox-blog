@@ -7,7 +7,7 @@ import { css } from "hono/css";
 const postLayout = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 8rem var(--spacing-lg) 2rem;
+  padding: 6rem var(--spacing-lg) 2rem;
   box-sizing: border-box;
   width: 100%;
 
@@ -19,12 +19,10 @@ const postLayout = css`
 `;
 
 const contentArea = css`
-  /* グリッドレイアウト: メインコンテンツとTOCを横並び */
   &:has(nav[aria-label="Table of Contents"]) {
     display: grid;
     grid-template-columns: 1fr 220px;
-    gap: var(--spacing-lg);
-    align-items: start;
+    gap: var(--spacing-sm);
 
     @media (max-width: 1024px) {
       grid-template-columns: 1fr;

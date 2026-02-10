@@ -9,7 +9,7 @@ interface Heading {
 
 const tocContainer = css`
   position: sticky;
-  top: 8rem;
+  top: 6rem;
   max-height: calc(100vh - 10rem);
   overflow-y: auto;
   padding: var(--toc-padding);
@@ -36,6 +36,21 @@ const tocList = css`
   list-style: none;
   padding: 0;
   margin: 0;
+  scroll-target-group: auto;
+
+
+  a:target-before {
+    color: #999;
+  }
+
+  a:target-current {
+    color: #0066cc;
+    font-weight: bold;
+  }
+
+  a:target-after {
+    color: #333;
+  }
 `;
 
 const tocItemH2 = css`
