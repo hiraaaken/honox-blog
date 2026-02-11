@@ -16,9 +16,17 @@ export interface FrontMatter {
 /** MDXコンポーネント型 */
 export type MDXComponent = FC;
 
+/** 見出し情報（TOC用） */
+export interface Heading {
+  id: string;
+  text: string;
+  level: number;
+}
+
 /** import.meta.globで読み込まれるMDXモジュールの型 */
 export type MDXModule = {
   frontmatter: FrontMatter;
+  headings?: Heading[];
   default?: MDXComponent;
 }
 
@@ -41,6 +49,7 @@ export interface PostSummary {
 /** 本文コンポーネント付き投稿（詳細ページ用） */
 export interface PostWithContent extends PostSummary {
   Content: MDXComponent;
+  headings: Heading[];
 }
 
 /** タグと投稿数 */

@@ -1,7 +1,7 @@
 import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
-import { TableOfContents } from "../../islands/TableOfContents";
+import { TableOfContents } from "../../components/TableOfContents";
 import { css } from "hono/css";
 
 const postLayout = css`
@@ -397,8 +397,16 @@ export default createRoute(async (c) => {
     return c.notFound();
   }
 
-  const { title, description, publishedAt, updatedAt, tags, image, Content } =
-    post;
+  const {
+    title,
+    description,
+    publishedAt,
+    updatedAt,
+    tags,
+    image,
+    Content,
+    headings,
+  } = post;
 
   const { prev, next } = await getAdjacentPosts(slug);
 
@@ -437,7 +445,7 @@ export default createRoute(async (c) => {
             <Content />
           </section>
         </article>
-        <TableOfContents />
+        <TableOfContents headings={headings} />
       </div>
       <nav class={postNavigation}>
         {prev ? (

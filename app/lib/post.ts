@@ -14,6 +14,9 @@ import type {
   GetAdjacentPosts,
 } from "@/types";
 
+/**
+ * ポストの一覧を取得する
+ */
 export const getPosts: GetPosts = async () => {
   const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
@@ -34,6 +37,9 @@ export const getPosts: GetPosts = async () => {
   );
 };
 
+/**
+ * 特定のポストを取得する
+ */
 export const getPostBySlug: GetPostBySlug = async (slug) => {
   const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
@@ -56,10 +62,11 @@ export const getPostBySlug: GetPostBySlug = async (slug) => {
     ...mod.frontmatter,
     slug,
     Content: mod.default,
+    headings: mod.headings ?? [],
   };
 
   return post;
-};
+};;
 
 export const getAllTags: GetAllTags = async () => {
   const posts = await getPosts();
