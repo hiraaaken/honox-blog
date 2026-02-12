@@ -5,8 +5,6 @@ interface TableOfContentsProps {
   headings: Heading[];
 }
 
-// === スタイル定義 ===
-
 const tocContainer = css`
   position: sticky;
   top: 6rem;
@@ -17,6 +15,7 @@ const tocContainer = css`
   border: var(--card-border);
   border-radius: var(--round-md);
   box-shadow: var(--card-shadow);
+  height: fit-content;
 
   @media (max-width: 768px) {
     display: none;
@@ -36,6 +35,7 @@ const tocList = css`
   list-style: none;
   padding: 0;
   margin: 0;
+  scroll-target-group: auto;
 `;
 
 const tocItemH2 = css`
@@ -59,6 +59,20 @@ const tocItemH2 = css`
         font-weight: var(--font-semibold);
       }
     }
+  }
+
+  a:target-before {
+    color: var(--toc-target-before-color);
+
+    &:hover {
+      color: var(--toc-selected-item-color);
+    }
+  }
+
+  a:target-current {
+    color: var(--toc-selected-item-color);
+    text-shadow: var(--toc-selected-item-outline);
+    font-weight: var(--font-semibold);
   }
 `;
 
@@ -90,15 +104,23 @@ const tocItemH3 = css`
       }
     }
   }
+
+  a:target-before {
+    color: var(--toc-target-before-color);
+
+    &:hover {
+      color: var(--toc-selected-item-color);
+    }
+  }
+
+  a:target-current {
+    color: var(--toc-selected-item-color);
+    text-shadow: var(--toc-selected-item-outline);
+    font-weight: var(--font-semibold);
+  }
 `;
 
-// === コンポーネント ===
 
-/**
- * 目次コンポーネント（サーバーサイドレンダリング）
- *
- * h2/h3 の見出しをグループ化して表示する
- */
 export function TableOfContents({ headings }: TableOfContentsProps) {
   // 見出しがない場合は何も表示しない
   if (headings.length === 0) {
