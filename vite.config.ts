@@ -9,6 +9,7 @@ import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import rehypeShiki from '@shikijs/rehype'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import { rehypeExtractHeadings } from './app/lib/rehype-extract-headings'
 
 const entry = "/app/server.ts"
 
@@ -30,6 +31,7 @@ export default defineConfig({
       remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
       rehypePlugins: [
         rehypeSlug,
+        rehypeExtractHeadings,  // rehypeSlug の後に実行（ID 付与後に見出しを抽出）
         [rehypeAutolinkHeadings, {
           behavior: 'wrap',
           properties: {

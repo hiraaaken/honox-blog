@@ -61,11 +61,23 @@
 	/**
    * Add scrollbar gutter
    *
-   * Prevent the page from “jumping” when switching from a long to a short page.
+   * Prevent the page from "jumping" when switching from a long to a short page.
    *
    */
 	html {
 		scrollbar-gutter: stable;
+	}
+
+	/**
+   * Enable smooth scrolling
+   *
+   * Provides a smooth scrolling experience when navigating to anchor links.
+   * Respects user's reduced motion preferences.
+   */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
 	}
 
 	/**

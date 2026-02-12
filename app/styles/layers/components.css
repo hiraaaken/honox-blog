@@ -20,7 +20,6 @@
   --card-shadow-hover: 0 4px 0 var(--color-card-shadow);
   --card-title-font-size: clamp(var(--text-lg), 5vw, var(--text-2xl));
   --card-title-outline:
-    /* primary layer - r=3px, 32方向 */
     3px 0 0.3px var(--color-primary),
     2.95px 0.59px 0.3px var(--color-primary),
     2.77px 1.15px 0.3px var(--color-primary),
@@ -143,6 +142,75 @@
   --toc-nested-margin-left: var(--size-200);
   --toc-nested-item-padding: var(--size-50) var(--size-150);
   --color-toc-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --toc-selected-item-color: var(--color-neutral-900);
+  --toc-target-before-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+  --toc-target-after-color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+  --toc-selected-item-outline: 
+    3px 0 0.3px var(--color-primary),
+    2.95px 0.59px 0.3px var(--color-primary),
+    2.77px 1.15px 0.3px var(--color-primary),
+    2.49px 1.67px 0.3px var(--color-primary),
+    2.12px 2.12px 0.3px var(--color-primary),
+    1.67px 2.49px 0.3px var(--color-primary),
+    1.15px 2.77px 0.3px var(--color-primary),
+    0.59px 2.95px 0.3px var(--color-primary),
+    0 3px 0.3px var(--color-primary),
+    -0.59px 2.95px 0.3px var(--color-primary),
+    -1.15px 2.77px 0.3px var(--color-primary),
+    -1.67px 2.49px 0.3px var(--color-primary),
+    -2.12px 2.12px 0.3px var(--color-primary),
+    -2.49px 1.67px 0.3px var(--color-primary),
+    -2.77px 1.15px 0.3px var(--color-primary),
+    -2.95px 0.59px 0.3px var(--color-primary),
+    -3px 0 0.3px var(--color-primary),
+    -2.95px -0.59px 0.3px var(--color-primary),
+    -2.77px -1.15px 0.3px var(--color-primary),
+    -2.49px -1.67px 0.3px var(--color-primary),
+    -2.12px -2.12px 0.3px var(--color-primary),
+    -1.67px -2.49px 0.3px var(--color-primary),
+    -1.15px -2.77px 0.3px var(--color-primary),
+    -0.59px -2.95px 0.3px var(--color-primary),
+    0 -3px 0.3px var(--color-primary),
+    0.59px -2.95px 0.3px var(--color-primary),
+    1.15px -2.77px 0.3px var(--color-primary),
+    1.67px -2.49px 0.3px var(--color-primary),
+    2.12px -2.12px 0.3px var(--color-primary),
+    2.49px -1.67px 0.3px var(--color-primary),
+    2.77px -1.15px 0.3px var(--color-primary),
+    2.95px -0.59px 0.3px var(--color-primary),
+    /* shadow layer - r=5px, 32方向 */
+    5px 0 0.3px var(--color-shadow-dark),
+    4.91px 0.98px 0.3px var(--color-shadow-dark),
+    4.62px 1.91px 0.3px var(--color-shadow-dark),
+    4.16px 2.78px 0.3px var(--color-shadow-dark),
+    3.54px 3.54px 0.3px var(--color-shadow-dark),
+    2.78px 4.16px 0.3px var(--color-shadow-dark),
+    1.91px 4.62px 0.3px var(--color-shadow-dark),
+    0.98px 4.91px 0.3px var(--color-shadow-dark),
+    0 5px 0.3px var(--color-shadow-dark),
+    -0.98px 4.91px 0.3px var(--color-shadow-dark),
+    -1.91px 4.62px 0.3px var(--color-shadow-dark),
+    -2.78px 4.16px 0.3px var(--color-shadow-dark),
+    -3.54px 3.54px 0.3px var(--color-shadow-dark),
+    -4.16px 2.78px 0.3px var(--color-shadow-dark),
+    -4.62px 1.91px 0.3px var(--color-shadow-dark),
+    -4.91px 0.98px 0.3px var(--color-shadow-dark),
+    -5px 0 0.3px var(--color-shadow-dark),
+    -4.91px -0.98px 0.3px var(--color-shadow-dark),
+    -4.62px -1.91px 0.3px var(--color-shadow-dark),
+    -4.16px -2.78px 0.3px var(--color-shadow-dark),
+    -3.54px -3.54px 0.3px var(--color-shadow-dark),
+    -2.78px -4.16px 0.3px var(--color-shadow-dark),
+    -1.91px -4.62px 0.3px var(--color-shadow-dark),
+    -0.98px -4.91px 0.3px var(--color-shadow-dark),
+    0 -5px 0.3px var(--color-shadow-dark),
+    0.98px -4.91px 0.3px var(--color-shadow-dark),
+    1.91px -4.62px 0.3px var(--color-shadow-dark),
+    2.78px -4.16px 0.3px var(--color-shadow-dark),
+    3.54px -3.54px 0.3px var(--color-shadow-dark),
+    4.16px -2.78px 0.3px var(--color-shadow-dark),
+    4.62px -1.91px 0.3px var(--color-shadow-dark),
+    4.91px -0.98px 0.3px var(--color-shadow-dark);
 
   /* --- Hero --- */
   --hero-padding-top: var(--size-1200);
