@@ -17,7 +17,7 @@ const tocContainer = css`
   box-shadow: var(--card-shadow);
   height: fit-content;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     display: none;
   }
 `;
@@ -55,7 +55,7 @@ const tocItemH2 = css`
     @media (hover: hover) {
       &:hover {
         color: var(--toc-selected-item-color);
-        text-shadow: var(--toc-selected-item-outline);
+        text-shadow: var(--text-outline);
         font-weight: var(--font-semibold);
       }
     }
@@ -71,7 +71,7 @@ const tocItemH2 = css`
 
   a:target-current {
     color: var(--toc-selected-item-color);
-    text-shadow: var(--toc-selected-item-outline);
+    text-shadow: var(--text-outline);
     font-weight: var(--font-semibold);
   }
 `;

@@ -42,9 +42,10 @@ const postHeader = css`
   >.title {
     font-size: var(--text-responsive-title);
     font-weight: var(--font-bold);
-    color: var(--color-foreground);
+    color: var(--post-title-color);
     margin-bottom: var(--spacing-sm);
     line-height: 1.2;
+    text-shadow: var(--text-outline);
 
     @media (max-width: 768px) {
       font-size: var(--text-responsive-title-mobile);
@@ -446,25 +447,25 @@ export default createRoute(async (c) => {
           </section>
         </article>
         <TableOfContents headings={headings} />
+        <nav class={postNavigation}>
+          {prev ? (
+            <a href={`/posts/${prev.slug}`} class="nav-link prev">
+              <div class="nav-direction">← 前の記事</div>
+              <div class="nav-title">{prev.title}</div>
+            </a>
+          ) : (
+            <div class="nav-placeholder"></div>
+          )}
+          {next ? (
+            <a href={`/posts/${next.slug}`} class="nav-link next">
+              <div class="nav-direction">次の記事 →</div>
+              <div class="nav-title">{next.title}</div>
+            </a>
+          ) : (
+            <div class="nav-placeholder"></div>
+          )}
+        </nav>
       </div>
-      <nav class={postNavigation}>
-        {prev ? (
-          <a href={`/posts/${prev.slug}`} class="nav-link prev">
-            <div class="nav-direction">← 前の記事</div>
-            <div class="nav-title">{prev.title}</div>
-          </a>
-        ) : (
-          <div class="nav-placeholder"></div>
-        )}
-        {next ? (
-          <a href={`/posts/${next.slug}`} class="nav-link next">
-            <div class="nav-direction">次の記事 →</div>
-            <div class="nav-title">{next.title}</div>
-          </a>
-        ) : (
-          <div class="nav-placeholder"></div>
-        )}
-      </nav>
     </div>,
   );
 });
