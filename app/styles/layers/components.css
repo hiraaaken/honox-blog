@@ -30,11 +30,11 @@
   --tag-shadow-hover: 0 1.5px 0 var(--color-tag-shadow);
 
   /* --- Code Blocks --- */
-  --color-code-inline-bg: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-  --color-code-inline-fg: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-  --color-code-inline-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  --color-code-inline-bg: var(--color-neutral-800);
+  --color-code-inline-fg: var(--color-neutral-50);
+  --color-code-inline-border: var(--color-neutral-700);
   --color-code-block-bg: light-dark(var(--color-neutral-100), var(--color-neutral-900));
-  --code-inline-padding: var(--size-50) var(--size-150);
+  --code-inline-padding: var(--size-100) var(--size-200);
   --code-block-padding: var(--size-700);
   --code-block-padding-mobile: var(--size-500);
 
@@ -48,7 +48,7 @@
   /* --- Table --- */
   --color-table-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
   --color-table-header-bg: light-dark(var(--color-neutral-100), var(--color-neutral-800));
-  --table-cell-padding: var(--size-300) var(--size-400);
+  --table-cell-padding: var(--size-400) var(--size-500);
 
   /* --- Theme Toggle --- */
   --toggle-size: var(--size-1000);

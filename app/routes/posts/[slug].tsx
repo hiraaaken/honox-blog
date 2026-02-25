@@ -7,7 +7,7 @@ import { css } from "hono/css";
 const postLayout = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 6rem var(--spacing-lg) 2rem;
+  padding: 8rem var(--spacing-lg) 2rem;
   box-sizing: border-box;
   width: 100%;
 
@@ -22,7 +22,7 @@ const contentArea = css`
   &:has(nav[aria-label="Table of Contents"]) {
     display: grid;
     grid-template-columns: 1fr 220px;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-lg);
 
     @media (max-width: 1024px) {
       grid-template-columns: 1fr;
@@ -72,19 +72,6 @@ const postHeader = css`
     gap: var(--spacing-sm);
   }
 
-  .hero-image {
-    margin: 0 auto var(--spacing-lg) auto;
-    border-radius: var(--round-md);
-    overflow: hidden;
-    box-shadow: 0 4px 20px light-dark(var(--color-shadow-light), var(--color-shadow-dark));
-    max-width: 600px;
-    
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-  }
 `;
 
 const postContent = css`
@@ -191,6 +178,7 @@ const postContent = css`
   p {
     margin-bottom: var(--spacing-lg);
     text-align: justify;
+    line-height: 1.8;
 
     @media (max-width: 480px) {
       text-align: left;
@@ -242,7 +230,7 @@ const postContent = css`
     color: var(--color-code-inline-fg);
     padding: var(--code-inline-padding);
     border-radius: var(--round-sm);
-    font-size: 1em;
+    font-size: 0.9em;
     font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
     border: 1px solid var(--color-code-inline-border);
   }
@@ -404,7 +392,6 @@ export default createRoute(async (c) => {
     publishedAt,
     updatedAt,
     tags,
-    image,
     Content,
     headings,
   } = post;
@@ -416,11 +403,6 @@ export default createRoute(async (c) => {
       <div class={contentArea}>
         <article class={postArticle}>
           <header class={postHeader}>
-            {image && (
-              <div class="hero-image">
-                <img src={image} alt={title} />
-              </div>
-            )}
             <h1 class="title">{title}</h1>
             <p class="description">{description}</p>
             <div class="meta">

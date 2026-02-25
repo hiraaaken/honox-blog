@@ -6,6 +6,7 @@ import mdx from '@mdx-js/rollup'
 import ssg from '@hono/vite-ssg'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
+import remarkGfm from 'remark-gfm'
 import rehypeShiki from '@shikijs/rehype'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
@@ -28,7 +29,7 @@ export default defineConfig({
     ssg({ entry }),
     mdx({
       jsxImportSource: 'hono/jsx',
-      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+      remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
       rehypePlugins: [
         rehypeSlug,
         rehypeExtractHeadings,  // rehypeSlug の後に実行（ID 付与後に見出しを抽出）

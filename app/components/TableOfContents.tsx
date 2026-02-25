@@ -55,8 +55,7 @@ const tocItemH2 = css`
     @media (hover: hover) {
       &:hover {
         color: var(--toc-selected-item-color);
-        text-shadow: var(--text-outline);
-        font-weight: var(--font-semibold);
+        background-color: var(--color-primary);
       }
     }
   }
@@ -66,13 +65,13 @@ const tocItemH2 = css`
 
     &:hover {
       color: var(--toc-selected-item-color);
+      background-color: var(--color-primary);
     }
   }
 
   a:target-current {
     color: var(--toc-selected-item-color);
-    text-shadow: var(--text-outline);
-    font-weight: var(--font-semibold);
+    background-color: var(--color-primary);
   }
 `;
 
@@ -99,8 +98,8 @@ const tocItemH3 = css`
 
     @media (hover: hover) {
       &:hover {
-        color: var(--color-primary);
-        background: var(--color-hover-background);
+        color: var(--toc-selected-item-color);
+        background-color: var(--color-primary);
       }
     }
   }
@@ -110,19 +109,17 @@ const tocItemH3 = css`
 
     &:hover {
       color: var(--toc-selected-item-color);
+      background-color: var(--color-primary);
     }
   }
 
   a:target-current {
     color: var(--toc-selected-item-color);
-    text-shadow: var(--toc-selected-item-outline);
-    font-weight: var(--font-semibold);
+    background-color: var(--color-primary);
   }
 `;
 
-
 export function TableOfContents({ headings }: TableOfContentsProps) {
-  // 見出しがない場合は何も表示しない
   if (headings.length === 0) {
     return null;
   }

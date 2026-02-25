@@ -53,7 +53,7 @@ export const About = () => {
           <h3>Hiraaaken</h3>
         </div>
         <p class={aboutTextClass}>
-          Software engineer in Kyoto, Japan. I share thoughts about web development, programming, and technology.
+          京都在住のソフトウェアエンジニア。Web 開発・プログラミング・技術的な気づきを日本語で発信しています。
         </p>
         <Link href="/about">read more...</Link>
       </article>
