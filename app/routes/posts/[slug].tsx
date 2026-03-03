@@ -7,7 +7,7 @@ import { css } from "hono/css";
 const postLayout = css`
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 6rem var(--spacing-lg) 2rem;
+  padding: 8rem var(--spacing-lg) 2rem;
   box-sizing: border-box;
   width: 100%;
 
@@ -22,7 +22,7 @@ const contentArea = css`
   &:has(nav[aria-label="Table of Contents"]) {
     display: grid;
     grid-template-columns: 1fr 220px;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-lg);
 
     @media (max-width: 1024px) {
       grid-template-columns: 1fr;
@@ -42,9 +42,10 @@ const postHeader = css`
   >.title {
     font-size: var(--text-responsive-title);
     font-weight: var(--font-bold);
-    color: var(--color-foreground);
+    color: var(--post-title-color);
     margin-bottom: var(--spacing-sm);
     line-height: 1.2;
+    text-shadow: var(--text-outline);
 
     @media (max-width: 768px) {
       font-size: var(--text-responsive-title-mobile);
@@ -71,19 +72,6 @@ const postHeader = css`
     gap: var(--spacing-sm);
   }
 
-  .hero-image {
-    margin: 0 auto var(--spacing-lg) auto;
-    border-radius: var(--round-md);
-    overflow: hidden;
-    box-shadow: 0 4px 20px light-dark(var(--color-shadow-light), var(--color-shadow-dark));
-    max-width: 600px;
-    
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-  }
 `;
 
 const postContent = css`
@@ -190,6 +178,7 @@ const postContent = css`
   p {
     margin-bottom: var(--spacing-lg);
     text-align: justify;
+    line-height: 1.8;
 
     @media (max-width: 480px) {
       text-align: left;
@@ -241,7 +230,7 @@ const postContent = css`
     color: var(--color-code-inline-fg);
     padding: var(--code-inline-padding);
     border-radius: var(--round-sm);
-    font-size: 1em;
+    font-size: 0.9em;
     font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
     border: 1px solid var(--color-code-inline-border);
   }
@@ -403,7 +392,6 @@ export default createRoute(async (c) => {
     publishedAt,
     updatedAt,
     tags,
-    image,
     Content,
     headings,
   } = post;
@@ -415,11 +403,6 @@ export default createRoute(async (c) => {
       <div class={contentArea}>
         <article class={postArticle}>
           <header class={postHeader}>
-            {image && (
-              <div class="hero-image">
-                <img src={image} alt={title} />
-              </div>
-            )}
             <h1 class="title">{title}</h1>
             <p class="description">{description}</p>
             <div class="meta">
@@ -446,25 +429,25 @@ export default createRoute(async (c) => {
           </section>
         </article>
         <TableOfContents headings={headings} />
+        <nav class={postNavigation}>
+          {prev ? (
+            <a href={`/posts/${prev.slug}`} class="nav-link prev">
+              <div class="nav-direction">← 前の記事</div>
+              <div class="nav-title">{prev.title}</div>
+            </a>
+          ) : (
+            <div class="nav-placeholder"></div>
+          )}
+          {next ? (
+            <a href={`/posts/${next.slug}`} class="nav-link next">
+              <div class="nav-direction">次の記事 →</div>
+              <div class="nav-title">{next.title}</div>
+            </a>
+          ) : (
+            <div class="nav-placeholder"></div>
+          )}
+        </nav>
       </div>
-      <nav class={postNavigation}>
-        {prev ? (
-          <a href={`/posts/${prev.slug}`} class="nav-link prev">
-            <div class="nav-direction">← 前の記事</div>
-            <div class="nav-title">{prev.title}</div>
-          </a>
-        ) : (
-          <div class="nav-placeholder"></div>
-        )}
-        {next ? (
-          <a href={`/posts/${next.slug}`} class="nav-link next">
-            <div class="nav-direction">次の記事 →</div>
-            <div class="nav-title">{next.title}</div>
-          </a>
-        ) : (
-          <div class="nav-placeholder"></div>
-        )}
-      </nav>
     </div>,
   );
 });

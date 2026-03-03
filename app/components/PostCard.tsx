@@ -36,7 +36,7 @@ const postCardTitleClass = css`
   padding: 0 0.5rem;
   text-wrap: balance;
   font-weight: var(--font-bold);
-  text-shadow: var(--card-title-outline);
+  text-shadow: var(--text-outline);
 `;
 
 const postCardDescriptionClass = css`
