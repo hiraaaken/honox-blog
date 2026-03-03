@@ -1,5 +1,8 @@
 import { css } from 'hono/css'
 import { Link } from '@/components/ui/Link'
+import GithubIcon from '@/components/ui/GithubIcon'
+import XIcon from '@/components/ui/XIcon'
+import ZennIcon from '@/components/ui/ZennIcon'
 
 const aboutClass = css`
   display: flex;
@@ -34,6 +37,24 @@ const aboutCardClass = css`
   box-shadow: var(--card-shadow);
   padding: var(--spacing-lg);
 `
+const socialLinksClass = css`
+  display: flex;
+  gap: var(--spacing-sm);
+
+  a {
+    display: inline-flex;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  @media (hover: hover) {
+    a:hover {
+      opacity: 1;
+    }
+  }
+`
+
 const aboutTextClass = css`
   font-size: var(--text-body-sm);
   line-height: 1.5;
@@ -50,10 +71,23 @@ export const About = () => {
       <article class={aboutCardClass}>
         <div class={profileSectionClass}>
           <img src="icon.png" alt='Hiraaaken profile' />
-          <h3>Hiraaaken</h3>
+          <div>
+            <h3>hiraaaken</h3>
+            <div class={socialLinksClass}>
+              <a href="https://github.com/hiraaaken" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <GithubIcon />
+              </a>
+              <a href="https://x.com/0512Ken" target="_blank" rel="noopener noreferrer" aria-label="X">
+                <XIcon />
+              </a>
+              <a href="https://zenn.dev/hiraaaken" target="_blank" rel="noopener noreferrer" aria-label="Zenn">
+                <ZennIcon />
+              </a>
+            </div>
+          </div>
         </div>
         <p class={aboutTextClass}>
-          京都在住のソフトウェアエンジニア。Web 開発・プログラミング・技術的な気づきを日本語で発信しています。
+        関西在住ソフトウェアエンジニア。<br />業務アプリ作ってます。
         </p>
         <Link href="/about">read more...</Link>
       </article>

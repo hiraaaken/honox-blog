@@ -1,5 +1,10 @@
 import { createRoute } from "honox/factory";
 import { css } from "hono/css";
+import { TechStackTag } from "@/islands/TechStackTag";
+import { InfoTooltip } from "@/islands/InfoTooltip";
+import GithubIcon from "@/components/ui/GithubIcon";
+import XIcon from "@/components/ui/XIcon";
+import ZennIcon from "@/components/ui/ZennIcon";
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
@@ -8,7 +13,7 @@ const sectionClass = css`
   padding: 6rem 1rem 2rem;
   max-width: var(--content-max-width);
   display: grid;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-base);
 `;
 
 const headerClass = css`
@@ -29,6 +34,10 @@ const cardClass = css`
   padding: var(--spacing-xl);
   background-color: var(--color-card-background);
   color: var(--color-foreground);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 `;
 
 const cardTitleClass = css`
@@ -40,6 +49,10 @@ const cardTitleClass = css`
     var(--color-neutral-200),
     var(--color-neutral-700)
   );
+
+  & button {
+    margin-left: var(--spacing-sm);
+  }
 `;
 
 // ─── Profile Card ──────────────────────────────────────────────────────────────
@@ -48,6 +61,8 @@ const profileWrapperClass = css`
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid light-dark( var(--color-neutral-200), var(--color-neutral-700));
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -83,7 +98,7 @@ const profileInfoClass = css`
 
 const snsLinksClass = css`
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   margin-top: var(--spacing-sm);
 
   @media (max-width: 768px) {
@@ -92,27 +107,14 @@ const snsLinksClass = css`
 `;
 
 const snsLinkClass = css`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: var(--round-full);
-  border: 1px solid var(--color-border);
+  display: inline-flex;
   color: var(--color-foreground);
-  text-decoration: none;
-  transition: opacity 0.2s, transform 0.2s;
-
-  svg {
-    width: 1.125rem;
-    height: 1.125rem;
-    fill: currentColor;
-  }
+  opacity: 0.6;
+  transition: opacity 0.2s ease-in-out;
 
   @media (hover: hover) {
     &:hover {
-      opacity: 0.65;
-      transform: translateY(-2px);
+      opacity: 1;
     }
   }
 `;
@@ -120,7 +122,7 @@ const snsLinkClass = css`
 // ─── Introduction ──────────────────────────────────────────────────────────────
 
 const introTextClass = css`
-  font-size: var(--text-body-lg);
+  font-size: clamp(var(--text-body-sm), 3vw, var(--text-body));
   line-height: 1.8;
 
   p + p {
@@ -133,7 +135,7 @@ const introTextClass = css`
 const stackGroupClass = css`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 
   & + & {
     margin-top: var(--spacing-md);
@@ -151,145 +153,103 @@ const stackLabelClass = css`
 const stackTagsClass = css`
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 `;
-
-const techTagClass = css`
-  display: inline-block;
-  padding: 0.2rem 0.75rem;
-  border-radius: var(--round-pill);
-  font-size: var(--text-body-sm);
-  font-weight: var(--font-medium);
-  background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-  color: light-dark(var(--color-neutral-700), var(--color-neutral-300));
-  border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
-`;
-
-// ─── Timeline ─────────────────────────────────────────────────────────────────
-
-const timelineClass = css`
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding-left: 1.5rem;
-
-  /* 縦線 */
-  &::before {
-    content: "";
-    position: absolute;
-    left: 4px;
-    top: 8px;
-    bottom: 8px;
-    width: 2px;
-    background-color: light-dark(var(--color-neutral-200), var(--color-neutral-700));
-  }
-`;
-
-const timelineItemClass = css`
-  position: relative;
-  padding-bottom: var(--spacing-lg);
-
-  /* 丸ポイント (線中心 = left:5px, ドット幅10px → item 基準 left:-24px) */
-  &::before {
-    content: "";
-    position: absolute;
-    left: -24px;
-    top: 5px;
-    width: 10px;
-    height: 10px;
-    border-radius: var(--round-full);
-    background-color: var(--color-primary);
-    border: 2px solid var(--color-card-background);
-  }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-`;
-
-const timelineDateClass = css`
-  font-size: var(--text-body-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-muted);
-  margin-bottom: 0.25rem;
-`;
-
-const timelineTitleClass = css`
-  font-size: var(--text-body-lg);
-  font-weight: var(--font-bold);
-  color: var(--color-foreground);
-  margin-bottom: 0.25rem;
-`;
-
-const timelineDescClass = css`
-  font-size: var(--text-body-sm);
-  opacity: 0.75;
-  line-height: 1.65;
-`;
-
-// ─── SVG Icons ────────────────────────────────────────────────────────────────
-
-const GitHubIcon = () => (
-  <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-  </svg>
-);
-
-const XIcon = () => (
-  <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
-  </svg>
-);
-
-// Zenn ロゴ（Z 字型シルエット）
-const ZennIcon = () => (
-  <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M.264 23.771h4.984c.264 0 .498-.147.645-.352L19.614 1.683c.176-.293.029-.683-.381-.683h-4.72c-.235 0-.44.117-.557.323L.03 23.239c-.088.176-.029.532.234.532zM17.666 23.771h5.835c.361 0 .537-.44.304-.703L17.049 16.8c-.176-.176-.44-.235-.674-.117l-2.956 1.58c-.264.146-.333.498-.147.732l3.923 4.542c.117.147.323.234.47.234z" />
-  </svg>
-);
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-// ✏️ 技術スタックを自由に編集してください
-const techStack = [
+interface TechStack {
+  category: string;
+  stacks: {
+    name: string;
+    rate: number; // 1-3のレベルを想定
+  }[];
+}
+
+
+const techStacks: TechStack[] = [
   {
-    category: "Frontend",
-    tags: ["TypeScript", "React", "Vue.js", "HonoX", "Tailwind CSS"],
+    category: "Languages",
+    stacks: [
+      {
+        name: "TypeScript",
+        rate: 2,
+      },
+      {
+        name: "JavaScript",
+        rate: 3,
+      },
+      {
+        name: "Java",
+        rate: 2,
+      },
+      {
+        name: "Kotlin",
+        rate: 2,
+      },
+      {
+        name: "C#",
+        rate: 1,
+      },
+      {
+        name: "Haskell",
+        rate: 1,
+      },
+    ],
   },
   {
-    category: "Backend",
-    tags: ["Node.js", "Hono", "Bun", "PostgreSQL"],
+    category: "Framworks/Libraries",
+    stacks: [
+      {
+        name: "Vue.js",
+        rate: 2,
+      },
+      {
+        name: "Spring Boot",
+        rate: 2,
+      },
+      {
+        name: "Hono/HonoX",
+        rate: 1,
+      },
+      {
+        name: "Svelte",
+        rate: 1,
+      },
+    ],
   },
   {
     category: "Infrastructure",
-    tags: ["Cloudflare Workers", "Cloudflare Pages", "Docker"],
+    stacks: [
+      {
+        name: "Cloudflare",
+        rate: 1,
+      },
+      {
+        name: "AWS",
+        rate: 1,
+      },
+      {
+        name: "Docker",
+        rate: 2,
+      },
+    ],
   },
   {
-    category: "Tools",
-    tags: ["Git", "GitHub Actions", "Vite"],
-  },
-] as const;
+    category: "Databases",
+    stacks: [
+      {
+        name: "MySQL",
+        rate: 2,
+      },
+      {
+        name: "Oracle Database",
+        rate: 2,
+      },
+    ],
+  }
+];
 
-// ✏️ 経歴を自由に編集してください
-const timeline = [
-  {
-    date: "2023年4月〜現在",
-    title: "株式会社〇〇（プレースホルダー）",
-    description:
-      "Webアプリケーションの設計・開発に従事。TypeScript / React を中心としたフロントエンド開発を担当。",
-  },
-  {
-    date: "2021年4月〜2023年3月",
-    title: "株式会社△△（プレースホルダー）",
-    description:
-      "バックエンド API の開発・保守。Node.js / PostgreSQL を用いたサービス開発。",
-  },
-  {
-    date: "2017年4月〜2021年3月",
-    title: "〇〇大学 工学部（プレースホルダー）",
-    description: "情報工学を専攻。在学中にプログラミングを独学で習得。",
-  },
-] as const;
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
@@ -299,98 +259,68 @@ export default createRoute((c) => {
       {/* ヘッダー */}
       <header class={headerClass}>
         <h1>About</h1>
-        <span>私について</span>
       </header>
 
-      {/* プロフィールカード */}
+      {/* プロフィール・自己紹介カード */}
       <div class={cardClass}>
         <div class={profileWrapperClass}>
           <img src="/icon.png" alt="プロフィール画像" class={profileImageClass} />
           <div class={profileInfoClass}>
-            {/* ✏️ 名前・肩書きを編集してください */}
-            <h2>Hiraaaken</h2>
-            <p>Software Engineer / 京都在住</p>
+            <h2>hiraaaken</h2>
 
-            {/* SNSリンク ✏️ URL を差し替えてください */}
             <div class={snsLinksClass}>
-              <a
-                href="https://github.com/username"
-                class={snsLinkClass}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-              >
-                <GitHubIcon />
+              <a href="https://github.com/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <GithubIcon size={24} />
               </a>
-              <a
-                href="https://x.com/username"
-                class={snsLinkClass}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X (Twitter)"
-              >
-                <XIcon />
+              <a href="https://x.com/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="X">
+                <XIcon size={24} />
               </a>
-              <a
-                href="https://zenn.dev/username"
-                class={snsLinkClass}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Zenn"
-              >
-                <ZennIcon />
+              <a href="https://zenn.dev/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="Zenn">
+                <ZennIcon size={24} />
               </a>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 自己紹介カード */}
-      <div class={cardClass}>
-        <h2 class={cardTitleClass}>自己紹介</h2>
-        {/* ✏️ 自己紹介文を自由に編集してください */}
         <div class={introTextClass}>
           <p>
-            京都を拠点に活動するソフトウェアエンジニアです。Web
-            フロントエンドを中心に、バックエンドからインフラまで幅広く興味を持って取り組んでいます。
+            関西在住のエンジニアです。社内 SE として、業務アプリの開発や保守をしています。
           </p>
           <p>
-            このブログでは、日々の開発で学んだことや試したこと、技術的な気づきなどを発信しています。
-            HonoX・Cloudflare Workers・TypeScript あたりのトピックが多めです。
+            このブログでは、日々の開発で学んだことや試したこと、技術的な発見などを書き留めていきます。<br />
+            アウトプットする場として、気軽に更新していく予定です👀
           </p>
           <p>
-            仕事や技術的な話題についてお気軽にご連絡ください。SNS
-            や GitHub でのやり取りも歓迎しています。
+            フロント、バックエンド問わず色々興味がありますが、最近は特に 型 と CSS に興味があります。<br />
           </p>
         </div>
-      </div>
 
-      {/* 技術スタックカード */}
-      <div class={cardClass}>
-        <h2 class={cardTitleClass}>技術スタック</h2>
-        {techStack.map(({ category, tags }) => (
-          <div class={stackGroupClass}>
-            <span class={stackLabelClass}>{category}</span>
-            <div class={stackTagsClass}>
-              {tags.map((tag) => (
-                <span class={techTagClass}>{tag}</span>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 経験・タイムラインカード */}
-      <div class={cardClass}>
-        <h2 class={cardTitleClass}>経験</h2>
-        <div class={timelineClass}>
-          {timeline.map(({ date, title, description }) => (
-            <div class={timelineItemClass}>
-              <p class={timelineDateClass}>{date}</p>
-              <p class={timelineTitleClass}>{title}</p>
-              <p class={timelineDescClass}>{description}</p>
+        <div>
+          <h2 class={cardTitleClass}>
+            技術スタック
+            <InfoTooltip id="tech-rate" label="評価の見方">
+              ★☆☆ 入門・学習中<br />
+              ★★☆ 実務経験あり<br />
+              ★★★ 自信をもって使える
+            </InfoTooltip>
+          </h2>
+          {techStacks.map(({ category, stacks }) => (
+            <div class={stackGroupClass}>
+              <span class={stackLabelClass}>{category}</span>
+              <div class={stackTagsClass}>
+                {stacks.map((stack) => (
+                  <TechStackTag name={stack.name} rate={stack.rate} />
+                ))}
+              </div>
             </div>
           ))}
+        </div>
+
+        <div>
+          <h2 class={cardTitleClass}>資格</h2>
+          <ul>
+            <li>応用情報技術者試験</li>
+          </ul>
         </div>
       </div>
     </section>,

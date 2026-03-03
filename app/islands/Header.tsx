@@ -161,13 +161,12 @@ const hamburgerMenuClass = css`
   border: var(--border-width-thick) solid var(--color-hamburger-border);
   border-radius: var(--round-md);
   width: 200px;
-  height: 190px;
   margin: 0 auto;
   transition:
     translate .2s ease-out,
     display .2s ease-out allow-discrete,
     overlay .2s ease-out allow-discrete;
-  translate: 250px 0;
+  translate: 48px -40px;
   box-shadow: var(--shadow-md);
   top: 0;
   left: auto;
@@ -175,10 +174,10 @@ const hamburgerMenuClass = css`
   color: currentColor;
 
   &:popover-open {
-    translate: 0 0;
+    translate: 48px -40px;
     
     @starting-style {
-      translate: 250px 0;
+      translate: 200px -40px;
     }
   }
 
