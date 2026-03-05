@@ -175,7 +175,7 @@
   /* --- Typography: Responsive Font Sizes --- */
   /* 記事タイトル用 */
   --text-responsive-title: clamp(var(--size-600), 4vw, var(--size-1000));
-  --text-responsive-title-mobile: clamp(var(--size-500), 5vw, var(--size-600));
+  --text-responsive-title-mobile: clamp(var(--size-700), 7vw, var(--size-900));
 
   /* コンテンツ見出し用（h1-h4） */
   --text-responsive-h1: clamp(var(--size-600), 4vw, var(--size-900));
