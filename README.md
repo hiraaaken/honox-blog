@@ -7,16 +7,21 @@ HonoXフレームワークで構築された現代的なブログアプリケー
 - フロントマター対応のMDXブログ投稿
 - ダーク/ライトテーマ切り替え
 - レスポンシブデザイン
-- タグベースの投稿フィルタリング
+- タグベースの投稿フィルタリング・タグ一覧ページ
 - アイランドアーキテクチャによるサーバーサイドレンダリング
+- 目次（Table of Contents）自動生成
+- Shikiによるシンタックスハイライト付きコードブロック
+- アーカイブページ / Aboutページ
 - Cloudflare Workersへのデプロイ
 
 ## 技術スタック
 
 - **フレームワーク**: [HonoX](https://github.com/honojs/honox) (フルスタックHonoフレームワーク)
 - **ランタイム**: Cloudflare Workers
-- **スタイリング**: Hono CSSによるCSS-in-JS
+- **ビルドツール**: Vite 6.x
+- **スタイリング**: CSS-in-JS (hono/css) + CSS Custom Properties
 - **コンテンツ**: フロントマター付きMDX
+- **シンタックスハイライト**: Shiki
 - **パッケージマネージャー**: pnpm
 - **開発環境**: Docker
 
@@ -35,7 +40,7 @@ git clone https://github.com/hiraaaken/honox-blog.git
 cd honox-blog
 
 # 開発サーバーを起動
-docker-compose up
+docker compose up
 ```
 
 アプリケーションは `http://localhost:5173` で利用できます。
@@ -68,14 +73,21 @@ pnpm run deploy
 
 ```
 app/
-├── components/          # 再利用可能なUIコンポーネント
-├── islands/            # インタラクティブなクライアントサイドコンポーネント
-├── lib/               # ユーティリティ関数
-├── posts/             # MDXブログ投稿 (YYYY/YYYYMM/slug.mdx)
-├── routes/            # ファイルベースルーティング
-├── types/             # TypeScript型定義
-├── client.ts          # クライアントサイドエントリーポイント
-└── server.ts          # サーバーサイドエントリーポイント
+├── components/          # サーバーサイドコンポーネント
+│   ├── home/            # ホームページ専用コンポーネント
+│   └── ui/              # UIプリミティブ（アイコン等）
+├── islands/             # インタラクティブなクライアントサイドコンポーネント
+├── lib/                 # ユーティリティ関数
+├── posts/               # MDXブログ投稿 (YYYY/YYYYMM/slug.mdx)
+├── routes/              # ファイルベースルーティング
+│   ├── about/
+│   ├── archive/
+│   ├── posts/
+│   └── tags/
+├── styles/              # グローバルCSSスタイル
+├── types/               # TypeScript型定義
+├── client.ts            # クライアントサイドエントリーポイント
+└── server.ts            # サーバーサイドエントリーポイント
 ```
 
 ## ブログ投稿の追加
@@ -100,7 +112,7 @@ MDX形式でブログ投稿のコンテンツを書きます。
 - **Wrangler**: `wrangler.jsonc` - Cloudflare Workers設定
 - **TypeScript**: `tsconfig.json` - TypeScript設定
 - **Vite**: `vite.config.ts` - ビルド設定
-- **Docker**: `docker-compose.yml` - 開発環境設定
+- **Docker**: `compose.yaml` - 開発環境設定
 
 ## ライセンス
 
