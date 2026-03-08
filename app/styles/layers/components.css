@@ -91,6 +91,12 @@
   --hero-letter-spacing: calc(var(--size-50) / 3 * -1);
   --color-hero-foreground: var(--color-neutral-800);
 
+  /* --- New Label (Comic Burst) --- */
+  --new-label-text: oklch(0.95 0.18 95);
+  --new-label-burst: oklch(0.55 0.22 27);
+  --new-label-outline: oklch(0.15 0 0);
+  --new-label-size: 3.5rem;
+
   /* --- Hamburger Menu --- */
   --color-hamburger-border: var(--color-neutral-950);
 }
