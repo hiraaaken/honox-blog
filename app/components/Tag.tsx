@@ -19,6 +19,12 @@ const tagClass = css`
       box-shadow: var(--tag-shadow-hover);
     }
   }
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: none;
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  }
   
   &[data-size="sm"] {
     font-size: var(--text-label);
