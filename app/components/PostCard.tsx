@@ -1,18 +1,27 @@
 import { css } from "hono/css";
 import { PostSummary } from "@/types";
 import { Tag } from "@/components/Tag";
+import { NewLabel } from "@/components/ui/NewLabel";
+
+const isNewPost = (publishedAt: string, withinDays = 3): boolean => {
+  const published = new Date(publishedAt);
+  const now = new Date();
+  const diffMs = now.getTime() - published.getTime();
+  return diffMs >= 0 && diffMs < withinDays * 24 * 60 * 60 * 1000;
+};
 
 const postCardClass = css`
   display: grid;
   grid-template-rows: subgrid;
   grid-row: span 3;
   gap: var(--spacing-xs);
-  padding: var(--card-padding-compact);
+  padding: var(--spacing-md);
   background-color: var(--color-card-background);
   border: var(--card-border);
   border-radius: 1rem;
   box-shadow: var(--card-shadow);
   position: relative;
+  overflow: visible;
   transform: translateY(0) scale(1);
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 
@@ -91,6 +100,7 @@ export const PostCard = ({
 }: PostSummary) => {
   return (
     <article class={postCardClass}>
+      {isNewPost(publishedAt) && <NewLabel />}
       <header>
         <h2 class={postCardTitleClass}>
           <a href={`/posts/${slug}`} class={cardLinkClass}>

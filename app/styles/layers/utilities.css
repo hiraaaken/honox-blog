@@ -1,1 +1,10 @@
 /* ユーティリティクラス（将来の拡張用） */
+
+@keyframes new-label-pop {
+  0% {
+    transform: rotate(12deg) scale(0);
+  }
+  100% {
+    transform: rotate(12deg) scale(1);
+  }
+}
