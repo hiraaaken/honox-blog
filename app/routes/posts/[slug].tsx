@@ -49,6 +49,7 @@ const postHeader = css`
 
     @media (max-width: 768px) {
       font-size: var(--text-responsive-title-mobile);
+      line-height: 1.4;
     }
   }
 
