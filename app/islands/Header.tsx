@@ -144,7 +144,9 @@ const hamburgerButtonClass = css`
   display: flex;
   align-items: center;
   height: 100%;
-  
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
   @media (hover: hover) {
     &:hover {
       transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
@@ -225,7 +227,9 @@ const closeButtonClass = css`
   border: none;
   filter: grayscale(100);
   cursor: pointer;
-  
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
   &:hover {
     opacity: 0.7;
     transition: opacity 0.2s ease-in-out;
