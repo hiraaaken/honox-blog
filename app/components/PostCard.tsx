@@ -32,6 +32,12 @@ const postCardClass = css`
     }
   }
 
+  &:active {
+    transform: translateY(2px) scale(1);
+    box-shadow: none;
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  }
+
   & > a {
     display: inline-block;
     flex: 1;

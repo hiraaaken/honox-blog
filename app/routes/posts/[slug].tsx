@@ -354,6 +354,12 @@ const postNavigation = css`
         box-shadow: var(--card-shadow-hover);
       }
     }
+
+    &:active {
+      transform: translateY(2px) scale(1);
+      box-shadow: none;
+      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    }
     
     .nav-direction {
       font-size: var(--text-sm);
