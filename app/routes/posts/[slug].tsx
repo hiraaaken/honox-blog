@@ -335,30 +335,31 @@ const postNavigation = css`
     border: var(--card-border);
     border-radius: 1rem;
     box-shadow: var(--card-shadow);
-    transform: translateY(0) scale(1);
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    transform: translateY(0);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     flex: 1;
     color: inherit;
-    
+
     &.prev {
       text-align: left;
     }
-    
+
     &.next {
       text-align: right;
     }
-    
+
     @media (hover: hover) {
       &:hover {
-        transform: translateY(-4px) scale(1.02);
+        transform: translateY(2px);
         box-shadow: var(--card-shadow-hover);
       }
     }
 
     &:active {
-      transform: translateY(2px) scale(1);
-      box-shadow: none;
-      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+      transform: translateY(4px);
+      box-shadow: var(--card-shadow-active);
+      transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
     }
     
     .nav-direction {

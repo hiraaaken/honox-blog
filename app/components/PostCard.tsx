@@ -22,20 +22,24 @@ const postCardClass = css`
   box-shadow: var(--card-shadow);
   position: relative;
   overflow: visible;
-  transform: translateY(0) scale(1);
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  transform: translateY(0);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   @media (hover: hover) {
     &:hover {
-      transform: translateY(-4px) scale(1.02);
+      transform: translateY(2px);
+      filter: brightness(0.99);
       box-shadow: var(--card-shadow-hover);
     }
   }
 
   &:active {
-    transform: translateY(2px) scale(1);
-    box-shadow: none;
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    transform: translateY(4px);
+    filter: brightness(0.98);
+    box-shadow: var(--card-shadow-active);
+    transition: transform 0.06s ease-out, box-shadow 0.06s ease-out, filter 0.06s ease-out;
   }
 
   & > a {

@@ -32,7 +32,9 @@ Semantic Tokensを参照し、特定のUIコンポーネントに適用。
 ```css
 --card-bg: light-dark(var(--color-neutral-100), var(--color-neutral-750));
 --card-border: var(--border-width-thick) solid var(--color-card-border);
---card-shadow: 0 2px 0 var(--color-card-shadow);
+--card-shadow: 4px 4px 0 var(--color-card-shadow);
+--card-shadow-hover: 2px 2px 0 var(--color-card-shadow);
+--card-shadow-active: 0 0 0 var(--color-card-shadow);
 ```
 
 ## トークン一覧
