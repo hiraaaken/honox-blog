@@ -415,13 +415,13 @@ export default createRoute(async (c) => {
             <p class="description">{description}</p>
             <div class="meta">
               <time dateTime={publishedAt}>
-                Published at: {new Date(publishedAt).toLocaleDateString("ja-JP")}
+                公開日: {new Date(publishedAt).toLocaleDateString("ja-JP")}
               </time>
               {updatedAt && (
                 <>
                   {" | "}
                   <time dateTime={updatedAt}>
-                    Updated at: {new Date(updatedAt).toLocaleDateString("ja-JP")}
+                    更新日: {new Date(updatedAt).toLocaleDateString("ja-JP")}
                   </time>
                 </>
               )}
