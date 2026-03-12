@@ -16,8 +16,9 @@
   --color-card-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
   --color-card-shadow: var(--color-card-border);
   --card-border: var(--border-width-thick) solid var(--color-card-border);
-  --card-shadow: 0 2px 0 var(--color-card-shadow);
-  --card-shadow-hover: 0 4px 0 var(--color-card-shadow);
+  --card-shadow: 4px 4px 0 var(--color-card-shadow);
+  --card-shadow-hover: 2px 2px 0 var(--color-card-shadow);
+  --card-shadow-active: 0 0 0 var(--color-card-shadow);
   --card-title-font-size: clamp(var(--text-lg), 5vw, var(--text-2xl));
 
   /* --- Tag --- */

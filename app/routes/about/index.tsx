@@ -272,7 +272,7 @@ export default createRoute((c) => {
               <a href="https://github.com/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <GithubIcon size={24} />
               </a>
-              <a href="https://x.com/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="X">
+              <a href="https://x.com/0512Ken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="X">
                 <XIcon size={24} />
               </a>
               <a href="https://zenn.dev/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="Zenn">

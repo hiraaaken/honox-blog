@@ -50,12 +50,11 @@ const triggerClass = css`
   line-height: 1;
   cursor: pointer;
   vertical-align: middle;
-  transition: color 0.15s, border-color 0.15s;
+  transition: opacity 0.15s;
 
   @media (hover: hover) {
     &:hover {
-      color: var(--color-primary);
-      border-color: var(--color-primary);
+      opacity: 0.6;
     }
   }
 
@@ -67,15 +66,15 @@ const triggerClass = css`
 
 const tooltipClass = css`
   position: fixed;
-  position-area: block-end center;
+  position-area: block-start center;
   position-try-fallbacks: flip-block;
   margin: 0;
   margin-top: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
   border-radius: var(--round-md);
-  background-color: light-dark(var(--color-neutral-100), var(--color-neutral-800));
-  color: var(--color-foreground);
+  background-color: var(--color-neutral-800);
+  color: var(--color-neutral-200);
   font-size: var(--text-body-sm);
   font-weight: normal;
   line-height: 1.6;
@@ -83,6 +82,7 @@ const tooltipClass = css`
   max-width: 400px;
   opacity: 0;
   transition: opacity 0.15s ease-out, display 0.15s ease-out allow-discrete;
+  container-type: anchored;
 
   &:popover-open {
     opacity: 1;
