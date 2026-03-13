@@ -4,26 +4,17 @@ import { PostCard } from "../../components/PostCard";
 import { css } from "hono/css";
 
 const archiveSection = css`
-  max-width: 1000px;
   margin: 0 auto;
-  padding: 8rem 1rem 2rem;
+  padding: 6rem 1rem 2rem;
+  max-width: var(--content-max-width);
+  display: grid;
+  gap: var(--spacing-base);
 `;
 
 const archiveHeader = css`
-  margin-bottom: 3rem;
-  
-  h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: var(--color-foreground);
-  }
-  
-  p {
-    font-size: 1.125rem;
-    color: var(--color-foreground);
-    opacity: 0.8;
-  }
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
 `;
 
 const noPostsCard = css`
@@ -41,8 +32,12 @@ const noPostsCard = css`
 const postsGrid = css`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  
+  gap: 1rem;
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
@@ -90,9 +85,9 @@ export default createRoute(async (c) => {
 
         <header class={archiveHeader}>
           <h1>{pageTitle}</h1>
-          <p>
-            {posts.length} {posts.length === 1 ? "post" : "posts"} found
-          </p>
+          <span>
+            {posts.length} {posts.length === 1 ? "post" : "posts"}
+          </span>
         </header>
 
         {posts.length === 0 ? (
