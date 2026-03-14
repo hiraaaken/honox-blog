@@ -43,25 +43,6 @@ const postsGrid = css`
   }
 `;
 
-const backLink = css`
-  display: inline-block;
-  margin-bottom: 2rem;
-  padding: 0.75rem 1.5rem;
-  background: var(--color-primary);
-  color: #2D2D2D;
-  text-decoration: none;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  border: 2px solid var(--color-border);
-  box-shadow: 1px 2px 0 var(--color-card-shadow);
-  transition: all 0.3s ease-in-out;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 2px 4px 0 var(--color-card-shadow);
-  }
-`;
-
 export default createRoute(async (c) => {
   const year = c.req.query("year");
   const month = c.req.query("month");
@@ -79,10 +60,6 @@ export default createRoute(async (c) => {
   return c.render(
     <>
       <section class={archiveSection}>
-        <a href="/posts" class={backLink}>
-          ← All Posts
-        </a>
-
         <header class={archiveHeader}>
           <h1>{pageTitle}</h1>
           <span>
