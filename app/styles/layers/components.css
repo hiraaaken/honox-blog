@@ -26,16 +26,16 @@
   --color-tag-foreground: var(--color-neutral-800);
   --color-tag-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
   --color-tag-shadow: var(--color-tag-border);
-  --tag-border: var(--border-width-thin) solid var(--color-tag-border);
-  --tag-shadow: 0 1px 0 var(--color-tag-shadow);
-  --tag-shadow-hover: 0 1.5px 0 var(--color-tag-shadow);
+  --tag-border: var(--border-width-thick) solid var(--color-tag-border);
+  --tag-shadow: 3px 3px 0 var(--color-tag-shadow);
+  --tag-shadow-hover: 1.5px 1.5px 0 var(--color-tag-shadow);
+  --tag-shadow-active: 0 0 0 var(--color-tag-shadow);
 
   /* --- Code Blocks --- */
-  --color-code-inline-bg: var(--color-neutral-800);
-  --color-code-inline-fg: var(--color-neutral-50);
-  --color-code-inline-border: var(--color-neutral-700);
+  --color-code-inline-bg: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  --color-code-inline-fg: light-dark(var(--color-neutral-800), var(--color-neutral-200));
   --color-code-block-bg: light-dark(var(--color-neutral-100), var(--color-neutral-900));
-  --code-inline-padding: var(--size-100) var(--size-200);
+  --code-inline-padding: 0.2em 0.4em;
   --code-block-padding: var(--size-700);
   --code-block-padding-mobile: var(--size-500);
 
@@ -49,7 +49,7 @@
   /* --- Table --- */
   --color-table-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
   --color-table-header-bg: light-dark(var(--color-neutral-100), var(--color-neutral-800));
-  --table-cell-padding: var(--size-400) var(--size-500);
+  --table-cell-padding: 0.5em 1em;
 
   /* --- Theme Toggle --- */
   --toggle-size: var(--size-1000);
