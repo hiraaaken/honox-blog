@@ -8,22 +8,23 @@ const tagClass = css`
   color: var(--color-tag-foreground);
   text-decoration: none;
   font-weight: 500;
-  transform: scale(1);
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  transform: translateY(0);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: var(--tag-border);
   box-shadow: var(--tag-shadow);
-  
+
   @media (hover: hover) {
     &:hover {
-      transform: scale(1.05);
+      transform: translateY(1.5px);
       box-shadow: var(--tag-shadow-hover);
     }
   }
 
   &:active {
-    transform: scale(0.95);
-    box-shadow: none;
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    transform: translateY(3px);
+    box-shadow: var(--tag-shadow-active);
+    transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
   }
   
   &[data-size="sm"] {
