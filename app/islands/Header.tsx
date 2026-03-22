@@ -11,20 +11,30 @@ const headerClass = css`
   color: var(--color-header-foreground);
   max-width: var(--content-max-width);
   z-index: 50;
-  box-shadow: var(--header-shadow);
+  border: var(--header-border);
+  anchor-name: --header;
   position: fixed;
   top: var(--spacing-base);
   left: 0;
   right: 0;
   margin-inline: auto;
   border-radius: var(--round-lg);
-  padding: var(--spacing-base) var(--spacing-xl);
+  padding: var(--spacing-base) var(--spacing-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: 
+  transition:
     transform 0.3s ease-in-out,
-    opacity 0.3s ease-in-out;
+    opacity 0.3s ease-in-out,
+    border-bottom-right-radius 0.65s ease-in-out;
+
+  &:has(:popover-open) {
+    border-bottom-right-radius: 0;
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.3s ease-in-out,
+      border-bottom-right-radius 0s;
+  }
 
   @media (max-width: 1100px) {
     margin-inline: var(--spacing-md);
@@ -95,7 +105,7 @@ const navLinkListClass = css`
     & li:not(:last-child) {
       display: none;
     }
-    
+
     & li:last-child {
       display: flex;
       align-items: center;
@@ -141,45 +151,80 @@ const hamburgerButtonClass = css`
   border: none;
   cursor: pointer;
   margin: 0 auto;
-  display: flex;
-  align-items: center;
+  display: grid;
+  place-items: center;
   height: 100%;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+
+  & > span {
+    grid-area: 1 / 1;
+  }
 
   @media (hover: hover) {
     &:hover {
       transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
       transform: scale(1.1);
 
-      & > svg > path {
+      & > span > svg > path {
         fill: var(--color-primary);
       }
     }
   }
 `
 
+const hamburgerIconClass = css`
+  display: flex;
+  opacity: 1;
+  rotate: 0deg;
+  transition: opacity 0.3s ease-out, rotate 0.3s ease-out;
+
+  header:has(:popover-open) & {
+    opacity: 0;
+    rotate: 180deg;
+  }
+`
+
+const closeIconClass = css`
+  display: flex;
+  opacity: 0;
+  rotate: -180deg;
+  transition: opacity 0.3s ease-out, rotate 0.3s ease-out;
+
+  header:has(:popover-open) & {
+    opacity: 1;
+    rotate: 0deg;
+  }
+`
+
 const hamburgerMenuClass = css`
-  border: var(--border-width-thick) solid var(--color-hamburger-border);
-  border-radius: var(--round-md);
-  width: 200px;
-  margin: 0 auto;
-  transition:
-    translate .2s ease-out,
-    display .2s ease-out allow-discrete,
-    overlay .2s ease-out allow-discrete;
-  translate: 48px -40px;
-  box-shadow: var(--shadow-md);
-  top: 0;
-  left: auto;
   background-color: var(--color-header-background);
-  color: currentColor;
+  color: var(--color-header-foreground);
+  border: var(--header-border);
+  border-top: none;
+  border-radius: 0 0 var(--round-md) var(--round-md);
+  padding: 0;
+  margin: 0;
+  inset: unset;
+  position-anchor: --header;
+  top: anchor(--header bottom);
+  left: calc(100% - 156px);
+  margin-top: calc(-1 * var(--border-width-thick));
+  width: 140px;
+
+  opacity: 1;
+  clip-path: inset(0 0 100% 0);
+
+  transition-property: clip-path, display, overlay;
+  transition-duration: 0.35s;
+  transition-timing-function: ease-in-out;
+  transition-behavior: normal, allow-discrete, allow-discrete;
 
   &:popover-open {
-    translate: 48px -40px;
-    
+    clip-path: inset(0 0 0 0);
+
     @starting-style {
-      translate: 200px -40px;
+      clip-path: inset(0 0 100% 0);
     }
   }
 
@@ -192,7 +237,7 @@ const hamburgerMenuClass = css`
     font-size: clamp(var(--text-md), 2.5vw, var(--text-lg));
     font-weight: var(--font-semibold);
     margin: auto 0;
-   
+
     & a {
       position: relative;
 
@@ -206,33 +251,16 @@ const hamburgerMenuClass = css`
         background-color: var(--color-primary);
         transition: width 0.3s ease;
       }
-      
+
       &:hover {
         opacity: 0.8;
         transition: opacity 0.2s ease-in-out;
       }
-      
+
       &:hover::after {
         width: 100%;
       }
     }
-  }
-`
-
-const closeButtonClass = css`
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: none;
-  border: none;
-  filter: grayscale(100);
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-
-  &:hover {
-    opacity: 0.7;
-    transition: opacity 0.2s ease-in-out;
   }
 `
 
@@ -251,6 +279,13 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
       }
 
       setLastScrollY(currentY);
+
+      if (currentY >= 300 && currentY > lastScrollY) {
+        const menu = document.getElementById('menu2');
+        if (menu?.matches(':popover-open')) {
+          menu.hidePopover();
+        }
+      }
     }
 
     window.addEventListener("scroll", handleScroll);
@@ -281,16 +316,14 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
           </li>
           <li>
             <button popovertarget="menu" class={hamburgerButtonClass} aria-label="Open menu">
-              <HamburgerIcon />
+              <span class={hamburgerIconClass}><HamburgerIcon /></span>
+              <span class={closeIconClass}><CloseIcon /></span>
             </button>
           </li>
         </ul>
       </nav>
 
-      <aside popover id="menu" class={hamburgerMenuClass}>
-        <button popovertarget="menu" popovertargetaction="hide" class={closeButtonClass}>
-          <CloseIcon />
-        </button>
+      <aside popover="auto" id="menu" class={hamburgerMenuClass}>
         <ul>
           <li>
             <a href="/posts" data-current={currentPath.startsWith('/posts') ? 'true' : 'false'}>Posts</a></li>
