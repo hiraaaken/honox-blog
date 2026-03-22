@@ -11,7 +11,7 @@ const headerClass = css`
   color: var(--color-header-foreground);
   max-width: var(--content-max-width);
   z-index: 50;
-  box-shadow: var(--header-shadow);
+  border: var(--header-border);
   anchor-name: --header;
   position: fixed;
   top: var(--spacing-base);
@@ -19,13 +19,22 @@ const headerClass = css`
   right: 0;
   margin-inline: auto;
   border-radius: var(--round-lg);
-  padding: var(--spacing-base) var(--spacing-xl);
+  padding: var(--spacing-base) var(--spacing-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: 
+  transition:
     transform 0.3s ease-in-out,
-    opacity 0.3s ease-in-out;
+    opacity 0.3s ease-in-out,
+    border-bottom-right-radius 0.65s ease-in-out;
+
+  &:has(:popover-open) {
+    border-bottom-right-radius: 0;
+    transition:
+      transform 0.3s ease-in-out,
+      opacity 0.3s ease-in-out,
+      border-bottom-right-radius 0s;
+  }
 
   @media (max-width: 1100px) {
     margin-inline: var(--spacing-md);
@@ -191,29 +200,28 @@ const closeIconClass = css`
 const hamburgerMenuClass = css`
   background-color: var(--color-header-background);
   color: var(--color-header-foreground);
-  border: none;
-  box-shadow: var(--header-shadow);
+  border: var(--header-border);
+  border-top: none;
   border-radius: 0 0 var(--round-md) var(--round-md);
   padding: 0;
   margin: 0;
   inset: unset;
   position-anchor: --header;
-  position-area: bottom end;
-  margin-top: calc(-1 * var(--spacing-base));
-  width: 150px;
+  top: anchor(--header bottom);
+  left: calc(100% - 156px);
+  margin-top: calc(-1 * var(--border-width-thick));
+  width: 140px;
 
+  opacity: 1;
   clip-path: inset(0 0 100% 0);
-  transition:
-    clip-path 0.25s ease-in,
-    display 0.25s ease-in allow-discrete,
-    overlay 0.25s ease-in allow-discrete;
+
+  transition-property: clip-path, display, overlay;
+  transition-duration: 0.35s;
+  transition-timing-function: ease-in-out;
+  transition-behavior: normal, allow-discrete, allow-discrete;
 
   &:popover-open {
     clip-path: inset(0 0 0 0);
-    transition:
-      clip-path 0.25s ease-out,
-      display 0.25s ease-out allow-discrete,
-      overlay 0.25s ease-out allow-discrete;
 
     @starting-style {
       clip-path: inset(0 0 100% 0);
@@ -256,23 +264,6 @@ const hamburgerMenuClass = css`
   }
 `
 
-const closeButtonClass = css`
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  background: none;
-  border: none;
-  filter: grayscale(100);
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-
-  &:hover {
-    opacity: 0.7;
-    transition: opacity 0.2s ease-in-out;
-  }
-`
-
 export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, currentPath: string }) => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -289,9 +280,11 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
 
       setLastScrollY(currentY);
 
-      const menu = document.getElementById('menu2');
-      if (menu?.matches(':popover-open')) {
-        menu.hidePopover();
+      if (currentY >= 300 && currentY > lastScrollY) {
+        const menu = document.getElementById('menu2');
+        if (menu?.matches(':popover-open')) {
+          menu.hidePopover();
+        }
       }
     }
 
@@ -322,7 +315,7 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
             <ThemeToggle initialTheme={initialTheme} />
           </li>
           <li>
-            <button popovertarget="menu2" class={hamburgerButtonClass} aria-label="Open menu">
+            <button popovertarget="menu" class={hamburgerButtonClass} aria-label="Open menu">
               <span class={hamburgerIconClass}><HamburgerIcon /></span>
               <span class={closeIconClass}><CloseIcon /></span>
             </button>
@@ -330,7 +323,7 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
         </ul>
       </nav>
 
-      <aside popover id="menu2" class={hamburgerMenuClass}>
+      <aside popover="auto" id="menu" class={hamburgerMenuClass}>
         <ul>
           <li>
             <a href="/posts" data-current={currentPath.startsWith('/posts') ? 'true' : 'false'}>Posts</a></li>
