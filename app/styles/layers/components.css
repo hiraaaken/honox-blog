@@ -7,14 +7,14 @@
   --color-header-background: var(--color-neutral-750);
   --color-header-foreground: var(--color-light-500);
   --color-header-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
-  --color-header-shadow: var(--color-header-border);
+  --color-header-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
   --header-border: var(--border-width-thick) solid var(--color-header-border);
   --header-shadow: 0 2px 0 var(--color-header-shadow);
 
   /* --- Card --- */
   --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
   --color-card-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
-  --color-card-shadow: var(--color-card-border);
+  --color-card-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
   --card-border: var(--border-width-thick) solid var(--color-card-border);
   --card-shadow: 4px 4px 0 var(--color-card-shadow);
   --card-shadow-hover: 2px 2px 0 var(--color-card-shadow);
@@ -25,7 +25,7 @@
   --color-tag-background: var(--color-primary);
   --color-tag-foreground: var(--color-neutral-800);
   --color-tag-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
-  --color-tag-shadow: var(--color-tag-border);
+  --color-tag-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
   --tag-border: var(--border-width-thick) solid var(--color-tag-border);
   --tag-shadow: 3px 3px 0 var(--color-tag-shadow);
   --tag-shadow-hover: 1.5px 1.5px 0 var(--color-tag-shadow);
@@ -84,6 +84,20 @@
   --toc-selected-item-color: var(--color-neutral-900);
   --toc-target-before-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
   --toc-target-after-color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+
+  /* --- Mobile TOC --- */
+  --mobile-toc-padding: var(--size-400);
+  --mobile-toc-summary-padding: var(--size-200) var(--size-400);
+  --mobile-toc-bg: var(--color-card-background);
+  --mobile-toc-border: var(--card-border);
+  --mobile-toc-radius: var(--round-md);
+
+  /* --- TOC FAB --- */
+  --toc-fab-size: var(--size-1000);
+  --toc-fab-bg: var(--color-primary);
+  --toc-fab-color: var(--color-neutral-900);
+  --toc-fab-shadow: var(--shadow-md);
+  --toc-fab-radius: var(--round-full);
 
   /* --- Hero --- */
   --hero-padding-top: var(--size-1200);

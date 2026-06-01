@@ -1,7 +1,7 @@
 import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
-import { TableOfContents } from "../../components/TableOfContents";
+import { TableOfContents, MobileTOC } from "../../components/TableOfContents";
 import { css } from "hono/css";
 
 const postLayout = css`
@@ -12,7 +12,7 @@ const postLayout = css`
   width: 100%;
 
   @media (max-width: 768px) {
-    padding: 6rem var(--spacing-md-lg) 2rem;
+    padding: 6rem var(--spacing-sm) 2rem;
     max-width: 100vw;
     overflow-x: hidden;
   }
@@ -29,6 +29,7 @@ const contentArea = css`
       gap: 0;
     }
   }
+
 `;
 
 const postArticle = css`
@@ -82,8 +83,7 @@ const postContent = css`
   box-sizing: border-box;
   background-color: var(--color-card-background);
   border: var(--card-border);
-  border-radius: 1rem;
-  box-shadow: var(--card-shadow);
+  border-radius: var(--round-md);
   padding: var(--spacing-xl);
 
   @media (max-width: 768px) {
@@ -91,13 +91,9 @@ const postContent = css`
   }
 
   @media (max-width: 480px) {
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    box-shadow: none;
-    padding: var(--spacing-md) var(--spacing-sm);
-    margin-left: calc(-1 * var(--spacing-md-lg));
-    margin-right: calc(-1 * var(--spacing-md-lg));
+    border: var(--card-border);
+    border-radius: var(--round-md);
+    padding: var(--spacing-sm);
     font-size: var(--text-sm);
   }
   
@@ -417,7 +413,7 @@ const postNavigation = css`
 `;
 
 export default createRoute(async (c) => {
-  const slug = c.req.param("slug");
+  const slug = c.req.param("slug") || "";
   const post = await getPostBySlug(slug);
 
   if (!post) {
@@ -462,6 +458,7 @@ export default createRoute(async (c) => {
               ))}
             </div>
           </header>
+          <MobileTOC headings={headings} />
           <section class={postContent}>
             <Content />
           </section>

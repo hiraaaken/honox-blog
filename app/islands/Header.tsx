@@ -37,7 +37,11 @@ const headerClass = css`
   }
 
   @media (max-width: 1100px) {
-    margin-inline: var(--spacing-md);
+    margin-inline: var(--spacing-lg);
+  }
+
+  @media (max-width: 768px) {
+    margin-inline: var(--spacing-sm);
   }
 `
 const navClass = css`

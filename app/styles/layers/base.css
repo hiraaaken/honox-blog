@@ -336,6 +336,7 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-background);
   color: var(--color-foreground);
+  word-break: auto-phrase;
   margin: 0;
   padding: 0;
   transition: background-color 0.3s, color 0.3s;

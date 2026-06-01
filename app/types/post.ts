@@ -23,6 +23,11 @@ export interface Heading {
   level: number;
 }
 
+export interface groupedHeading {
+  parent: Heading;
+  children: Heading[];
+}
+
 /** import.meta.globで読み込まれるMDXモジュールの型 */
 export type MDXModule = {
   frontmatter: FrontMatter;
@@ -49,7 +54,7 @@ export interface PostSummary {
 /** 本文コンポーネント付き投稿（詳細ページ用） */
 export interface PostWithContent extends PostSummary {
   Content: MDXComponent;
-  headings: Heading[];
+  headings: groupedHeading[];
 }
 
 /** タグと投稿数 */
