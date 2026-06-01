@@ -32,7 +32,7 @@ export default defineConfig({
       remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
       rehypePlugins: [
         rehypeSlug,
-        rehypeExtractHeadings,  // rehypeSlug の後に実行（ID 付与後に見出しを抽出）
+        rehypeExtractHeadings,
         [rehypeAutolinkHeadings, {
           behavior: 'wrap',
           properties: {

@@ -1,5 +1,7 @@
 import type {
   MDXModule,
+  Heading,
+  groupedHeading,
   PostSummary,
   PostWithContent,
   TagCount,
@@ -13,6 +15,22 @@ import type {
   GetArchives,
   GetAdjacentPosts,
 } from "@/types";
+
+/**
+ * 見出しを階層構造にグループ化する
+ */
+function groupHeadings(headings: Heading[]): groupedHeading[] {
+  return headings.reduce<groupedHeading[]>((groups, heading) => {
+    if (heading.level === 2) {
+      return [...groups, { parent: heading, children: [] }];
+    }
+    if (heading.level === 3 && groups.length > 0) {
+      const last = groups[groups.length - 1];
+      return [...groups.slice(0, -1), { parent: last.parent, children: [...last.children, heading] }];
+    }
+    return groups;
+  }, []);
+}
 
 /**
  * ポストの一覧を取得する
@@ -62,7 +80,7 @@ export const getPostBySlug: GetPostBySlug = async (slug) => {
     ...mod.frontmatter,
     slug,
     Content: mod.default,
-    headings: mod.headings ?? [],
+    headings: groupHeadings(mod.headings ?? []),
   };
 
   return post;

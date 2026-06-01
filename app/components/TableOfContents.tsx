@@ -1,8 +1,8 @@
 import { css } from "hono/css";
-import type { Heading } from "../types/post";
+import type { groupedHeading } from "../types/post";
 
 interface TableOfContentsProps {
-  headings: Heading[];
+  headings: groupedHeading[];
 }
 
 const tocContainer = css`
@@ -119,49 +119,128 @@ const tocItemH3 = css`
   }
 `;
 
+
+const mobileTocContainer = css`
+  display: none;
+  margin-bottom: var(--spacing-md);
+  border: var(--mobile-toc-border);
+  border-radius: var(--mobile-toc-radius);
+  background: var(--mobile-toc-bg);
+  overflow: hidden;
+
+  @media (max-width: 1024px) {
+    display: block;
+  }
+`;
+
+const mobileTocSummary = css`
+  padding: var(--mobile-toc-summary-padding);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-foreground);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::before {
+    content: "▶";
+    font-size: var(--text-xs);
+    transition: transform 0.5s linear(0, 0.6 20%, 1.1 55%, 0.97 72%, 1);
+  }
+
+  details[open] &::before {
+    transform: rotate(90deg);
+  }
+`;
+
+const mobileTocContent = css`
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  height: 0;
+  transition: height 0.5s linear(0, 0.6 20%, 1.1 55%, 0.97 72%, 1);
+  padding: 0 var(--mobile-toc-padding);
+
+  details[open] & {
+    height: auto;
+    padding-bottom: var(--mobile-toc-padding);
+  }
+`;
+
+function TocList({
+  grouped,
+  itemH2Class,
+  nestedListClass,
+  itemH3Class,
+  listClass,
+}: {
+  grouped: groupedHeading[];
+  itemH2Class: Promise<string>;
+  nestedListClass: Promise<string>;
+  itemH3Class: Promise<string>;
+  listClass: Promise<string>;
+}) {
+  return (
+    <ul class={listClass}>
+      {grouped.map((group) => (
+        <li key={group.parent.id} class={itemH2Class}>
+          <a href={`#${group.parent.id}`}>{group.parent.text}</a>
+          {group.children.length > 0 && (
+            <ul class={nestedListClass}>
+              {group.children.map((h3) => (
+                <li key={h3.id} class={itemH3Class}>
+                  <a href={`#${h3.id}`}>{h3.text}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export function MobileTOC({ headings }: TableOfContentsProps) {
+  if (headings.length === 0) {
+    return null;
+  }
+
+  return (
+    <details class={mobileTocContainer}>
+      <summary class={mobileTocSummary}>目次</summary>
+      <div class={mobileTocContent}>
+        <TocList
+          grouped={headings}
+          listClass={tocList}
+          itemH2Class={tocItemH2}
+          nestedListClass={tocNestedList}
+          itemH3Class={tocItemH3}
+        />
+      </div>
+    </details>
+  );
+}
+
 export function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) {
     return null;
   }
 
-  // h3 を親の h2 の下にグループ化
-  const groupedHeadings: { h2: Heading; h3s: Heading[] }[] = [];
-  let currentGroup: { h2: Heading; h3s: Heading[] } | null = null;
-
-  for (const heading of headings) {
-    if (heading.level === 2) {
-      if (currentGroup) {
-        groupedHeadings.push(currentGroup);
-      }
-      currentGroup = { h2: heading, h3s: [] };
-    } else if (heading.level === 3 && currentGroup) {
-      currentGroup.h3s.push(heading);
-    }
-  }
-
-  if (currentGroup) {
-    groupedHeadings.push(currentGroup);
-  }
-
   return (
     <nav class={tocContainer} aria-label="Table of Contents">
       <h2 class={tocTitle}>目次</h2>
-      <ul class={tocList}>
-        {groupedHeadings.map((group) => (
-          <li key={group.h2.id} class={tocItemH2}>
-            <a href={`#${group.h2.id}`}>{group.h2.text}</a>
-            {group.h3s.length > 0 && (
-              <ul class={tocNestedList}>
-                {group.h3s.map((h3) => (
-                  <li key={h3.id} class={tocItemH3}>
-                    <a href={`#${h3.id}`}>{h3.text}</a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+      <TocList
+        grouped={headings}
+        listClass={tocList}
+        itemH2Class={tocItemH2}
+        nestedListClass={tocNestedList}
+        itemH3Class={tocItemH3}
+      />
     </nav>
   );
 }
