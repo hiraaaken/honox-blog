@@ -212,9 +212,17 @@ const hamburgerMenuClass = css`
   inset: unset;
   position-anchor: --header;
   top: anchor(--header bottom);
-  left: calc(100% - 156px);
+  left: calc(100% - 140px);
   margin-top: calc(-1 * var(--border-width-thick));
   width: 140px;
+
+  @media (max-width: 1100px) {
+    left: calc(100% - 140px - var(--spacing-lg));
+  }
+
+  @media (max-width: 768px) {
+    left: calc(100% - 140px - var(--spacing-sm));
+  }
 
   opacity: 1;
   clip-path: inset(0 0 100% 0);
@@ -271,6 +279,20 @@ const hamburgerMenuClass = css`
 export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, currentPath: string }) => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 580px)');
+    const handleBreakpoint = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        const menu = document.getElementById('menu');
+        if (menu?.matches(':popover-open')) {
+          menu.hidePopover();
+        }
+      }
+    };
+    mq.addEventListener('change', handleBreakpoint);
+    return () => mq.removeEventListener('change', handleBreakpoint);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
