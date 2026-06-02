@@ -115,3 +115,17 @@
   /* --- Hamburger Menu --- */
   --color-hamburger-border: var(--color-neutral-950);
 }
+
+.dark,
+[data-theme="dark"] {
+  --card-border: var(--border-width-thin) solid oklch(0.62 0 0 / 0.45);
+  --card-shadow:
+    0 10px 24px oklch(0 0 0 / 0.34),
+    0 1px 0 oklch(1 0 0 / 0.08) inset;
+  --card-shadow-hover:
+    0 6px 16px oklch(0 0 0 / 0.36),
+    0 1px 0 oklch(1 0 0 / 0.12) inset;
+  --card-shadow-active:
+    0 2px 8px oklch(0 0 0 / 0.32),
+    0 1px 0 oklch(1 0 0 / 0.08) inset;
+}
