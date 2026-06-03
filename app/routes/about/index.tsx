@@ -74,7 +74,7 @@ const profileImageClass = css`
   width: 6rem;
   height: 6rem;
   border-radius: var(--round-full);
-  border: var(--border-width-thick) solid var(--color-border);
+  border: var(--border-width-thick) solid var(--color-profile-border);
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 `;
