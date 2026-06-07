@@ -9,8 +9,8 @@ const tagClass = css`
   text-decoration: none;
   font-weight: 500;
   transform: translateY(0);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform var(--duration-hover) var(--ease-bounce),
+    box-shadow var(--duration-hover) var(--ease-bounce);
   border: var(--tag-border);
   box-shadow: var(--tag-shadow);
 
@@ -24,7 +24,7 @@ const tagClass = css`
   &:active {
     transform: translateY(3px);
     box-shadow: var(--tag-shadow-active);
-    transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
+    transition: transform var(--duration-snap) var(--ease-out), box-shadow var(--duration-snap) var(--ease-out);
   }
   
   &[data-size="sm"] {

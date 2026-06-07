@@ -110,7 +110,7 @@ const snsLinkClass = css`
   display: inline-flex;
   color: var(--color-foreground);
   opacity: 0.6;
-  transition: opacity 0.2s ease-in-out;
+  transition: opacity var(--duration-base) var(--ease-standard);
 
   @media (hover: hover) {
     &:hover {

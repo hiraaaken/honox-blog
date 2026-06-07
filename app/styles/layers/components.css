@@ -13,6 +13,7 @@
 
   /* --- Card --- */
   --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
+  --color-card-background-hover: light-dark(var(--color-neutral-200), var(--color-neutral-800));
   --color-card-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
   --color-card-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
   --card-border: var(--border-width-thick) solid var(--color-card-border);
