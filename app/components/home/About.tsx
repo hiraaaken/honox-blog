@@ -19,7 +19,7 @@ const profileSectionClass = css`
     width: 3rem;
     height: 3rem;
     border-radius: var(--round-full);
-    border: 2px solid var(--color-border);
+    border: 2px solid var(--color-profile-border);
   }
   
   h3 {
@@ -45,7 +45,7 @@ const socialLinksClass = css`
     display: inline-flex;
     color: var(--color-foreground);
     opacity: 0.6;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity var(--duration-base) var(--ease-standard);
   }
 
   @media (hover: hover) {

@@ -43,7 +43,7 @@ const toggleSwitchClass = css`
     background-color: var(--color-toggle-knob);
     box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    transition: transform 0.3s ease;
+    transition: transform var(--duration-slow);
   }
 
   &:checked::before {
@@ -55,7 +55,7 @@ const toggleSwitchClass = css`
 const toggleIconClass = css`
   position: absolute;
   top: 17.5%;
-  transition: opacity .2s;
+  transition: opacity var(--duration-base);
   
   &[data-icon="sun"] {
     left: 10%;

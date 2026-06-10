@@ -14,13 +14,13 @@ const linkClass = css`
     width: 0;
     height: 2px;
     background-color: currentColor;
-    transition: width 0.3s ease;
+    transition: width var(--duration-slow);
   }
   
   @media (hover: hover) {
     &:hover {
       opacity: 0.8;
-      transition: opacity 0.2s ease-in-out;
+      transition: opacity var(--duration-base) var(--ease-standard);
     }
     
     &:hover::after {

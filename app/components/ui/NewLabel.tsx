@@ -10,7 +10,7 @@ const newLabelClass = css`
   z-index: 10;
   pointer-events: none;
   transform: rotate(12deg) scale(0);
-  animation: new-label-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+  animation: new-label-pop 0.4s var(--ease-bounce) 0.6s forwards;
 `;
 
 const newLabelShapeClass = css`
