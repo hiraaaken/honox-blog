@@ -114,7 +114,10 @@
   --new-label-size: 3.5rem;
 
   /* --- Hamburger Menu --- */
-  --color-hamburger-border: var(--color-neutral-950);
+  --color-hamburger-background: var(--color-primary);
+  --color-hamburger-foreground: var(--color-neutral-800);
+  --border-hamburger: var(--border-width-thick) solid var(--color-hamburger-foreground);
+  --shadow-hamburger: 0px 0px 4px var(--color-hamburger-foreground);
 
   /* --- Profile Avatar --- */
   --color-profile-border: light-dark(var(--color-neutral-800), var(--color-neutral-400));

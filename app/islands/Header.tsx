@@ -203,110 +203,77 @@ const closeIconClass = css`
 `
 
 const hamburgerMenuClass = css`
+  inset: unset;
+  top: -350px;
+  left: -300px;
   width: 600px;
   height: 600px;
+  background-color: var(--color-hamburger-background);
+  color: var(--color-hamburger-foreground);
+  border: var(--border-hamburger);
+  box-shadow: var(--shadow-hamburger);
+  border-radius: 55% 45% 30% 70% / 60% 40% 65% 35%;
+
+  translate: 100% -100%;
   transition:
-    opacity var(--duration-spring) var(--ease-spring),
     translate var(--duration-spring) var(--ease-spring),
     display var(--duration-spring) allow-discrete,
     overlay var(--duration-spring) allow-discrete;
-  border: var(--header-border);
-  background-color: var(--color-hamburger-background);
-  color: var(--color-hamburger-foreground);
-  border-radius: var(--round-full);
-
 
   &:popover-open {
-    translateX: 50px;
-    translateY: 50px;
+    translate: 0 0;
 
     @starting-style {
-      translate: 100px;
-      toranslateY: 100px;
+      translate: 100% -100%;
+    }
+  }
+
+  ul {
+    /* Visible area = bottom-left quadrant of the circle.
+       top: 50% = element center = top edge of the visible quarter. */
+    position: absolute;
+    top: 52%;
+    left: 0;
+    width: 46%;
+    list-style: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0 var(--spacing-xl) var(--spacing-xl);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      position: relative;
+      display: inline-block;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 3px;
+        background-color: var(--color-hamburger-foreground);
+        transition: width var(--duration-slow);
+      }
+
+      @media (hover: hover) {
+        &:hover::after {
+          width: 100%;
+        }
+      }
+
+      &[data-current="true"]::after {
+        width: 100%;
+      }
     }
   }
 `
 
-// const hamburgerMenuClass = css`
-//   /* Reset dialog UA styles */
-//   margin: 0;
-//   padding: 0;
-//   border: none;
-//   color: inherit;
-//
-//   /* Anchor positioning */
-//   inset: unset;
-//   position-anchor: --header;
-//   top: anchor(--header bottom);
-//   left: calc(100% - 140px);
-//   margin-top: calc(-1 * var(--border-width-thick));
-//   width: 140px;
-//
-//   @media (max-width: 1100px) {
-//     left: calc(100% - 140px - var(--spacing-lg));
-//   }
-//
-//   @media (max-width: 768px) {
-//     left: calc(100% - 140px - var(--spacing-sm));
-//   }
-//
-//   /* Styling */
-//   background-color: var(--color-header-background);
-//   border: var(--header-border);
-//   border-top: none;
-//   border-radius: 0 0 var(--round-md) var(--round-md);
-//
-//   /* Entry/exit animation */
-//   clip-path: inset(0 0 100% 0);
-//   transition-property: clip-path, display, overlay;
-//   transition-duration: var(--duration-panel);
-//   transition-timing-function: var(--ease-standard);
-//   transition-behavior: normal, allow-discrete, allow-discrete;
-//
-//   &:popover-open {
-//     clip-path: inset(0 0 0 0);
-//
-//     @starting-style {
-//       clip-path: inset(0 0 100% 0);
-//     }
-//   }
-//
-//   ul {
-//     list-style: none;
-//     display: flex;
-//     flex-direction: column;
-//     gap: var(--spacing-md);
-//     padding: var(--spacing-md);
-//     font-size: clamp(var(--text-md), 2.5vw, var(--text-lg));
-//     font-weight: var(--font-semibold);
-//     margin: 0;
-//
-//     a {
-//       position: relative;
-//
-//       &::after {
-//         content: '';
-//         position: absolute;
-//         left: 0;
-//         bottom: 0;
-//         width: 0;
-//         height: 3px;
-//         background-color: var(--color-primary);
-//         transition: width var(--duration-slow);
-//       }
-//
-//       &:hover {
-//         opacity: 0.8;
-//         transition: opacity var(--duration-base) var(--ease-standard);
-//       }
-//
-//       &:hover::after {
-//         width: 100%;
-//       }
-//     }
-//   }
-// `
-//
 export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, currentPath: string }) => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
