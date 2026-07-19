@@ -23,13 +23,14 @@ const headerClass = css`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  translate: 0 0;
   transition:
     transform var(--duration-slow) var(--ease-standard),
     opacity var(--duration-slow) var(--ease-standard),
-    border-bottom-right-radius var(--duration-panel) var(--ease-standard);
+    border-bottom-right-radius var(--duration-panel) var(--ease-standard),
+    translate var(--duration-slow) var(--ease-standard);
 
   &:has(:popover-open) {
-    border-bottom-right-radius: 0;
     transition:
       transform var(--duration-slow) var(--ease-standard),
       opacity var(--duration-slow) var(--ease-standard),
@@ -42,6 +43,13 @@ const headerClass = css`
 
   @media (max-width: 768px) {
     margin-inline: var(--spacing-sm);
+  }
+
+  @container style(--scroll-direction: 1) and style(--past-threshold: 1) {
+    & {
+      translate: 0 calc(-100% - var(--spacing-base));
+      opacity: 0;
+    }
   }
 `
 
@@ -203,114 +211,15 @@ const closeIconClass = css`
 `
 
 const hamburgerMenuClass = css`
-  inset: unset;
-  top: -350px;
-  left: -300px;
-  width: 600px;
-  height: 600px;
-  background-color: var(--color-hamburger-background);
-  color: var(--color-hamburger-foreground);
-  border: var(--border-hamburger);
-  box-shadow: var(--shadow-hamburger);
-  border-radius: 55% 45% 30% 70% / 60% 40% 65% 35%;
-
-  translate: 100% -100%;
-  transition:
-    translate var(--duration-spring) var(--ease-spring),
-    display var(--duration-spring) allow-discrete,
-    overlay var(--duration-spring) allow-discrete;
-
-  &:popover-open {
-    translate: 0 0;
-
-    @starting-style {
-      translate: 100% -100%;
-    }
-  }
-
-  ul {
-    /* Visible area = bottom-left quadrant of the circle.
-       top: 50% = element center = top edge of the visible quarter. */
-    position: absolute;
-    top: 52%;
-    left: 0;
-    width: 46%;
-    list-style: none;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-    padding: var(--spacing-sm) 0 var(--spacing-xl) var(--spacing-xl);
-    font-size: var(--text-xl);
-    font-weight: var(--font-semibold);
-
-    a {
-      color: inherit;
-      text-decoration: none;
-      position: relative;
-      display: inline-block;
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: -2px;
-        width: 0;
-        height: 3px;
-        background-color: var(--color-hamburger-foreground);
-        transition: width var(--duration-slow);
-      }
-
-      @media (hover: hover) {
-        &:hover::after {
-          width: 100%;
-        }
-      }
-
-      &[data-current="true"]::after {
-        width: 100%;
-      }
-    }
-  }
 `
 
 export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, currentPath: string }) => {
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-
-      if (currentY < 300) {
-        setVisible(true);
-      } else {
-        setVisible(currentY < lastScrollY);
-      }
-
-      if (currentY >= 300 && currentY > lastScrollY) {
-        const menu = document.getElementById('nav-menu') as HTMLElement | null;
-        if (menu?.matches(':popover-open')) {
-          menu.hidePopover();
-        }
-      }
-
-      setLastScrollY(currentY);
-    }
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY])
-
-  const visibilityStyles = {
-    transform: `${visible ? 'translateY(0)' : 'translateY(-5rem)'}`,
-    opacity: visible ? '1' : '0'
-  }
-
   return (
     <header
       class={headerClass}
-      style={visibilityStyles}
     >
       <nav class={navClass}>
         <a href="/" class={blandLinkClass} data-current={currentPath === '/' ? 'true' : 'false'}>

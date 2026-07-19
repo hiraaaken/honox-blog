@@ -273,6 +273,10 @@
   --duration-slow: 0.3s;
   --duration-panel: 0.35s;
   --duration-spring: 0.5s;
+
+  animation: track-scroll linear both, cross-threshold linear both;
+  animation-timeline: scroll(root), scroll(root);
+  animation-range: 0 100%, 299px 300px;
 }
 
 /* Mobile Typography */
@@ -281,5 +285,44 @@
     --text-sm: var(--size-350);
     --text-md: var(--size-400);
     --text-lg: var(--size-500);
+  }
+}
+
+
+/* スクロール駆動アニメーションの設定値 */
+@property --scroll-position {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --scroll-position-delayed {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --scroll-direction {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --past-threshold {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes track-scroll {
+  to {
+    --scroll-position: 100;
+    --scroll-position-delayed: 100;
+  }
+}
+
+@keyframes cross-threshold {
+  to {
+    --past-threshold: 1;
   }
 }
