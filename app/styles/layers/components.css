@@ -53,7 +53,7 @@
   --table-cell-padding: 0.5em 1em;
 
   /* --- Theme Toggle --- */
-  --toggle-size: var(--size-1000);
+  --toggle-size: var(--size-800);
   --color-toggle-bg: var(--color-neutral-800);
   --color-toggle-knob: var(--color-neutral-600);
 
@@ -114,9 +114,10 @@
   --new-label-size: 3.5rem;
 
   /* --- Hamburger Menu --- */
-  --color-hamburger-background: var(--color-primary);
-  --color-hamburger-foreground: var(--color-neutral-800);
-  --border-hamburger: var(--border-width-thick) solid var(--color-hamburger-foreground);
+  --color-hamburger-background: var(--color-card-background);
+  --color-hamburger-foreground: var(--color-foreground);
+  --drawer-width: min(15rem, 60vw);
+  --border-hamburger: var(--border-width-thick) solid var(--color-foreground);
   --shadow-hamburger: 0px 0px 4px var(--color-hamburger-foreground);
 
   /* --- Profile Avatar --- */

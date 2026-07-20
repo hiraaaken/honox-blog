@@ -148,6 +148,7 @@
   --round-md: var(--size-200);
   --round-lg: var(--size-300);
   --round-xl: var(--size-400);
+  --round-circle: 50%;
   --round-pill: 999em;
   --round-full: 9999px;
 
@@ -272,7 +273,7 @@
   --duration-hover: 0.25s;
   --duration-slow: 0.3s;
   --duration-panel: 0.35s;
-  --duration-spring: 0.5s;
+  --duration-spring: 0.35s;
 
   animation: track-scroll linear both, cross-threshold linear both;
   animation-timeline: scroll(root), scroll(root);
