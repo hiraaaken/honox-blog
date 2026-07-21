@@ -122,7 +122,7 @@ const postContent = css`
     text-decoration: none;
     border: none;
     border-bottom: none;
-    transition: color 0.2s ease;
+    transition: color var(--duration-base);
     position: relative;
 
   @media (hover: hover) {
@@ -205,7 +205,7 @@ const postContent = css`
   a {
     color: light-dark(var(--color-secondary), var(--color-secondary-lighten));
     text-decoration: underline;
-    transition: all 0.2s ease;
+    transition: color var(--duration-base);
     
     @media (hover: hover) {
       &:hover {
@@ -362,8 +362,8 @@ const postNavigation = css`
     border-radius: 1rem;
     box-shadow: var(--card-shadow);
     transform: translateY(0);
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-      box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform var(--duration-hover) var(--ease-bounce),
+      box-shadow var(--duration-hover) var(--ease-bounce);
     flex: 1;
     color: inherit;
 
@@ -385,7 +385,7 @@ const postNavigation = css`
     &:active {
       transform: translateY(4px);
       box-shadow: var(--card-shadow-active);
-      transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
+      transition: transform var(--duration-snap) var(--ease-out), box-shadow var(--duration-snap) var(--ease-out);
     }
     
     .nav-direction {

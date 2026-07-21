@@ -23,14 +23,15 @@ const postCardClass = css`
   position: relative;
   overflow: visible;
   transform: translateY(0);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-    filter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform var(--duration-hover) var(--ease-bounce),
+    box-shadow var(--duration-hover) var(--ease-bounce),
+    background-color var(--duration-hover) var(--ease-bounce),
+    filter var(--duration-hover) var(--ease-bounce);
 
   @media (hover: hover) {
     &:hover {
       transform: translateY(2px);
-      filter: brightness(0.99);
+      background-color: var(--color-card-background-hover);
       box-shadow: var(--card-shadow-hover);
     }
   }
@@ -39,7 +40,7 @@ const postCardClass = css`
     transform: translateY(4px);
     filter: brightness(0.98);
     box-shadow: var(--card-shadow-active);
-    transition: transform 0.06s ease-out, box-shadow 0.06s ease-out, filter 0.06s ease-out;
+    transition: transform var(--duration-snap) var(--ease-out), box-shadow var(--duration-snap) var(--ease-out), background-color var(--duration-snap) var(--ease-out), filter var(--duration-snap) var(--ease-out);
   }
 
   & > a {

@@ -50,7 +50,7 @@ const triggerClass = css`
   line-height: 1;
   cursor: pointer;
   vertical-align: middle;
-  transition: opacity 0.15s;
+  transition: opacity var(--duration-fast);
 
   @media (hover: hover) {
     &:hover {
@@ -81,7 +81,7 @@ const tooltipClass = css`
   width: max-content;
   max-width: 400px;
   opacity: 0;
-  transition: opacity 0.15s ease-out, display 0.15s ease-out allow-discrete;
+  transition: opacity var(--duration-fast) var(--ease-out), display var(--duration-fast) var(--ease-out) allow-discrete;
   container-type: anchored;
 
   &:popover-open {

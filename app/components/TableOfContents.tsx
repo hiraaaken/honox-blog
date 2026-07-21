@@ -50,7 +50,7 @@ const tocItemH2 = css`
     font-weight: var(--font-medium);
     line-height: 1.5;
     border-radius: var(--round-sm);
-    transition: all 0.2s ease;
+    transition: color var(--duration-base), background-color var(--duration-base);
 
     @media (hover: hover) {
       &:hover {
@@ -94,7 +94,7 @@ const tocItemH3 = css`
     font-size: var(--text-xs);
     line-height: 1.5;
     border-radius: var(--round-sm);
-    transition: all 0.2s ease;
+    transition: color var(--duration-base), background-color var(--duration-base);
 
     @media (hover: hover) {
       &:hover {
@@ -151,7 +151,7 @@ const mobileTocSummary = css`
   &::before {
     content: "▶";
     font-size: var(--text-xs);
-    transition: transform 0.5s linear(0, 0.6 20%, 1.1 55%, 0.97 72%, 1);
+    transition: transform var(--duration-spring) var(--ease-spring);
   }
 
   details[open] &::before {
@@ -163,7 +163,7 @@ const mobileTocContent = css`
   interpolate-size: allow-keywords;
   overflow: clip;
   height: 0;
-  transition: height 0.5s linear(0, 0.6 20%, 1.1 55%, 0.97 72%, 1);
+  transition: height var(--duration-spring) var(--ease-spring);
   padding: 0 var(--mobile-toc-padding);
 
   details[open] & {

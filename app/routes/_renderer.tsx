@@ -1,7 +1,7 @@
 import { jsxRenderer } from "hono/jsx-renderer";
 import { getCookie } from "hono/cookie";
 import { Link, Script } from "honox/server";
-import { Header } from "../islands/Header";
+import { Header } from "../components/Header";
 import { css, Style } from "hono/css";
 
 const mainClass = css`
