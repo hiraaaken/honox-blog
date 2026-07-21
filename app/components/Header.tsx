@@ -195,6 +195,7 @@ const hamburgerMenuClass = css`
   translate: 100% 0;
   transition:
     translate var(--duration-spring) var(--ease-spring),
+    opacity var(--duration-spring) var(--ease-spring),
     display var(--duration-spring) allow-discrete,
     overlay var(--duration-spring) allow-discrete;
 
