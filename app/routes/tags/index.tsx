@@ -40,5 +40,10 @@ export default createRoute(async (c) => {
         ))}
       </div>
     </section>,
+    {
+      title: "タグ一覧",
+      description: "記事に付けられた全てのタグを一覧表示します。",
+      path: "/tags",
+    },
   );
 });

@@ -324,5 +324,11 @@ export default createRoute((c) => {
         </div>
       </div>
     </section>,
+    {
+      title: "About",
+      description:
+        "関西在住のエンジニアhiraaakenのプロフィール・技術スタックを紹介しています。",
+      path: "/about",
+    },
   );
 });

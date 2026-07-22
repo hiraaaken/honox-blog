@@ -484,5 +484,14 @@ export default createRoute(async (c) => {
         </nav>
       </div>
     </div>,
+    {
+      title,
+      description,
+      path: `/posts/${slug}`,
+      type: "article",
+      image: post.image,
+      publishedAt,
+      updatedAt,
+    },
   );
 });
