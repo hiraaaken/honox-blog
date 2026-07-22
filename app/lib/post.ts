@@ -38,7 +38,7 @@ function groupHeadings(headings: Heading[]): groupedHeading[] {
 export const getPosts: GetPosts = async () => {
   const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
-  const posts: PostSummary[] = await Promise.all(
+  const allPosts = await Promise.all(
     Object.entries(modules).map(async ([path, resolver]) => {
       const mod = await resolver();
       const slug = path.match(/([^\/]+)\.mdx$/)?.[1] || "";
@@ -47,6 +47,10 @@ export const getPosts: GetPosts = async () => {
         slug,
       };
     }),
+  );
+
+  const posts: PostSummary[] = allPosts.filter(
+    (post) => !post.draft || import.meta.env.DEV,
   );
 
   return posts.sort(
@@ -73,6 +77,10 @@ export const getPostBySlug: GetPostBySlug = async (slug) => {
   const mod = await resolver();
 
   if (!mod.default) {
+    return null;
+  }
+
+  if (mod.frontmatter.draft && !import.meta.env.DEV) {
     return null;
   }
 

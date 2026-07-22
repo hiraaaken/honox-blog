@@ -11,6 +11,8 @@ export interface FrontMatter {
   updatedAt: string;
   tags: string[];
   image: string;
+  /** trueの場合、本番環境では一覧・詳細・タグ・アーカイブに表示されない */
+  draft?: boolean;
 }
 
 /** MDXコンポーネント型 */
