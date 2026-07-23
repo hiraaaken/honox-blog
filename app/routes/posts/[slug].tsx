@@ -299,24 +299,16 @@ const postContent = css`
     }
   }
 
-  table {
-    display: block;
-    overflow-x: auto;
+  .table-wrapper table {
+    display: table;
+    width: 100%;
     border-collapse: collapse;
-    margin: var(--spacing-lg) 0;
     font-size: 0.9em;
-    max-width: 100%;
+    margin: 0;
 
     @media (max-width: 768px) {
       font-size: 0.85em;
-      margin: var(--spacing-md) 0;
     }
-  }
-
-  .table-wrapper table {
-    display: table;
-    overflow-x: initial;
-    margin: 0;
   }
 
   th, td {
