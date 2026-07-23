@@ -96,7 +96,7 @@ export default jsxRenderer(
           <main class={mainClass}>{children}</main>
 
           <footer class={footerClass}>
-            <p>&copy; 2025 hiraaaken All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} hiraaaken All rights reserved.</p>
           </footer>
         </body>
       </html>
