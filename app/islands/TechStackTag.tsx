@@ -106,7 +106,7 @@ export function TechStackTag({ name, rate }: Props) {
         id={tooltipId}
         role="tooltip"
         class={tooltipClass}
-        // @ts-expect-error hono/jsxの型定義がPopover Hint APIの"hint"値に未対応のため
+        // @ts-expect-error
         popover="hint"
         style={`position-anchor: ${anchorName}`}
       >
