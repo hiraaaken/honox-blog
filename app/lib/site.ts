@@ -3,7 +3,7 @@ import type { Context } from "hono";
 export const SITE_NAME = "hiraaaken Blog";
 
 export const DEFAULT_DESCRIPTION =
-  "関西在住のエンジニアhiraaakenによる個人技術ブログ。TypeScript・CSS・Honoまわりの学びを書き留めています。";
+  "関西住みエンジニアhiraaakenによる個人技術ブログ。TypeScript・CSS・Honoまわりの学びを書き留めています。";
 
 /** カスタムドメイン導入（#49）までの暫定フォールバック画像 */
 export const DEFAULT_OG_IMAGE_PATH = "/icon.png";

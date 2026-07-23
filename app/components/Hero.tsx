@@ -45,7 +45,7 @@ export const Hero = () => {
           <span>I'm Hiraaaken.</span>
         </h1>
         <p class={heroDescriptionClass}>
-          I'm a software engineer working in Kyoto.<br />
+          I'm a software engineer working in Kansai.<br />
           I'll write about my experiences and learnings in software engineering.
         </p>
       </div>
