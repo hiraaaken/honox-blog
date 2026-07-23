@@ -106,6 +106,7 @@ export function TechStackTag({ name, rate }: Props) {
         id={tooltipId}
         role="tooltip"
         class={tooltipClass}
+        // @ts-expect-error
         popover="hint"
         style={`position-anchor: ${anchorName}`}
       >

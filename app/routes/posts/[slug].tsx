@@ -259,7 +259,7 @@ const postContent = css`
     margin: var(--spacing-xl) 0;
     border: 1px solid var(--color-border);
     line-height: 1.6;
-    font-size: 1em;
+    font-size: var(--text-code);
     max-width: 100%;
     box-sizing: border-box;
 
@@ -267,17 +267,16 @@ const postContent = css`
       padding: var(--code-block-padding-mobile);
       margin: var(--spacing-lg) 0;
       border-radius: var(--round-sm);
-      font-size: 0.9em;
     }
   }
-  
+
   pre code {
     background: transparent !important;
     padding: 0;
     border: none;
     color: inherit;
-    font-family: inherit;
-    font-size: 1.2em;
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-size: inherit;
     line-height: inherit;
   }
   
@@ -300,24 +299,16 @@ const postContent = css`
     }
   }
 
-  table {
-    display: block;
-    overflow-x: auto;
+  .table-wrapper table {
+    display: table;
+    width: 100%;
     border-collapse: collapse;
-    margin: var(--spacing-lg) 0;
     font-size: 0.9em;
-    max-width: 100%;
+    margin: 0;
 
     @media (max-width: 768px) {
       font-size: 0.85em;
-      margin: var(--spacing-md) 0;
     }
-  }
-
-  .table-wrapper table {
-    display: table;
-    overflow-x: initial;
-    margin: 0;
   }
 
   th, td {
@@ -484,5 +475,14 @@ export default createRoute(async (c) => {
         </nav>
       </div>
     </div>,
+    {
+      title,
+      description,
+      path: `/posts/${slug}`,
+      type: "article",
+      image: post.image,
+      publishedAt,
+      updatedAt,
+    },
   );
 });

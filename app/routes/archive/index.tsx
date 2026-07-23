@@ -80,5 +80,10 @@ export default createRoute(async (c) => {
         )}
       </section>
     </>,
+    {
+      title: pageTitle,
+      description: `${pageTitle}の一覧です。`,
+      path: `/archive?year=${year}&month=${month}`,
+    },
   );
 });

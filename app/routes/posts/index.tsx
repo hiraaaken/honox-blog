@@ -76,5 +76,10 @@ export default createRoute(async (c) => {
         )}
       </section>
     </>,
+    {
+      title: "記事一覧",
+      description: "全ての記事を新着順に一覧表示します。",
+      path: "/posts",
+    },
   );
 });

@@ -59,6 +59,7 @@ export default createRoute(async (c) => {
           <Archives />
         </aside>
       </section>
-    </>
+    </>,
+    { path: '/' },
   )
 })

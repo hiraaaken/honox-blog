@@ -11,6 +11,7 @@ import rehypeShiki from '@shikijs/rehype'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import { rehypeExtractHeadings } from './app/lib/rehype-extract-headings'
+import { rehypeWrapTables } from './app/lib/rehype-wrap-tables'
 
 const entry = "/app/server.ts"
 
@@ -33,6 +34,7 @@ export default defineConfig({
       rehypePlugins: [
         rehypeSlug,
         rehypeExtractHeadings,
+        rehypeWrapTables,
         [rehypeAutolinkHeadings, {
           behavior: 'wrap',
           properties: {
