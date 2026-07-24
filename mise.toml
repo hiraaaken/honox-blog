@@ -1,0 +1,8 @@
+[tools]
+node = "22"
+aube = "1.32.0"
+
+[settings.npm]
+# mise自身がnpm:パッケージをツールとしてインストールする際に使うパッケージマネージャー
+# （このプロジェクト自体の依存関係インストールはaube installを使う。無関係だが念のため揃えておく）
+package_manager = "aube"

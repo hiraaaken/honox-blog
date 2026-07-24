@@ -43,10 +43,14 @@ app/
 
 ### Development Commands
 
-- `pnpm run dev` - Development with host binding (0.0.0.0)
-- `pnpm run build` - Dual build: client bundle + server (required order)
-- `pnpm run preview` - Wrangler dev server for production testing
-- `pnpm run deploy` - Build and deploy to Cloudflare Workers
+Package manager is [aube](https://aube.jdx.dev/) (pnpm-lock.yaml compatible), toolchain managed via [mise](https://mise.jdx.dev/) (`mise.toml`).
+
+- `mise install` - Install toolchain (Node/aube) declared in `mise.toml`
+- `aube install` - Install dependencies
+- `aube run dev` - Development with host binding (0.0.0.0)
+- `aube run build` - Dual build: client bundle + server (required order)
+- `aube run preview` - Wrangler dev server for production testing
+- `aube run deploy` - Build and deploy to Cloudflare Workers
 
 ### Integration Points
 

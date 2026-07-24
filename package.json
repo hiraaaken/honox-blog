@@ -5,7 +5,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build --mode client && vite build",
     "preview": "wrangler dev",
-    "deploy": "pnpm run build && wrangler deploy"
+    "deploy": "aube run build && wrangler deploy"
   },
   "private": true,
   "dependencies": {
@@ -30,6 +30,7 @@
     "@types/mdx": "^2.0.13",
     "remark-frontmatter": "^5.0.0",
     "remark-mdx-frontmatter": "^5.2.0",
+    "typescript": "^5.9.2",
     "vite": "^6.3.5",
     "wrangler": "^4.4.0"
   }

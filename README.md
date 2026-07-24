@@ -10,42 +10,51 @@ hiraaaken（Kenta Hirakata）のテックブログ 🥦
 - **ビルドツール**: Vite 6.x
 - **スタイリング**: CSS-in-JS (hono/css) 
 - **シンタックスハイライト**: Shiki
-- **パッケージマネージャー**: pnpm
+- **ツールチェーン管理**: [mise](https://mise.jdx.dev/)
+- **パッケージマネージャー**: [aube](https://aube.jdx.dev/)（mise作者jdx製、pnpm-lock.yaml互換）
 
 ## 開発
 
 ### 必要な環境
 
-- Docker と Docker Compose
-- pnpm（ローカルで実行する場合）
+- [devcontainer](https://containers.dev/) 対応エディタ（推奨）、または
+- [mise](https://mise.jdx.dev/) （ローカルで直接実行する場合）
 
-### Dockerでのセットアップ
+### devcontainerでのセットアップ（推奨）
 
 ```bash
 # リポジトリをクローン
 git clone https://github.com/hiraaaken/honox-blog.git
 cd honox-blog
-
-# 開発サーバーを起動
-docker compose up
 ```
 
-アプリケーションは `http://localhost:5173` で利用できます。
+VS Code等でリポジトリを開き、devcontainerで再度開く（`.devcontainer/devcontainer.json`）と、mise・aubeのセットアップと依存関係インストールが自動で行われる。
 
 ### ローカル開発
 
 ```bash
+# ツールチェーン（Node/aube）をインストール
+mise install
+
 # 依存関係をインストール
-pnpm install
+aube install
 
 # 開発サーバーを起動
-pnpm run dev
+aube run dev
 
 # 本番用ビルド
-pnpm run build
+aube run build
 
 # 本番ビルドをプレビュー
-pnpm run preview
+aube run preview
+```
+
+アプリケーションは `http://localhost:5173` で利用できます。
+
+### Docker Composeでのセットアップ（従来方式・引き続き利用可）
+
+```bash
+docker compose up
 ```
 
 ## デプロイ
@@ -53,7 +62,7 @@ pnpm run preview
 Cloudflare Workersへのデプロイ:
 
 ```bash
-pnpm run deploy
+aube run deploy
 ```
 
 ## プロジェクト構造
@@ -99,7 +108,9 @@ MDX形式でブログ投稿のコンテンツを書きます。
 - **Wrangler**: `wrangler.jsonc` - Cloudflare Workers設定
 - **TypeScript**: `tsconfig.json` - TypeScript設定
 - **Vite**: `vite.config.ts` - ビルド設定
-- **Docker**: `compose.yaml` - 開発環境設定
+- **mise**: `mise.toml` - Node/aubeのバージョン管理
+- **devcontainer**: `.devcontainer/devcontainer.json` - コンテナ開発環境設定
+- **Docker（従来方式）**: `compose.yaml` - 開発環境設定
 
 ## ライセンス
 

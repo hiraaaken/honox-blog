@@ -1,0 +1,14 @@
+{
+  "name": "honox-blog",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/mise:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["hverlin.mise-vscode"]
+    }
+  },
+  "forwardPorts": [5173],
+  "postCreateCommand": "mise trust && mise install && aube install"
+}
