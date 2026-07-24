@@ -9,7 +9,6 @@ hiraaaken（Kenta Hirakata）のテックブログ 🥦
 - **ランタイム**: Cloudflare Workers
 - **ビルドツール**: Vite 6.x
 - **スタイリング**: CSS-in-JS (hono/css) 
-  - tail は使わないんだからね！わざわざ剥がしたんだからね！
 - **シンタックスハイライト**: Shiki
 - **パッケージマネージャー**: pnpm
 
