@@ -1,29 +1,17 @@
-# HonoX ブログ
 
-HonoXフレームワークで構築された現代的なブログアプリケーション。Cloudflare Workersにデプロイされています。
+# hiraaaken.dev 🔥
 
-## 特徴
-
-- フロントマター対応のMDXブログ投稿
-- ダーク/ライトテーマ切り替え
-- レスポンシブデザイン
-- タグベースの投稿フィルタリング・タグ一覧ページ
-- アイランドアーキテクチャによるサーバーサイドレンダリング
-- 目次（Table of Contents）自動生成
-- Shikiによるシンタックスハイライト付きコードブロック
-- アーカイブページ / Aboutページ
-- Cloudflare Workersへのデプロイ
+hiraaaken（Kenta Hirakata）のテックブログ 🥦
 
 ## 技術スタック
 
 - **フレームワーク**: [HonoX](https://github.com/honojs/honox) (フルスタックHonoフレームワーク)
 - **ランタイム**: Cloudflare Workers
 - **ビルドツール**: Vite 6.x
-- **スタイリング**: CSS-in-JS (hono/css) + CSS Custom Properties
-- **コンテンツ**: フロントマター付きMDX
+- **スタイリング**: CSS-in-JS (hono/css) 
+  - tail は使わないんだからね！わざわざ剥がしたんだからね！
 - **シンタックスハイライト**: Shiki
 - **パッケージマネージャー**: pnpm
-- **開発環境**: Docker
 
 ## 開発
 
