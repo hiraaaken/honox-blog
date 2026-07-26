@@ -1,10 +1,6 @@
 [tools]
 node = "22"
 aube = "1.32.0"
-# devcontainer内でLSPを動かす構成（devcontainers.nvim等）向け。
-# Neovimはホスト側に置き、language serverだけコンテナ内で起動する。
-# vtsls派の場合は "npm:@vtsls/language-server" に差し替え可。
-"npm:typescript-language-server" = "latest"
 
 [settings.npm]
 # mise自身がnpm:パッケージをツールとしてインストールする際に使うパッケージマネージャー

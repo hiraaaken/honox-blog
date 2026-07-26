@@ -21,7 +21,7 @@ Honox を用いた個人技術ブログ。
 - `aube run build` - 本番ビルド（クライアント→サーバーの順で実行）
 - `aube run preview` - Wranglerでプレビュー
 - `aube run deploy` - ビルド後Cloudflare Workersにデプロイ
-- devcontainer（`.devcontainer/devcontainer.json`）での開発を推奨。`docker compose up`（Dockerfile経由、ポート5173）も引き続き利用可能
+- `docker compose up` - Docker開発環境（素のUbuntu + mise + aube、ポート5173）
 
 ### ディレクトリ構成
 - `app/server.ts` - Honoアプリインスタンス作成

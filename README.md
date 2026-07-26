@@ -17,20 +17,10 @@ hiraaaken（Kenta Hirakata）のテックブログ 🥦
 
 ### 必要な環境
 
-- [devcontainer](https://containers.dev/) 対応エディタ（推奨）、または
-- [mise](https://mise.jdx.dev/) （ローカルで直接実行する場合）
+- [mise](https://mise.jdx.dev/)（ツールチェーン管理。Node/aube を `mise.toml` に宣言）、または
+- Docker / Docker Compose
 
-### devcontainerでのセットアップ（推奨）
-
-```bash
-# リポジトリをクローン
-git clone https://github.com/hiraaaken/honox-blog.git
-cd honox-blog
-```
-
-VS Code等でリポジトリを開き、devcontainerで再度開く（`.devcontainer/devcontainer.json`）と、mise・aubeのセットアップと依存関係インストールが自動で行われる。
-
-### ローカル開発
+### ローカル開発（mise）
 
 ```bash
 # ツールチェーン（Node/aube）をインストール
@@ -51,7 +41,9 @@ aube run preview
 
 アプリケーションは `http://localhost:5173` で利用できます。
 
-### Docker Composeでのセットアップ（従来方式・引き続き利用可）
+### Docker Composeでのセットアップ
+
+素の Ubuntu イメージに mise を入れ、`mise.toml` の宣言に従って Node と aube をインストールする構成（`Dockerfile`）。
 
 ```bash
 docker compose up
@@ -109,8 +101,7 @@ MDX形式でブログ投稿のコンテンツを書きます。
 - **TypeScript**: `tsconfig.json` - TypeScript設定
 - **Vite**: `vite.config.ts` - ビルド設定
 - **mise**: `mise.toml` - Node/aubeのバージョン管理
-- **devcontainer**: `.devcontainer/devcontainer.json` - コンテナ開発環境設定
-- **Docker（従来方式）**: `compose.yaml` - 開発環境設定
+- **Docker**: `Dockerfile` / `compose.yaml` - コンテナ開発環境設定（素のUbuntu + mise + aube）
 
 ## ライセンス
 
