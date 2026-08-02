@@ -7,7 +7,10 @@ import {
   DEFAULT_DESCRIPTION,
   SITE_NAME,
   absoluteUrl,
+  buildJsonLd,
+  getSiteUrl,
   resolveOgImage,
+  serializeJsonLd,
 } from "@/lib/site";
 
 const mainClass = css`
@@ -38,6 +41,18 @@ export default jsxRenderer(
     const canonicalUrl = absoluteUrl(c, path || currentPath);
     const ogType = type || "website";
     const ogImage = resolveOgImage(c, image);
+
+    const jsonLd = buildJsonLd({
+      type: ogType,
+      path: path || currentPath,
+      title,
+      description: pageDescription,
+      canonicalUrl,
+      image: ogImage,
+      siteUrl: getSiteUrl(c),
+      publishedAt,
+      updatedAt,
+    });
 
     return (
       <html
@@ -71,6 +86,12 @@ export default jsxRenderer(
           <meta name="twitter:title" content={pageTitle} />
           <meta name="twitter:description" content={pageDescription} />
           <meta name="twitter:image" content={ogImage} />
+          {jsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+            />
+          )}
           <script
             dangerouslySetInnerHTML={{
               __html: `

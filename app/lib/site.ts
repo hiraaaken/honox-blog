@@ -2,6 +2,8 @@ import type { Context } from "hono";
 
 export const SITE_NAME = "hiraaaken Blog";
 
+export const AUTHOR_NAME = "hiraaaken";
+
 export const DEFAULT_DESCRIPTION =
   "関西住みエンジニアhiraaakenによる個人技術ブログ。TypeScript・CSS・Honoまわりの学びを書き留めています。";
 
@@ -35,4 +37,74 @@ export function absoluteUrl(c: Context, path: string): string {
 export function resolveOgImage(c: Context, image?: string): string {
   const path = image || DEFAULT_OG_IMAGE_PATH;
   return path.startsWith("http") ? path : absoluteUrl(c, path);
+}
+
+interface JsonLdInput {
+  /** ページ種別。"article"なら記事(BlogPosting)、"/"のwebsiteならサイト(WebSite) */
+  type: "website" | "article";
+  path?: string;
+  title?: string;
+  /** フォールバック適用後の説明文 */
+  description: string;
+  /** 絶対URL（canonical） */
+  canonicalUrl: string;
+  /** 絶対URLのOGP画像 */
+  image: string;
+  /** サイトのオリジン（WebSite用） */
+  siteUrl: string;
+  publishedAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * ページに埋め込むJSON-LD構造化データを組み立てる。
+ * - 記事詳細（type="article"）: BlogPosting
+ * - トップページ（path="/"）: WebSite
+ * - それ以外: null（構造化データを出力しない）
+ */
+export function buildJsonLd(input: JsonLdInput): Record<string, unknown> | null {
+  if (input.type === "article") {
+    return {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: input.title ?? SITE_NAME,
+      description: input.description,
+      datePublished: input.publishedAt,
+      dateModified: input.updatedAt ?? input.publishedAt,
+      author: { "@type": "Person", name: AUTHOR_NAME },
+      publisher: { "@type": "Person", name: AUTHOR_NAME },
+      image: input.image,
+      url: input.canonicalUrl,
+      mainEntityOfPage: { "@type": "WebPage", "@id": input.canonicalUrl },
+    };
+  }
+
+  if ((input.path ?? "/") === "/") {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: SITE_NAME,
+      description: input.description,
+      url: input.siteUrl,
+      author: { "@type": "Person", name: AUTHOR_NAME },
+    };
+  }
+
+  return null;
+}
+
+/**
+ * JSON-LDを<script>に安全に埋め込むための文字列化。
+ * "</script>"によるタグ早期終了を防ぐため "<" を、JSで無効な行区切り文字
+ * (U+2028 LINE SEPARATOR / U+2029 PARAGRAPH SEPARATOR)を \uXXXX にエスケープする。
+ * パターンはソースに不可視文字を残さないよう char code から組み立てる。
+ */
+export function serializeJsonLd(obj: Record<string, unknown>): string {
+  const lineSep = String.fromCharCode(0x2028);
+  const paraSep = String.fromCharCode(0x2029);
+  const pattern = new RegExp("[<" + lineSep + paraSep + "]", "g");
+  return JSON.stringify(obj).replace(pattern, (ch) => {
+    const code = ch.charCodeAt(0).toString(16).padStart(4, "0");
+    return "\\u" + code;
+  });
 }
