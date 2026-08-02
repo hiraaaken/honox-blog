@@ -67,6 +67,12 @@ export default jsxRenderer(
           <title>{pageTitle}</title>
           <meta name="description" content={pageDescription} />
           <link rel="canonical" href={canonicalUrl} />
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title={`${SITE_NAME} RSS`}
+            href={absoluteUrl(c, "/feed.xml")}
+          />
 
           <meta property="og:site_name" content={SITE_NAME} />
           <meta property="og:title" content={pageTitle} />
@@ -117,6 +123,9 @@ export default jsxRenderer(
           <main class={mainClass}>{children}</main>
 
           <footer class={footerClass}>
+            <p>
+              <a href="/feed.xml">RSS</a>
+            </p>
             <p>&copy; {new Date().getFullYear()} hiraaaken All rights reserved.</p>
           </footer>
         </body>
