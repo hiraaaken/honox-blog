@@ -1,0 +1,114 @@
+---
+title: "HonoXで個人技術ブログを作った"
+publishedAt: 2026-08-02
+updatedAt: 2026-08-02
+tags: ["HonoX", "Hono", "Cloudflare Workers", "MDX", "個人ブログ"]
+description: "このブログをHonoXで構築した経緯と、MDX執筆基盤・CSS-in-JSによるデザインシステム・Cloudflare Workersへのデプロイまでの設計を振り返ります。"
+---
+
+このブログは [HonoX](https://github.com/honojs/honox) で作っています。この記事では、なぜHonoXを選んだのか、どういう構成でMDX記事を書ける基盤を作ったのか、実際に手を動かして分かったことをまとめます。
+
+## 技術スタックの全体像
+
+- フレームワーク: HonoX（Hono 4.x ベースのフルスタックフレームワーク）
+- ランタイム: Cloudflare Workers
+- ビルドツール: Vite
+- コンテンツ: MDX（Markdown + JSX）
+- スタイリング: CSS-in-JS（`hono/css`）+ CSS Custom Properties
+- シンタックスハイライト: Shiki
+- パッケージ管理: [aube](https://aube.jdx.dev/)（pnpm-lock.yaml互換）、ツールチェーンは[mise](https://mise.jdx.dev/)
+
+Next.jsやAstroではなくHonoXを選んだのは、単純に「Honoで書ける範囲を広げたかった」からです。普段APIサーバーをHonoで書いていて、同じ書き味でSSRのページも組めるなら、フロントエンドだけ別フレームワークに切り替える必要がなくなります。ファイルベースルーティング・アイランドアーキテクチャ・Cloudflare Workersへのネイティブなデプロイという三点セットが揃っているのも決め手でした。
+
+## MDXで記事を書ける基盤を作る
+
+記事は `app/posts/YYYY/YYYYMM/slug.mdx` という形式で配置しています。`import.meta.glob` でこのディレクトリを丸ごと読み込み、frontmatterとコンポーネントを一覧・詳細・タグ・アーカイブの各ページに供給する構成です。
+
+```ts
+export const getPosts: GetPosts = async () => {
+  const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
+
+  const allPosts = await Promise.all(
+    Object.entries(modules).map(async ([path, resolver]) => {
+      const mod = await resolver();
+      const slug = path.match(/([^\/]+)\.mdx$/)?.[1] || "";
+      return { ...mod.frontmatter, slug };
+    }),
+  );
+
+  return allPosts
+    .filter((post) => !post.draft || import.meta.env.DEV)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+};
+```
+
+ファイルパスからslugを抽出するだけなので、記事の追加はディレクトリにMDXファイルを置くだけで完結します。DBもCMSも要らず、記事の実体はリポジトリの中に置いたテキストファイルです。
+
+Vite側では `@mdx-js/rollup` を中心に、remark/rehypeのプラグイン群でMarkdown→HTMLの変換パイプラインを組んでいます。
+
+```ts
+mdx({
+  jsxImportSource: 'hono/jsx',
+  remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
+  rehypePlugins: [
+    rehypeSlug,
+    rehypeExtractHeadings,
+    rehypeWrapTables,
+    [rehypeAutolinkHeadings, { behavior: 'wrap', properties: { className: ['heading-link'] } }],
+    [rehypeShiki, { theme: 'github-dark' }],
+  ],
+})
+```
+
+`rehypeExtractHeadings` と `rehypeWrapTables` は自作のrehypeプラグインです。見出しをTOC用のデータとして抜き出したり、テーブルを `.table-wrapper` で囲んでモバイルで横スクロールできるようにしたりと、このブログ固有の要件はプラグインとして切り出しています。
+
+## CSS-in-JSと3層トークンでデザインシステムを管理する
+
+スタイリングは `hono/css` を使ったCSS-in-JSと、CSS Custom Propertiesによるデザイントークンの組み合わせです。トークンはPrimitive（生の値）→ Semantic（用途）→ Component（コンポーネント固有）の3層構造にしています。
+
+```css
+/* Layer 1: Primitive */
+--color-neutral-100: oklch(0.97 0 0);
+
+/* Layer 2: Semantic */
+--color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
+
+/* Layer 3: Component */
+--card-shadow: 4px 4px 0 var(--color-card-shadow);
+```
+
+コンポーネント側は基本的にLayer 3のComponent Tokensだけを参照し、Primitiveを直接触らないようにしています。色やスペーシングの見直しが入ったときに、影響範囲が「そのコンポーネントの見た目」だけに閉じるようにするためです。ダークモードは `light-dark()` 関数に任せていて、`<html data-theme="light|dark">` を切り替えるだけで配色が反転します。
+
+## Cloudflare Workersへのデプロイと周辺機能
+
+`@hono/vite-build` でクライアント→サーバーの順にビルドし、Wranglerでデプロイします。SSGにも対応させていて、ビルド時に静的化できるページは静的化しています。
+
+個人ブログとしての基本機能も一通り揃えました。
+
+- RSSフィード（`/feed.xml`）
+- `sitemap.xml` / `robots.txt`
+- JSON-LD構造化データ（`BlogPosting` / `WebSite`）
+- OGP / canonical URLを含むメタタグ基盤
+- 記事のdraft機能（本番では非表示、開発環境でのみプレビュー可能）
+
+これらは1つの巨大な機能ではなく、Issueを切って一つずつ小さく実装していきました。ブログという性質上どれも「無くても動くが、あると信頼性が上がる」ものばかりなので、後回しにしても崩れないのが気楽なところです。
+
+## つまずいたところ
+
+### frontmatterと本文の見出しレベルの二重管理
+
+最初は本文中に `# タイトル`（h1）を書いていましたが、記事詳細ページ側でも `frontmatter.title` を `<h1>` として描画していたため、同じ見出しが2つ並ぶ状態になっていました。結局「タイトルはfrontmatterのみで管理し、本文はh2から始める」というルールに倒し、CLAUDE.mdにも明記しています。地味ですが、記事を書くたびに迷わないようにルールとして固定化しておくのが効きます。
+
+### モバイルでのコードブロックとテーブル
+
+コードブロックのフォントサイズが本文より大きくなってしまう問題や、テーブルがモバイル幅で崩れる問題も後から見つかりました。前者は `--text-code` というComponent Tokenを本文用トークンと分離することで、後者は先述の `rehypeWrapTables` で `.table-wrapper` の横スクロールコンテナに包むことで解決しています。デザイントークンを層で分けておくと、こういう「ある要素だけサイズ調整したい」という要求にピンポイントで対応しやすくなります。
+
+## 学んだこと
+
+- HonoXは薄いフレームワークなので、足りない機能（TOC抽出、テーブルラップなど）は自作のrehype/remarkプラグインとして素直に足せる。フレームワークの流儀に無理に合わせず、パイプラインに差し込む形で拡張できるのは扱いやすい
+- MDXファイルをそのままデータソースにする構成は、CMSを持たない個人ブログと相性が良い。記事の追加・編集がリポジトリへのコミットで完結し、レビューやドラフト管理もgitの仕組みに乗せられる
+- デザイントークンを3層に分けておくと、後から見つかる「この要素だけ直したい」に対して、上位レイヤーを壊さずに対応できる
+
+## まとめ
+
+HonoXでSSR・MDX・Cloudflare Workersを一直線につなげることで、DBもCMSも持たない個人ブログを、リポジトリだけで完結する形で作れました。フレームワークが薄い分、TOC抽出やテーブルラップのような細かい要件は自分でrehype/remarkプラグインとして書く必要がありますが、逆に言えばHonoの拡張性の範囲内で好きなように組み立てられるということでもあります。Honoに慣れている人が個人ブログを作るなら、選択肢として十分検討する価値があると思います。
