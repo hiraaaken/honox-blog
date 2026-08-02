@@ -1,0 +1,6 @@
+[tools]
+node = "24"
+aube = "1.32.0"
+
+[settings.npm]
+package_manager = "aube"

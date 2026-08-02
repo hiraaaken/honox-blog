@@ -13,11 +13,15 @@ Honox を用いた個人技術ブログ。
 
 ## 開発コマンド
 
-- `pnpm run dev` - 開発サーバー起動（0.0.0.0でホストバインド）
-- `pnpm run build` - 本番ビルド（クライアント→サーバーの順で実行）
-- `pnpm run preview` - Wranglerでプレビュー
-- `pnpm run deploy` - ビルド後Cloudflare Workersにデプロイ
-- `docker-compose up` - Docker開発環境（ポート5173）
+パッケージマネージャーは [aube](https://aube.jdx.dev/)（mise作者jdx製、pnpm-lock.yaml互換）。ツールチェーンは[mise](https://mise.jdx.dev/)で管理する（`mise.toml`にNode/aubeのバージョンを宣言）。
+
+- `mise install` - mise.tomlで宣言したツール（Node/aube）をインストール
+- `aube install` - 依存関係インストール
+- `aube run dev` - 開発サーバー起動（0.0.0.0でホストバインド）
+- `aube run build` - 本番ビルド（クライアント→サーバーの順で実行）
+- `aube run preview` - Wranglerでプレビュー
+- `aube run deploy` - ビルド後Cloudflare Workersにデプロイ
+- `docker compose up` - Docker開発環境（素のUbuntu + mise + aube、ポート5173）
 
 ### ディレクトリ構成
 - `app/server.ts` - Honoアプリインスタンス作成
