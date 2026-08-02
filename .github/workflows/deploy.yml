@@ -17,7 +17,11 @@ jobs:
 
       - run: aube install --frozen-lockfile
 
+      # canonical / OGP / sitemap / feed / JSON-LD の絶対URLを本番ドメインで埋め込む。
+      # SSGで事前生成されるページはビルド時のこの値が使われる（未設定だとlocalhostになる）。
       - run: aube run build
+        env:
+          VITE_SITE_URL: https://hiraaaken.dev
 
       - uses: cloudflare/wrangler-action@v3
         with:
