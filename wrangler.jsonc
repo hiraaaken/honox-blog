@@ -8,7 +8,13 @@
   ],
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "hiraaaken.dev",
+      "custom_domain": true
+    }
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
