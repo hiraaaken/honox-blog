@@ -2,6 +2,7 @@ import { jsxRenderer } from "hono/jsx-renderer";
 import { getCookie } from "hono/cookie";
 import { Link, Script } from "honox/server";
 import { Header } from "../components/Header";
+import RssIcon from "@/components/ui/RssIcon";
 import { css, Style } from "hono/css";
 import {
   DEFAULT_DESCRIPTION,
@@ -26,6 +27,26 @@ const footerClass = css`
   margin-top: auto;
   font-size: var(--text-body-sm);
   color: var(--color-muted);
+`;
+
+const footerLinksClass = css`
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+`;
+
+const footerLinkClass = css`
+  display: inline-flex;
+  color: inherit;
+  opacity: 0.6;
+  transition: opacity var(--duration-base) var(--ease-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 1;
+    }
+  }
 `;
 
 export default jsxRenderer(
@@ -123,9 +144,15 @@ export default jsxRenderer(
           <main class={mainClass}>{children}</main>
 
           <footer class={footerClass}>
-            <p>
-              <a href="/feed.xml">RSS</a>
-            </p>
+            <div class={footerLinksClass}>
+              <a
+                href="/feed.xml"
+                class={footerLinkClass}
+                aria-label="RSSフィード"
+              >
+                <RssIcon size={18} />
+              </a>
+            </div>
             <p>&copy; {new Date().getFullYear()} hiraaaken All rights reserved.</p>
           </footer>
         </body>
