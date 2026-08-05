@@ -1,11 +1,11 @@
 import type { Context } from "hono";
 
-export const SITE_NAME = "hiraaaken Blog";
+export const SITE_NAME = "hiraaaken.dev";
 
 export const AUTHOR_NAME = "hiraaaken";
 
 export const DEFAULT_DESCRIPTION =
-  "関西住みエンジニアhiraaakenによる個人技術ブログ。TypeScript・CSS・Honoまわりの学びを書き留めています。";
+  "hiraaakenのテックブログ。日々の学びや気づきを書き留めています。";
 
 /** カスタムドメイン導入（#49）までの暫定フォールバック画像 */
 export const DEFAULT_OG_IMAGE_PATH = "/icon.png";
