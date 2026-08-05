@@ -87,7 +87,8 @@ export const About = () => {
           </div>
         </div>
         <p class={aboutTextClass}>
-        関西住みエンジニア。<br />業務アプリ作ってます。
+        関西でソフトウェアエンジニアをしています。<br />
+        フロントもバックも色々やりたいんだなぁ...
         </p>
         <Link href="/about">read more...</Link>
       </article>

@@ -284,7 +284,7 @@ export default createRoute((c) => {
 
         <div class={introTextClass}>
           <p>
-            関西住みエンジニアです。社内 SE として、業務アプリの開発や保守をしています。
+            関西のソフトウェアエンジニアです。現在は社内 SE として、業務アプリの開発や保守をしています。
           </p>
           <p>
             このブログでは、日々の開発で学んだことや試したこと、技術的な発見などを書き留めていきます。<br />
@@ -319,7 +319,8 @@ export default createRoute((c) => {
         <div>
           <h2 class={cardTitleClass}>資格</h2>
           <ul>
-            <li>応用情報技術者試験</li>
+            <li>2026年7月：UX検定（基礎）</li>
+            <li>2022年11月：応用情報技術者試験</li>
           </ul>
         </div>
       </div>
@@ -327,7 +328,7 @@ export default createRoute((c) => {
     {
       title: "About",
       description:
-        "関西住みエンジニアhiraaakenのプロフィール・技術スタックを紹介しています。",
+        "hiraaakenのプロフィール・技術スタックを紹介しています。",
       path: "/about",
     },
   );
