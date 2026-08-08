@@ -195,10 +195,14 @@ const techStacks: TechStack[] = [
         name: "Haskell",
         rate: 1,
       },
+      {
+        name: "CSS",
+        rate: 2,
+      },
     ],
   },
   {
-    category: "Framworks/Libraries",
+    category: "Frameworks/Libraries",
     stacks: [
       {
         name: "Vue.js",
@@ -210,7 +214,7 @@ const techStacks: TechStack[] = [
       },
       {
         name: "Hono/HonoX",
-        rate: 1,
+        rate: 2,
       },
       {
         name: "Svelte",
@@ -291,7 +295,7 @@ export default createRoute((c) => {
             アウトプットする場として、気軽に更新していく予定です👀
           </p>
           <p>
-            フロント、バックエンド問わず色々興味がありますが、最近は特に 型 と Web標準（CSS/HTML仕様）に興味があります。<br />
+            フロント、バックエンド問わず色々興味がありますが、最近は特に型とWeb標準（CSS/HTML仕様）に興味があります。
           </p>
         </div>
 
