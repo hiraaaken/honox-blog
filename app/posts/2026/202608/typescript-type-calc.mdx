@@ -1,0 +1,285 @@
+---
+title: "TypeScript の型だけで四則演算を作る"
+publishedAt: 2026-08-09
+updatedAt: 2026-08-09
+tags: ["TypeScript", "型システム", "型レベルプログラミング"]
+description: "TypeScriptの型定義だけで四則演算(Add, Subtract, Multiply, Divide)を実装し、タプル、スプレッド演算子、Conditional Types、inferといった型レベルプログラミングのテクニックを解説します。"
+---
+
+## はじめに
+
+TypeScriptの型システムは**非常に柔軟**であり、言語が持つ様々な型の機能を組み合わせる…いわゆる **型レベルプログラミング** によって、型定義の時点で文字列のパースや演算、オブジェクト構造の再構築などが実現できます。
+[Type Challenges](https://github.com/type-challenges/type-challenges) はそんな TypeScript の型レベルプログラミングの問題集として有名です。  
+
+この度は TypeScript の型の機構について理解を深めることを目的に、**型定義だけで四則演算を実装してみました**。  
+(実用性は皆無ですし、実行時はなにも残りません。あと、だいぶ擦られたネタでもありますね…)  
+
+[こちら](https://x.gd/XTlhK)が今回実装したコードの全体です。  
+`TS Playground` で動作するコードです。
+
+本記事では、実装時に使用した型の各機能などをコードをみながら解説していこうと思います。
+
+## そもそも TypeScript の型って...
+
+TypeScript は、JavaScript に静的型付け機能、つまり **型**が付与された言語であり、 JavaScript のスーパーセットとして設計されています。  
+ただし、実際に実行されるのは、TypeScript をトランスパイル（別のプログラミング言語へ変換すること）することで生成された JavaScript のプログラムです。  
+この過程で、TypeScript 固有の記法や型情報はすべて削除されるということですね。  
+  
+TypeScript での実装に際して、 JavaScript の実装時にはあまり考えなかった型について開発者は考えることになるわけですが、その型による制約によって得られるメリットはいくつかあります。
+- 開発時に実装不備に気づきやすくなる
+  - `null` かもしれない値をそのまま触る、オブジェクトのプロパティ名を打ち間違える、関数に想定と違う型の値を渡す。こうした「実行してみるまで気づけなかった」類のミスを、IDE がその場で警告してくれます。
+- IDE による優れた補完機能が使える
+  - 型情報があることで、IDE はより正確な補完候補を提示してくれるので、正確かつ効率的なコーディングが可能になります。
+- 安全にコードの編集、リファクタリングができる
+  - 型情報があることで、コードの変更による影響範囲を IDE が正確に把握できるので、安心してコードの編集やリファクタリングが可能になります。
+- ランタイムエラー（実行時エラー）を減らせる
+  - 実行時にエラーになる箇所は、未然に型システムがエラーとして教えてくれるので、実装時点で気づくことができます。
+
+
+そして、基本的には `string（文字列）`や、`number（数値）`のような**プリミティブ型**、複数のプリミティブ型によって構成された **オブジェクト型**、引数と戻り値を定義する **関数型**などがあります。  
+これらを組み合わせて、型による安全性を自身で担保していきながら、実装を進めていくことになります。
+
+型の基本的な知識については、[サバイバルTypeScript](https://typescriptbook.jp/) などのドキュメントを参照するのがおすすめです。  
+というかこれ読んでおけば、この記事読まなくてもいいです。
+
+## 「型だけで四則演算」の基本イメージ
+
+基本的には、足し算の `Add` 型、引き算の `Subtract` 型、掛け算の `Multiply` 型、割り算の `Divide` 型を使用して演算を行います。小数は考慮していません（そこまで頑張れません）。
+
+これらの型は、**ジェネリクス**を使って定義されており、`Add<2, 3>` のように型引数（型を
+導出するために渡す引数）として数値の**リテラル型**を渡すことで、計算結果がまた型として
+導出されます。
+
+リテラル型とは、特定の値だけを代入可能にする型のことです。number 型の数値や string 型の
+文字列、boolean 型の true/false といった値そのものを、型として表現することができます。
+
+```ts
+type Two = 2;
+
+const a: Two = 2; // OK
+const b: Two = 3; // エラー: 型 '3' を型 '2' に割り当てることはできません
+
+type Hello = "Hello";
+
+const c: Hello = "Hello"; // OK
+const d: Hello = "World"; // エラー
+```
+
+つまり `Add<2, 3>` の `2` や `3` は値ではなく型であり、導出される `5` も値ではなく型で
+す。計算はすべて型の世界の中だけで起きています。
+
+以下が使用例です。
+
+```ts
+type AnswerOfAdd = Add<2, 3> // 5
+type AnswerOfSubtract = Subtract<5, 3> // 2
+type AnswerOfMultiply = Multiply<2, 8> // 16
+type AnswerOfDivide = Divide<15, 3> // 5
+
+// Add の計算結果である AnswerOfAdd は 5 というリテラル型
+// (=数値の5の代入のみを可能にする型になる)
+const answer: AnswerOfAdd = 5; // OK
+```
+
+## 今回使用した型の機能たち
+
+### タプル（tuple）
+
+衝撃的な事実ですが、TypeScript の型の世界では、`+` や `-` といった演算子は使えません。
+そのため、ある工夫によって無理やり四則演算っぽい処理を実現する必要があります。
+その一つが、**タプル（tuple）**を使った方法です。
+
+タプルは、**要素数と、各要素の位置の型が固定された配列**を表す型です。
+
+他の言語でもデータ構造の一種として目にする機会があるかと思いますが、Haskell の `(a, b)` や Rust の `(i32, String)` が配列やリストとは別物の独立した型であるのに対して、TypeScript のタプルは**あくまで配列**である、という点が少し変わっています。この「配列である」という性質が、後で効いてきます。
+
+具体的には以下のように定義します。
+
+```ts
+function tupleExample(): [number, string, boolean] {
+  return [42, "Hello", true]; // string 型や number 型の値をまとめて返すことができる
+}
+```
+
+例の関数の戻り値`[number, string, boolean]` の場合、一つ目は `number` 型、二つ目は `string` 型、三つ目は `boolean` 型の、長さ 3 の配列を意味します。
+通常の配列型 `number[]` が「長さは不定で、要素はすべて number 型の配列」を表すのに対して、タプル型は長さまで情報として保持していることがポイントです。
+
+そして、以下の方法によってタプルから長さの数値リテラル型を導出することができます。
+
+```ts
+type Tuple = [number, number, string];
+type Length = Tuple["length"]; // 3 というリテラル型が導出される
+
+type Arr = number[];
+type ArrLength = Arr["length"]; // number（長さが不定なので number 型にしかならない）
+```
+
+`["length"]` という記法がいきなり出てきましたね...。
+なぜこれで配列の長さが導出できるのかというと、タプルは**配列**を表す型であり、配列型 `Array<T>` が `length` というプロパティを保持しているためです。
+
+普段なにげなく書いている `number[]` という記法ですが、[公式ハンドブック](https://www.typescriptlang.org/docs/handbook/2/objects.html#the-array-type)にはこう書かれています。
+
+> Whenever we write out types like `number[]` or `string[]`, that's really just a shorthand for `Array<number>` and `Array<string>`.
+
+`number[]` は `Array<number>` の省略記法であり、配列型もまた型引数を受け取るジェネリック型なんですね。そして `Array<T>` は `length` や `push()` といったプロパティ・メソッドを持っています。
+
+そのうえで、タプルはハンドブックで次のように説明されています。
+
+> A *tuple type* is another sort of `Array` type that knows exactly how many elements it contains, and exactly which types it contains at specific positions.
+
+**要素をいくつ含んでいるかを正確に知っている「Array 型の一種」**。
+配列だから `length` を持っていて、しかも要素数が確定しているから、その `length` が `number` ではなく `3` という数値リテラル型になる...。
+このような仕組みによって、タプルの長さを使った数値の加算や減算が可能になります。
+
+### スプレッド演算子 (`...T`)
+
+型の機能…と言うと少し語弊がありますが、TypeScript では、**スプレッド演算子**を使ってタプルの要素を展開することができます。
+タプルの要素を展開することで、タプルの結合や、タプルの一部を取り出すことが可能になります。
+
+具体的な使用例として、足し算 `Add` 型の実装を見てみましょう。
+
+
+```ts
+type Add<A extends number, B extends number> =
+    [...CreateTuple<A>, ...CreateTuple<B>]["length"];
+```
+
+`CreateTuple<T>` はタプルを生成するヘルパー関数のようなものだと思ってください。
+`T` に渡した数値のリテラル型の長さを持つタプルを生成します。
+そして生成されたタプルに対してスプレッド演算子を使うことで、一度各要素に分解し、外側の`[]` によって再度タプルとしてマージしています。  
+そのマージしたタプルに対して、 `["length"]` を使うことで、タプルの長さを数値リテラル型として導出するわけです。  
+
+このようにしてあたかも `A + B` のような計算を、タプルの長さを使って実現しています。  
+めんどくさいですね。`+` 使えたらいいんですけどね。   
+
+### Conditional Types（条件付き型）
+
+実装をみていただくと分かると思うのですが、`extends` というキーワードが随所に出てきます。  
+その中でも、 三項演算子のように`T extends U ? X : Y` と言う形で使われているものを、**Conditional Types（条件付き型）** と呼びます。
+
+その名の通り、型を定義する際に条件分岐が行われ、`T` 型 が `U` 型に割り当て可能（`T` が `U` に含まれる）な場合は `X` が、そうでない場合は `Y` が型として導出されます。
+
+ちょっと不便な if 文といった感じですが、これを駆使することで **再帰処理** を実装することができます。  
+（for なんて革命的な機能は当然存在しません。型の判定の最中に、再度自分自身を呼び出すことで擬似ループ処理を実現しています）
+
+実際のコードで確認してみます。
+以下は、掛け算 `Multiply` 型の実装です。
+
+```ts
+type Multiply<A extends number, B extends number, Count extends number = B, Result extends unknown[] = []> =
+  A extends 0 | never
+    ? 0
+    : B extends 0 | never
+        ? 0
+        : Count extends 0
+            ? Result["length"]
+            : Multiply<A, B, Decrement<Count>, [...Result, ...CreateTuple<A>]>
+
+```
+
+まず掛け算というものを、「数値AをB回足し合わせる」演算と捉えます。  
+それを踏まえて、`Multiply` はジェネリクスに合計4つの型が受け取れるようにしています。
+足し合わせる数`A`と足し合わせる回数`B`に加え、残り回数を数える`Count`と、足し合わせる作業を繰り返して最終的に生成されるタプルである`Result`です。
+`Count`と`Result`は最初の呼び出し時には設定しなくてもいいようにデフォルト値を設定しています。
+(`Count` は `B`、`Result` は `[]` 空のタプル)
+
+なお、`A extends 0 | never` のように `| never` を加えているのは、Conditional Types が Union 型に対しては要素ごとに分配される（distributive）性質を持っており、`A` に `never` が渡された場合にこの分配によって意図しない挙動になるのを防ぐためのガードです。ここでは深入りしませんが、型レベルプログラミングでは頻出するテクニックなので頭の片隅に置いておくと良さそうです。
+
+ソースの最後の方は以下のようになっています。
+
+```ts
+  : Count extends 0
+    ? Result['length']
+    : Multiply<A, B, Decrement<Count>, [...Result, ...CreateTuple<A>]>;
+```
+
+翻訳すると、
+もし残り回数が0なら(= B回足し合わせが完了した)、`Result['length']` でタプルの長さを返却する。
+そうでないなら (= あと`Count` 回足し合わせる必要がある)、`Count` を減らし、マージしたタプルを `Result` として、`Multiply` を再度呼び出す。  
+という処理になります。  
+再帰処理では、ベースケースと呼ばれる再帰呼び出しを終了するための条件の設定が必要になります。  
+今回は、`Count` が0になったときがベースケースに当たるわけですが、「ベースケースにたどり着いたときに…」という処理をするには、条件分岐が必須です。
+
+### infer ...
+
+`infer` は Conditional Types と一緒に使うものであり、`extends` の右側にのみ書くことができるキーワードです。  
+（`infer` は「推論する」という意味ですね）
+「推論する」と言うと少し抽象的なのですが、一言で説明すると「**型の一部を取り出して名前を付ける**」ためのキーワードと言えます。
+
+配列の分割代入と発想は少し似ているかもしれません。
+
+```ts
+const [first, ...rest] = [1, 2, 3];
+// first = 1, rest = [2, 3];
+```
+
+
+では、引き算 `Subtract<A, B>` の実装を見てみましょう。  
+
+```ts
+type Subtract<A extends number, B extends number> =
+    CreateTuple<A> extends [...infer R, ...CreateTuple<B>] ? R['length'] : 0;
+```
+
+`extends`の右側に `[...infer R, ...CreateTuple<B>]` と記述されています。  
+これは、`CreateTuple<A>` によって生成されたタプルの構造が
+「なんらかの前半部分（これに `R` という名前を付ける)と、`CreateTuple<B>` の要素」に分解できるか…を判定しています。  
+
+- 分解できる場合、`R` には、前半部分の型（タプル）が抽出され、`R["length"]` でその長さを取得しています。
+- 分解できない場合は、0 を返却する（A よりも　B が大きい場合など）。
+
+こうして構造が不明な型に対しても、条件分岐によって型を仮定することで構造の型判定の処理を進めることができるようになります。
+
+最後に、冒頭で名前だけ出しておいて放置していた割り算 `Divide` も、この `infer` を使った構造の分解を応用して実装しています。  
+割り算は「`A` から `B` を、`A` が `B` 未満になるまで繰り返し引き算し、何回引けたか」を数える処理として実装しています。
+
+```ts
+// AはB以上であるかの比較
+type GreaterThanOrEqual<A extends number, B extends number> = 
+  CreateTuple<A> extends [...CreateTuple<B>, ...infer Rest]
+  ? true
+  : false;
+
+// 除算（A / B）
+type Divide<A extends number, B extends number, Count extends unknown[] = []> =
+  GreaterThanOrEqual<A, B> extends true
+    ? Subtract<A, B> extends infer R extends number
+      ? R extends 0 | never
+        ? [...Count, unknown]['length']
+        : Divide<R, B, [...Count, unknown]>
+      : [...Count]['length']
+    : [...Count]['length']
+```
+
+まず `GreaterThanOrEqual<A, B>` は、`Subtract` と同じ「タプルをスプレッドしつつ `infer` で残りを取り出す」というテクニックの応用です。`CreateTuple<A>` が `[...CreateTuple<B>, ...infer Rest]`（長さ `B` の前半部分＋残り）という形に分解できれば、それは `A` が `B` 以上であることを意味するので `true` を、分解できなければ `A` が `B` 未満ということで `false` を返します。
+
+`Divide` はこの `GreaterThanOrEqual` を「まだ引き算を続けられるか」のループ継続条件として使っています。
+
+- `A` が `B` 以上である間は、`Subtract<A, B>` で `A` から `B` を1回分引いた残り `R` を求め、商をカウントするタプル `Count` に `unknown` を1つ積みながら `Divide<R, B, Count>` として自分自身を呼び出す
+- ちょうど割り切れて `R` が `0` になったら、最後にもう1つ `Count` を積んで `['length']` で商を返す
+- `A` が `B` 未満になったら（＝もうこれ以上引けない）、そこまでに積んだ `Count` の長さを商として返す
+
+つまり `Divide<15, 3>` なら「15 → 12 → 9 → 6 → 3 → 0」と5回引き算できるので、商は `5` になる、という寸法です。冒頭で断った通り小数は出てこないので、割り切れない場合は自動的に切り捨て（floor）の結果になります。
+
+ちなみに `Subtract<A, B> extends infer R extends number` という書き方、ここで初めて `infer` に `extends` で制約を付けています。「`R` という名前で取り出しつつ、それは `number` 型のはずだ」と念押ししているわけですね。これは TypeScript 4.7 で追加された比較的新しい構文です。  
+また `R extends 0 | never` の部分は、`Multiply` のところで説明した distributive な挙動を避けるためのガードと同じものです。
+
+## まとめ
+
+単純な四則演算をしたいだけなのに、こんなにめんどくさいコードを書かないといけないということが分かって頂けたかと思います。
+逆に、単純な四則演算を実装するだけでも、たくさんのことが学べた気がします。
+
+ただ、改めて言いますが、これはあくまで**型**です。実際のデータの値は出てきていません。
+つまり、TypeScriptは**「実装次第でいくらでも開発者の都合のいいような型を作ることができる」**
+と言えそうです。
+
+冒頭で言った
+
+>  TypeScriptの型システムは**非常に柔軟**であり、
+
+も実際に実装してみることでお分かりいただけたのではないでしょうか。
+また、使用した構文に関して、説明を端折った部分もあるため、理解に苦しんだ箇所が多かったかもしれません。
+
+正直、ここら辺の型演算子とか知らなくてもTypeScriptで開発はできます。  
+怖がらないでください。  
+より詳しく調べたくなった方は、先述した[サバイバルTypeScript](https://typescriptbook.jp/)をぜひ読んでみてください。
