@@ -27,13 +27,10 @@ const footerClass = css`
   margin-top: auto;
   font-size: var(--text-body-sm);
   color: var(--color-muted);
-`;
-
-const footerLinksClass = css`
   display: flex;
   justify-content: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
+  align-items: center;
+  gap: var(--spacing-sm);
 `;
 
 const footerLinkClass = css`
@@ -144,16 +141,14 @@ export default jsxRenderer(
           <main class={mainClass}>{children}</main>
 
           <footer class={footerClass}>
-            <div class={footerLinksClass}>
-              <a
-                href="/feed.xml"
-                class={footerLinkClass}
-                aria-label="RSSフィード"
-              >
-                <RssIcon size={18} />
-              </a>
-            </div>
             <p>&copy; {new Date().getFullYear()} hiraaaken All rights reserved.</p>
+            <a
+              href="/feed.xml"
+              class={footerLinkClass}
+              aria-label="RSSフィード"
+            >
+              <RssIcon size={18} />
+            </a>
           </footer>
         </body>
       </html>

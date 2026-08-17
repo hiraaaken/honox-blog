@@ -10,4 +10,3 @@ services:
     ports:
       - "5173:5173"
     tty: true
-    command: sleep infinity
