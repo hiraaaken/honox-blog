@@ -1,0 +1,474 @@
+---
+title: "Kotlin の class、ちゃんと使い分けてる? 全9種類のクラス宣言まとめ"
+publishedAt: 2026-08-17
+updatedAt: 2026-08-17
+tags: ["Kotlin", "クラス設計", "Java"]
+description: "Kotlinのclassキーワードが持つ9種類のバリエーション(無印class, open, abstract, data, sealed, enum, inner, value, annotation)を、ECサイトの注文管理システムを例に、それぞれの特徴と使いどころを整理して解説します。"
+draft: false
+---
+
+## はじめに
+
+**Kotlin** と聞くと、なんとなく「Android アプリを書くときに使う言語」というイメージを持たれている方も多いのではないでしょうか。
+自分も最初はそんな認識でした。
+
+初めてガッツリ Kotlin を触ったのは、バックエンド側の開発（`Spring Boot` を使ったアプリ）だったのですが、実際に調べながら使っていくにつれて、型システム・イミュータビリティを前提とした設計、記述の簡潔さ（`getter`, `setter` めっちゃ書かなくてもいいみたいな）などに惹かれたのを覚えています。
+
+（Kotlin の詳しい言語仕様や概要については [公式ドキュメント](https://kotlinlang.org/docs/home.html) を参照してくださいな…）
+
+ただ、実際にコードを書くに際して、便利な標準機能が豊富にあるが故に、いまいち何をどう使えばいいのかわからない…結局 Java で書くのとあまり変わらないコードになってしまう…ということもありました。
+
+本記事ではそんな悩みを少しでも解消すべく、Kotlin の `class` キーワードに着目し、各種クラスの特徴と使いどころを整理しようと思います。
+
+Kotlin では class キーワード（およびそれに関連する構文）だけで用途に応じたさまざまな構造体を定義できます。  
+「どんな種類のクラス定義があって、それぞれどういう場面で使うのか」をパッと見返せて使用場面を思い出せる一覧表にしたいなと思って、以下にまとめました。
+（使いどころとして例示しているコードは、ECサイトの注文管理システムを想定しています）
+
+## Kotlin の各種 class
+
+### class（無印）
+
+修飾子を何も付けない、最もシンプルな `class` 宣言です。
+
+```kotlin
+class Customer(val name: String, val email: String)
+
+val customer = Customer("Taro", "taro@example.com")
+```
+
+上記のように、コンストラクタの引数をそのままプロパティとして宣言できるのが特徴です。
+`val` / `var` を付けた引数はそのままプロパティになるので、Java のように「フィールド宣言 → コンストラクタ引数の受け取り → `this.name = name` の代入」を別々に書く必要がありません。
+（こういうところが Better Java って感じでしょうか）
+
+もう一つ、Java との大きな違いが **デフォルトで `final`（継承不可）である**という点です。  
+Java の `class` は明示的に `final` を付けない限り継承可能ですが、Kotlin では逆に、継承させたい場合は `open` を明示的に付ける必要があります（後述）。  
+「継承させるつもりのなかったクラスが、うっかり継承されて事故る」というパターンを言語レベルで防いでいるわけですね。だれか悩んでた人がいたんですかね。
+
+#### 使いどころ
+
+- 特に理由がなければ、まずはこの無印 `class` を選ぶことになるかなと思います
+- 例: 注文金額を計算するだけの、継承を必要としない単純な処理
+
+```kotlin
+// 注文金額を計算するだけの単純なクラス
+class OrderTotalCalculator {
+    fun calculate(unitPrice: Int, quantity: Int): Int = unitPrice * quantity
+}
+
+OrderTotalCalculator().calculate(unitPrice = 1200, quantity = 3) // 3600
+```
+
+### open class
+
+前述の通り、Kotlin の `class` はデフォルトで `final`（=継承できない） なので、継承させたい場合は `open` を付ける必要があります。
+
+```kotlin
+open class ShippingNotifier(protected val customerName: String) {
+    open fun buildMessage(): String = "$customerName 様の商品を発送しました"
+}
+
+class ExpressShippingNotifier(customerName: String) : ShippingNotifier(customerName) {
+    override fun buildMessage(): String = "$customerName 様の商品を速達で発送しました"
+}
+```
+
+継承させたいクラス自体だけでなく、**オーバーライドを許可したいメンバー（プロパティ・メソッド）にも個別に`open`が必要** なのがポイントです。クラスに `open` を付けたからといって、中身が自動的にオーバーライド可能になるわけではありません。
+
+#### 使いどころ
+
+- 「基本の処理は共通化しつつ、一部のケースだけ振る舞いを変えたい」場面
+  - 例: 注文データの CSV エクスポート処理で、通常はそのまま使えるが Excel 向けだけセルの整形を変えたい
+
+```kotlin
+open class OrderCsvExporter {
+    open fun formatCell(value: String): String = value
+}
+
+class ExcelSafeOrderCsvExporter : OrderCsvExporter() {
+    override fun formatCell(value: String) = "\"$value\""
+}
+```
+
+- `OrderCsvExporter` は単体でも使えて、必要な箇所だけ `ExcelSafeOrderCsvExporter` に差し替えられる、という関係
+- フレームワーク側の都合で `open` が要求される場面もある
+  - 代表例: Spring Boot + JPA の `Order` Entity クラス
+  - JPA（Hibernate）は、DB からデータを取得する際に、Entity クラスを継承した「代理クラス」を裏側で自動生成する仕組みを持っている
+  - `class`（無印）のままだと継承できずこの仕組みが動かないので、`Order` Entity クラスには `open` を付けておく必要がある
+
+### abstract class
+
+インスタンス化できない、継承されることを前提としたクラスです。`abstract class` は暗黙的に `open` と同じ扱いになります（継承させることが大前提のクラスなので当然ですね）。
+
+```kotlin
+abstract class BatchJob {
+    abstract fun execute()
+
+    fun run() {
+        println("[${this::class.simpleName}] バッチ開始")
+        execute()
+        println("[${this::class.simpleName}] バッチ終了")
+    }
+}
+
+class ExpiredOrderCancelJob : BatchJob() {
+    override fun execute() {
+        println("支払い期限切れの注文をキャンセルします")
+    }
+}
+
+ExpiredOrderCancelJob().run()
+```
+
+`abstract fun execute()` は実装を持たず、シグネチャ（名前・引数・戻り値の型）だけを定義したメンバーです。継承先のクラスは、これを必ずオーバーライドして中身を実装しなければなりません。
+
+一方 `run()` は最初から実装済みの普通のメソッドで、オーバーライド不要のまま全てのバッチジョブで共通利用されます。  
+つまり `abstract class` は、「ジョブごとに変わる部分（`execute()`）」と「全ジョブ共通の部分（開始・終了ログを含む `run()`）」を1つのクラスに同居させられる、というのがポイントです。
+
+#### 使いどころ
+
+- 「共通処理は基底クラスに持たせつつ、可変な部分だけサブクラスに実装させたい」場面（テンプレートメソッドパターン）
+- 上の `BatchJob` はまさにその例で、開始・終了のログ出力は共通化しつつ、ジョブごとの処理内容だけを `execute()` にサブクラス側で実装させています
+- 他にも `LowStockAlertJob`（在庫アラート）のようなジョブを増やしても、`run()` 側の共通処理には一切手を入れずに済みます
+
+#### open と abstract の違い
+
+`open class` と `abstract class`、似ているようで役割が異なります。
+
+| | `open class` | `abstract class` |
+|---|---|---|
+| 単体でインスタンス化 | できる | できない |
+| `abstract` メンバー | 持てない | 持てる |
+| クラス自体の継承可否 | `open` を明示する必要がある | 明示しなくても継承可能（暗黙的に open） |
+
+一言でいうと、継承が **「任意のオプション」なのが `open class`**、**「必須の前提」なのが `abstract class`** です。「このクラス単体で完結して使うことがあり得るか?」を判断基準にすると迷いにくいと思います。
+
+なお `abstract class` が暗黙的に継承可能なのは、公式ドキュメントにも「You can inherit from abstract classes and interfaces by default.」と明記されている通りです（[Inheritance | Kotlin Documentation](https://kotlinlang.org/docs/inheritance.html)）。
+
+### data class
+
+「データを保持すること」に特化したクラスです。`data` を付けるだけで、以下のメンバーをコンパイラが自動生成してくれます。
+
+```kotlin
+data class Order(val id: Long, val customerName: String, val totalPrice: Int)
+
+val order1 = Order(1, "Taro", 3000)
+val order2 = order1.copy(totalPrice = 2500) // クーポン適用後の金額に更新
+
+println(order1) // Order(id=1, customerName=Taro, totalPrice=3000)
+println(order1 == Order(1, "Taro", 3000)) // true
+```
+
+#### 自動生成されるメンバー
+
+##### toString()
+
+プロパティを列挙した読みやすい文字列表現を生成します。
+
+##### equals() / hashCode()
+
+全プロパティを使った構造的な等価性判定を行います。
+
+##### copy()
+
+一部のプロパティだけ差し替えた複製を作れます（残りは元の値を引き継ぐ）。  
+Kotlin では基本的にプロパティを `val`（再代入不可）にして不変（イミュータブル）に設計するのがセオリーですが、不変にすると「一部のフィールドだけ更新したい」ときに、フィールドの数だけ引数を並べて `new` し直す羽目になりがちです。  
+これが面倒だと、結局 `var` にして直接書き換えてしまい、「知らないところで中身が変わっていた」というイミュータビリティ崩壊の温床になります。  
+`copy()` は「変えたいプロパティだけ指定すれば、残りは元の値のまま複製してくれる」ので、この面倒くささを解消してくれます。
+
+```kotlin
+val order1 = Order(id = 1, customerName = "Taro", totalPrice = 3000)
+
+// totalPrice だけを差し替えた新しいインスタンスを作る(id と customerName はそのまま引き継がれる)
+val order2 = order1.copy(totalPrice = 2500)
+
+println(order1) // Order(id=1, customerName=Taro, totalPrice=3000) ← 元のインスタンスは変化しない
+println(order2) // Order(id=1, customerName=Taro, totalPrice=2500)
+```
+
+##### componentN()
+
+分解宣言（`val (id, customerName, totalPrice) = order1`）を可能にします。
+
+なお、`equals` / `hashCode` / `copy` / `componentN` は**プライマリコンストラクタのプロパティのみ**が対象になる点は注意が必要です。クラス本体（ボディ）で追加したプロパティは対象外になります。
+
+#### Java で書くとどうなるか
+
+Java で同じ `Order` を DTO として定義しようとすると、素の Java ではこれくらいの分量になります。
+
+```java
+public final class Order {
+    private final long id;
+    private final String customerName;
+    private final int totalPrice;
+
+    public Order(long id, String customerName, int totalPrice) {
+        this.id = id;
+        this.customerName = customerName;
+        this.totalPrice = totalPrice;
+    }
+
+    public long getId() { return id; }
+    public String getCustomerName() { return customerName; }
+    public int getTotalPrice() { return totalPrice; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+        Order order = (Order) o;
+        return id == order.id
+            && totalPrice == order.totalPrice
+            && Objects.equals(customerName, order.customerName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, customerName, totalPrice);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{id=" + id + ", customerName=" + customerName + ", totalPrice=" + totalPrice + "}";
+    }
+}
+```
+
+これでもまだ `copy()` に相当するもの（一部のフィールドだけ変えた新しいインスタンスを作る手段）がありません。それを足そうとすると、`withTotalPrice(int totalPrice)` のようなメソッドをフィールドの組み合わせ分だけ自分で書く羽目になります。Lombok の `@Data` / `@With` を使えばある程度圧縮できますが、それでも「アノテーションの意味を覚える」というコストは残ります。`data class Order(val id: Long, val customerName: String, val totalPrice: Int)` の1行がこれら全部を肩代わりしてくれるわけです。
+
+#### 使いどころ
+
+- API のリクエスト/レスポンス DTO
+- DB から取得した1行を表すレコードクラス
+- ドメイン層の値オブジェクト（例: `OrderSummary`）
+- テストコードの期待値オブジェクト（`assertEquals(expected, actual)` が `equals()` のおかげでそのまま書ける）
+
+```kotlin
+// 注文作成 API のレスポンス DTO
+data class OrderResponse(val orderId: Long, val status: String, val totalPrice: Int)
+
+// Order ドメインモデルから OrderResponse DTO に変換する処理
+fun toResponse(order: Order): OrderResponse =
+    OrderResponse(order.id, "PENDING", order.totalPrice)
+```
+
+### sealed class
+
+継承先のクラスを**同一ファイル/モジュール内に限定**するクラスです。コンパイラが「あり得るサブタイプ（`PaymentResult` を継承した `Success` / `Failure` / `Pending` のような、派生先の各クラス）全て」を把握できるようになるため、`when` 式で分岐を網羅しているかをコンパイル時にチェックできるようになります。
+
+```kotlin
+// 決済結果を表す sealed class
+sealed class PaymentResult
+
+// Success / Failure / Pending の3パターンしか存在しないことが保証される
+data class Success(val orderId: Long, val transactionId: String) : PaymentResult()
+data class Failure(val orderId: Long, val reason: String) : PaymentResult()
+data object Pending : PaymentResult()
+
+// 決済結果を受け取って、ユーザー向けのメッセージに変換する処理
+fun handle(result: PaymentResult) = when (result) {
+    is Success -> "注文 #${result.orderId} の決済完了: ${result.transactionId}"
+    is Failure -> "注文 #${result.orderId} の決済失敗: ${result.reason}"
+    Pending -> "処理中"
+    // else が不要。分岐漏れがあればコンパイルエラーになる
+}
+```
+
+これが本当に便利で、`sealed` を使わない enum や普通の interface + 複数実装クラスの組み合わせだと、「新しいパターンを追加したのに、一部の `when` / `switch` の実装を直し忘れる」という事故が起きがちです。`sealed` にしておけば、新しいサブタイプを追加した瞬間、それを網羅していない `when` 式が全てコンパイルエラーとして検出されるので、**変更漏れをコンパイラに見つけてもらえます**。決済結果や API レスポンスの成功/失敗のような「Result 型」を表現するのに最適で、個人的にはかなり多用しているお気に入りの機能です。
+
+#### 使いどころ
+
+- 決済結果やバリデーション結果など、「決まったパターンのいずれか」を表す型
+- API レスポンスの成功/失敗を型安全に表現する Result 型
+- 状態遷移を持つドメインモデル（注文ステータスなど。ただし付随データが不要なら enum class の方がシンプルな場合も多い）
+
+### enum class
+
+有限個の定数を表すクラスです。Kotlin の enum は、定数ごとにプロパティやメソッドを持たせられる点が Java と共通しつつも扱いやすくなっています。
+
+```kotlin
+// 注文ステータスを表す enum
+enum class OrderStatus(val label: String) {
+    PENDING("処理待ち"),
+    SHIPPED("発送済み"),
+    DELIVERED("配達完了");
+
+    // 「配達完了」になったら最終状態なので、以降のステータス遷移はないことを表すメソッド
+    fun isFinal(): Boolean = this == DELIVERED
+}
+```
+
+#### 使いどころ
+
+- 有限の選択肢+付随するデータ・振る舞いをまとめて表現したいとき
+- DB の status カラムのような、決まった値しか取らない区分値
+
+```kotlin
+val status = OrderStatus.SHIPPED
+println(status.label)     // 発送済み
+println(status.isFinal()) // false
+```
+
+#### enum と sealed の違い
+
+どちらも「決まったパターンのいずれか」を表現でき、`when` の網羅性チェックが効くという共通点があります。  
+ただし、表現できるものの性質が若干違います。
+
+##### `enum class`
+- 全ての定数が**同じ構造**を持つ「値」のバリエーション
+- 各定数は、enum class 自体に定義したプロパティを共通して持つ
+
+##### `sealed class`
+- サブタイプ（部分型）ごとに**異なる構造**を持てる「型」のバリエーション
+- `Success` は `transactionId` を持つが `Failure` は `reason` を持つ、というように非対称な構造を表現できる
+  
+試しに、前述の `PaymentResult` を enum で無理やり表現しようとすると、こうなります。
+
+```kotlin
+enum class PaymentResultType {
+    SUCCESS, FAILURE, PENDING
+}
+
+data class PaymentResult(
+    val type: PaymentResultType,
+    val transactionId: String? = null, // SUCCESS のときだけ使う
+    val reason: String? = null,        // FAILURE のときだけ使う
+)
+```
+
+`transactionId` や `reason` を nullable にせざるを得ず、「`SUCCESS` なのに `transactionId` が `null`」のような、本来あり得ない状態を型で防げなくなってしまいます。  
+`sealed class` なら各サブタイプが必要なプロパティだけを **non-null** で持てるので、こうした「実際にはあり得ない組み合わせ」自体をコンパイル時に排除できます。
+
+| | `enum class` | `sealed class` |
+|---|---|---|
+| 表すもの | 同じ構造を持つ「値」のバリエーション | 異なる構造を持ちうる「型」のバリエーション |
+| インスタンス数 | 各定数につき1つ（シングルトン） | サブタイプごとにいくつでも生成できる |
+| 各ケースが持てるプロパティ | 全定数で共通 | サブタイプごとに自由 |
+| `when` の網羅性チェック | 効く | 効く |
+
+判断基準はシンプルで、**「各パターンで持たせたいデータの形が同じか、違うか」** です。`OrderStatus` のように全パターンが同じ形（ラベルだけ）なら `enum class`、`PaymentResult` のようにパターンごとに持ちたいデータが違うなら `sealed class` を選ぶとよさそうです。
+
+### inner class
+
+Kotlin では、ネストされたクラスはデフォルトで外側クラスのインスタンスへの参照を持ちません（Java の `static` ネストクラス相当）。`inner` を付けることで、外側インスタンスへの参照を保持できるようになります。
+
+```kotlin
+class ShoppingCart(private val customerName: String) {
+    inner class Item(val productName: String, val price: Int) {
+        fun receiptLine() = "$customerName 様: $productName ¥$price"
+    }
+}
+
+val cart = ShoppingCart("Taro")
+val item = cart.Item("Kotlin入門書", 2800)
+println(item.receiptLine()) // Taro 様: Kotlin入門書 ¥2800
+```
+
+#### 使いどころ
+
+- 外側クラスの状態に依存する処理をまとめたいとき
+  - 上の `ShoppingCart.Item` は、外側の `ShoppingCart` が持つ `customerName` を参照して明細を組み立てています
+- Builder パターンなどで、外側の状態を参照しながら内部的にオブジェクトを組み立てるとき
+- 正直、Web アプリケーションのバックエンド開発では出番は多くありません（Android の `RecyclerView.Adapter` の `ViewHolder` のような UI 実装で見かけることが多い印象です）
+
+### value class
+
+いわゆる inline class です。プリミティブ型や `String` を、**実行時のオーバーヘッドなしで**ラップして型安全性を高められます。
+
+```kotlin
+@JvmInline
+value class CustomerId(val value: Long)
+
+@JvmInline
+value class OrderId(val value: Long)
+
+fun findOrder(id: OrderId): Order? { /* ... */ }
+```
+
+`CustomerId` と `OrderId` はどちらも中身は `Long` ですが、コンパイラ上は別の型として扱われます。そのため `findOrder(customerId)` のように引数を渡し間違えると、実行時ではなく**コンパイルエラーとして**検出できます。「同じ型の引数が並んでいて、順番を間違えても気づけない」といういわゆる **Primitive Obsession**（基本型への執着）というコードスメルを、言語機能でスマートに解消できるわけです。
+
+しかも `value class` はコンパイル時にラッパーが取り除かれ、実行時には元のプリミティブ型として扱われます（インライン化）。つまり、通常のクラスでラップした場合に発生するオブジェクト生成やボクシングのコストをほぼゼロに抑えつつ、型安全性だけを手に入れられます。「型安全性をタダで手に入れられる」というのが、この機能の一番好きなポイントです。
+
+#### 使いどころ
+
+- `CustomerId` / `OrderId` のような ID 型
+- `Money` や `Email` のような、意味を持たせたいプリミティブ値
+- DDD でいうところの値オブジェクト（Value Object）の軽量な実装
+
+```kotlin
+val customerId = CustomerId(42)
+val orderId = OrderId(42)
+
+findOrder(orderId)     // OK
+// findOrder(customerId) // コンパイルエラー: 型が違う
+```
+
+### annotation class
+
+アノテーションを自作するためのクラスです。
+
+```kotlin
+// 1. アノテーションを定義する
+@Target(AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+@Constraint(validatedBy = [PhoneNumberValidator::class])
+annotation class ValidPhoneNumber(
+    val message: String = "電話番号の形式が不正です",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = [],
+)
+
+// 2. アノテーションに紐づく実際のチェック処理を実装する
+class PhoneNumberValidator : ConstraintValidator<ValidPhoneNumber, String?> {
+    override fun isValid(value: String?, context: ConstraintValidatorContext): Boolean {
+        if (value == null) return true // null チェックは @NotNull 側の責務にする
+        return value.matches(Regex("^0\\d{9,10}$"))
+    }
+}
+
+// 3. 定義したアノテーションをフィールドに付与して使う
+data class OrderRequest(
+    val customerName: String,
+    @field:ValidPhoneNumber
+    val phoneNumber: String,
+)
+
+// 4. Controller 側では @Valid を付けるだけで、上記のチェックが自動的に走る
+@RestController
+class OrderController {
+    @PostMapping("/orders")
+    fun createOrder(@RequestBody @Valid request: OrderRequest): Order {
+        // phoneNumber が不正な形式なら、ここに到達する前に 400 Bad Request が返る
+        TODO()
+    }
+}
+```
+
+`ValidPhoneNumber` はあくまで「目印」で、実際のチェックロジックは `ConstraintValidator` を実装した `PhoneNumberValidator` 側に書きます。この2つを `@Constraint(validatedBy = [...])` で紐付けておくと、あとは `@field:ValidPhoneNumber` を付けるだけで、Controller 側は `@Valid` を付けるだけの薄いコードのまま独自ルールのバリデーションを効かせられます。
+
+#### 使いどころ
+
+- リクエストのカスタムバリデーション（独自フォーマットのチェックなど、Bean Validation 標準の `@NotNull` 等だけでは足りないルールを表現したいとき）
+- 独自の例外・エラーハンドリングの目印（例: Spring の `@ResponseStatus` のように、独自の例外クラスに付与して特定の HTTP ステータスやエラーレスポンス形式と紐付ける）
+- AOP やリフレクションと組み合わせて使いたいとき（例: メソッドの実行時間計測）
+- 他のクラス種と比べると、実務で自作する機会はそう多くありません
+
+## まとめ
+
+Kotlin の `class` 宣言のバリエーションを、9種類まとめて見てきました。改めて一覧にすると、こんな感じです。
+
+| class | 特徴 | 使いどころ |
+|---|---|---|
+| `class`（無印） | デフォルトで `final`（継承不可） | 継承を必要としないクラス全般。まずはこれを選ぶ |
+| `open class` | 継承・オーバーライドを許可 | 共通処理は使いつつ一部だけ挙動を変えたいとき |
+| `abstract class` | インスタンス化不可、テンプレート | 共通処理+実装をサブクラスに強制したいとき |
+| `data class` | equals/hashCode/toString/copy/componentN を自動生成 | DTO、値オブジェクト |
+| `sealed class` | 継承先を限定、`when` の網羅性をチェック | Result 型、決まったパターンの表現 |
+| `enum class` | 定数ごとにプロパティ・振る舞いを持てる | 有限の選択肢を表す区分値 |
+| `inner class` | 外側インスタンスへの参照を保持 | 外側クラスの状態に依存する処理 |
+| `value class` | ランタイムコストなしの型安全ラッパー | ID 型など、意味を持たせたいプリミティブ値 |
+| `annotation class` | アノテーションの自作 | 独自アノテーション + AOP・リフレクション |
+
+はじめにで書いた通り、今回のモチベーションは「便利なクラスがあるのは知っていても、いざというとき名前や使いどころをパッと思い出せない」という悩みを解消することでした。 
+こうして一覧化してみると、なんだか使いこなせそうな気もしてきますし、Kotlin が何を大事に設計された言語なのかも、少し理解できた気がします。 
+今後も Kotlin と仲良くなっていきたいですね。
+
