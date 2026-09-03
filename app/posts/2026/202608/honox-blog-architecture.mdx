@@ -1,0 +1,304 @@
+---
+title: "そういえばHonoXで個人ブログを作っていた"
+publishedAt: 2026-08-22
+updatedAt: 2026-08-22
+tags: ["HonoX", "CSS", "Cloudflare Workers"]
+description: "個人の技術ブログをHonoXで一から作りました。技術スタックの紹介やこだわり、Cloudflare Workersへのデプロイなど、思い出しがてらまとめます。"
+draft: true
+---
+
+## はじめに
+
+本技術ブログは、[HonoX](https://github.com/honojs/honox) というメタフレームワークを使って作りました。
+
+Astro にしようかな…Svelte にしようかな…と迷ったのですが、ブログなので静的サイトでよい点と、Markdown で記事を管理したい点、デプロイが簡単な点、ちょっと珍しい技術である点などから **HonoX** を選んだ記憶があります（作り始めたのは結構前…）。
+
+まだ発展途上ではありますが、ちゃんと記事も書いていかなきゃな…と思いだしたところなので、ここいらで技術スタックや、実装するにあたってこだわった部分などをまとめておこうと思います。
+
+## 技術スタック
+
+| 分類 | 使用技術 |
+|---|---|
+| フレームワーク | HonoX(Hono ベースのフルスタックフレームワーク) |
+| ビルドツール | Vite |
+| コンテンツ | MDX(`@mdx-js/rollup`) |
+| シンタックスハイライト | Shiki(`@shikijs/rehype`) |
+| Markdown拡張 | remark-gfm, remark-frontmatter, rehype-slug, rehype-autolink-headings |
+| ビルド方式 | 静的サイト生成(`@hono/vite-ssg`) |
+| デプロイ先 | Cloudflare Workers(Wrangler) |
+| パッケージ管理 | aube(pnpm-lock.yaml互換)+ mise |
+
+### HonoX 
+
+> HonoX is a simple and fast meta-framework for creating full-stack websites or Web APIs - (formerly Sonik). It stands on the shoulders of giants; built on Hono, Vite, and UI libraries.
+
+HonoX は、Hono をベースにしたフルスタックWebアプリケーション向けのメタフレームワークです。
+Hono 上で動き、Vite や UI ライブラリと組み合わせて使うことができます。
+
+画面を実装する際、JSXで書くことができます。
+使っているのは `hono/jsx` というHono自前のJSXランタイムです。
+`useState`・`useEffect`・`useRef`・`useContext`・`useMemo` など、Reactの主要なフックがほぼそのままの名前・使い方でエクスポートされていて、書き味はReactとほとんど変わらないのかなと思います。
+
+ファイルベースルーティング(`app/routes/`)も、HonoXの特徴のひとつです。
+特徴的なのが「island」という単位でのハイドレーションで、`app/islands/`に置いたコンポーネントだけがクライアントサイドでJavaScriptとして動き、それ以外(`app/components/`)はサーバーでレンダリングされたHTMLのまま、静的なページとしてクライアントに届きます。
+
+### Vite
+
+Vite は、フロントエンドのビルドツールです。
+開発時は **ESM(ES Modules)** をそのままブラウザに配信することで高速なHMR(Hot Module Replacement)を実現し、本番ビルド時はRollupベースの最適化されたバンドルを生成します。  
+(余談ですが、[Vite のドキュメンタリー](https://www.youtube.com/watch?v=bmWQqAKLgT4) が YouTube に公開されていて、これがまた面白いんですよねぇ…)
+
+このブログでは、単なる「バンドラー」というより、ビルドパイプライン全体をまとめるハブとして使っています。 `vite.config.ts` には複数のプラグインが並んでいて、それぞれ役割が違います。
+
+- `honox/vite`: HonoXのファイルベースルーティングを解決する中核プラグイン。islands用のクライアントバンドルの入り口(`app/client.ts`)もここで指定しています
+- `@hono/vite-dev-server`(`cloudflare`アダプター): `vite --host 0.0.0.0` だけで、Cloudflare WorkersのbindingsをローカルでエミュレートしながらSSRを動かせる開発サーバーを提供します
+- `@hono/vite-build`(`cloudflare-workers`): アプリ全体をCloudflare Workers向けの単一JSファイルにバンドルします
+- `@hono/vite-ssg`: 全ルートをクロールして静的HTMLを事前生成する、SSG(Static Site Generation)用のプラグインです
+- `@mdx-js/rollup`: 次のMDXの節で紹介します
+
+ビルドコマンド(`vite build --mode client && vite build`)が2段階になっているのも、1回目でislands用のクライアントサイドJS、2回目でサーバー側(SSG込み)のビルドを分けて行っているからです。
+
+### MDX
+
+ブログ記事本体は、MDX(Markdown + JSX)で書いています。`@mdx-js/rollup` というプラグインが、`.mdx`ファイルをimportした瞬間に、中身をJSXコンポーネントへ変換してくれます。
+
+素のMarkdownだけだと物足りない部分を、remark/rehypeのプラグイン群で補っています。
+
+- `remark-gfm`: 表や取り消し線などのGFM(GitHub Flavored Markdown)記法に対応
+- `remark-frontmatter` + `remark-mdx-frontmatter`: frontmatter(記事の`title`や`tags`などのメタデータ)をパース
+- `rehype-slug` + `rehype-autolink-headings`: 見出しに自動でidとアンカーリンクを付与
+- 自作の`rehypeExtractHeadings`: 目次(TOC)を組み立てるための見出し抽出
+- 自作の`rehypeWrapTables`: テーブルを横スクロール可能な要素でラップ
+- `@shikijs/rehype`(Shiki): コードブロックのシンタックスハイライト
+
+自作のrehypeプラグインを2つ書いたのが、地味に手間がかかった部分です。特にTOC用の見出し抽出は、見出しの階層構造(h2の下にh3が複数ぶら下がる、など)を保ったまま抜き出す必要があったので、そこそこ苦労しました。
+
+### aube と mise
+
+パッケージ管理には aube、ツールチェーン管理には mise を使っています。
+
+- mise: Node.jsやaube自体のバージョンを `mise.toml` で宣言的に管理するツール
+- aube: mise作者(jdx)が作った、pnpm-lock.yaml互換のパッケージマネージャー
+
+`mise install` でツールチェーンを揃え、`aube install` で依存関係をインストールする、という2段構えです。npmやpnpmと大きく変わる部分はないので、慣れれば特に迷うことはありません。
+
+## JavaScriptをなるべく使わない
+
+### インタラクティブなコンポーネントは2つだけ
+
+現時点で `app/islands/` に置いているコンポーネントは、`TechStackTag`(技術タグのホバーツールチップ)と `InfoTooltip`(補足情報のツールチップ)の2つだけです。ヘッダーやテーマ切り替え、記事一覧など、他の見た目上「動いている」ように見える部分は、すべてサーバーレンダリングのコンポーネントと、あとで紹介するCSSだけで作っています。
+
+### テーマ切り替えは `<form>` の POST だけ
+
+ライト/ダーク切り替えボタンは、こういう素朴な `<form>` です。
+
+```tsx
+export function ThemeToggle({ theme }: { theme: Theme }) {
+  return (
+    <form action="/theme" method="post" class={themeToggleFormClass}>
+      <button
+        type="submit"
+        class={themeToggleClass}
+        role="switch"
+        aria-checked={theme === "dark" ? "true" : "false"}
+        aria-label="Toggle Theme"
+      >
+        {/* アイコン省略 */}
+      </button>
+    </form>
+  );
+}
+```
+
+受け側のルートも、Cookieを読み書きしてリダイレクトするだけです。
+
+```ts
+export const POST = createRoute((c) => {
+  const next = getCookie(c, "theme") === "dark" ? "light" : "dark";
+  setCookie(c, "theme", next, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "Lax",
+  });
+
+  const referer = c.req.header("Referer");
+  const refererUrl = referer && URL.canParse(referer) ? new URL(referer) : null;
+  const back = refererUrl && refererUrl.origin === new URL(c.req.url).origin ? refererUrl.pathname : "/";
+  return c.redirect(back, 303);
+});
+```
+
+トグルボタンの見た目のアニメーション(丸いノブがスライドする動き)も、クリックイベントをJSで拾っているわけではなく、サーバーから返ってきた `aria-checked` 属性の値に対するCSSの属性セレクタだけで切り替えています。
+
+```css
+&[aria-checked="true"]::before {
+  translate: 0 0;
+}
+```
+
+ページを開いた瞬間に一瞬だけ古いテーマがちらつく(FOUC)のを防ぐために、`_renderer.tsx` にだけCookieを同期的に読んで `data-theme` を書き換える小さなインラインスクリプトを置いていますが、テーマ切り替えという機能そのものはJS無しで完結しています。
+
+### スクロールに応じたヘッダーの表示/非表示はCSSだけ
+
+下にスクロールするとヘッダーが隠れて、上にスクロールすると出てくる、よくあるUIパターンも、`scroll` イベントリスナーを書かずに実現しています。使っているのはスクロール駆動アニメーション(`animation-timeline`)です。
+
+```css
+@property --scroll-position {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes track-scroll {
+  to {
+    --scroll-position: 100;
+    --scroll-position-delayed: 100;
+  }
+}
+
+:root {
+  animation: track-scroll linear both, cross-threshold linear both;
+  animation-timeline: scroll(root), scroll(root);
+  animation-range: 0 100%, 299px 300px;
+}
+```
+
+`--scroll-position` と、`transition-delay` を挟んだ `--scroll-position-delayed` の2つのカスタムプロパティを、`@property` で「アニメーション可能な数値」として登録し、スクロール位置に応じて更新しています。この2つの差分を `sign()` で符号だけ取り出すと、スクロール方向(上か下か)が求まります。
+
+```css
+body {
+  transition: --scroll-position-delayed 0.3s var(--ease-standard);
+  --scroll-direction: sign(calc(var(--scroll-position) - var(--scroll-position-delayed)));
+}
+```
+
+あとは、この `--scroll-direction` の値をコンテナスタイルクエリ(`@container style()`)でヘッダー側から参照するだけです。
+
+```css
+@container style(--scroll-direction: 1) and style(--past-threshold: 1) {
+  & {
+    translate: 0 calc(-100% - var(--spacing-base));
+    opacity: 0;
+  }
+}
+```
+
+「スクロール位置を数値化して保持する」「その数値の変化からアニメーション可能な独自プロパティを作る」「その値をスタイルクエリで条件分岐に使う」という3段構えで、JSのスクロールリスナーを一切書かずに実装できました。書いていて一番面白かった部分です。
+
+### ツールチップは Popover API + CSS Anchor Positioning
+
+技術タグや補足アイコンのツールチップは、`popover` 属性と、CSSアンカー位置指定(`anchor-name` / `position-anchor`)の組み合わせで作っています。
+
+```tsx
+<span
+  class={tagClass}
+  style={`anchor-name: ${anchorName}`}
+  onMouseEnter={() => showTooltip(tooltipId)}
+  onMouseLeave={() => hideTooltip(tooltipId)}
+>
+  {name}
+</span>
+<div
+  id={tooltipId}
+  class={tooltipClass}
+  popover="hint"
+  style={`position-anchor: ${anchorName}`}
+>
+  {/* ツールチップの中身 */}
+</div>
+```
+
+```css
+.tooltip {
+  position-area: block-start center;
+  position-try-fallbacks: flip-block;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out), display var(--duration-fast) var(--ease-out) allow-discrete;
+
+  &:popover-open {
+    opacity: 1;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+}
+```
+
+JSが担っているのは `showPopover()` / `hidePopover()` の呼び出しだけで、位置合わせもフェードイン/アウトのアニメーションも、すべてCSS側の責務です。以前は位置計算のために `getBoundingClientRect()` を使ったJSを書く必要がありましたが、CSS Anchor Positioningのおかげでその部分が丸ごと不要になりました。
+
+### ハンバーガーメニューも `popovertarget` 属性だけ
+
+モバイル用のハンバーガーメニューは、`<dialog popover="auto">` と、開閉ボタン側の `popovertarget` 属性だけで動いています。
+
+```tsx
+<button popovertarget="nav-menu" aria-label="Open menu">
+  <HamburgerIcon />
+</button>
+
+<dialog id="nav-menu" popover="auto">
+  <button popovertarget="nav-menu" popovertargetaction="hide">
+    <CloseIcon />
+  </button>
+  {/* メニュー本体 */}
+</dialog>
+```
+
+`popovertarget` にターゲット要素のIDを指定するだけで、クリックによる開閉をブラウザが面倒を見てくれます。イベントリスナーを登録するコードは1行も書いていません。
+
+## モダンCSSのこだわり
+
+スタイリングの方針として、TailwindCSSは使わないことに決めました。ユーティリティクラスの手軽さは魅力ですが、今回は「モダンCSSの機能を自分の手で書いて試す」こと自体が目的のひとつだったので、`hono/css`でコンポーネントに閉じたCSSを直接書くスタイルを選んでいます。
+
+JS削減の話と重なる部分も多いですが、他にも今回のブログで積極的に使ったCSSの機能をいくつか挙げておきます。
+
+- **`light-dark()`**: ライト/ダーク両方の色を1つの関数呼び出しで書ける。`color-scheme` と組み合わせることで、テーマごとに別々のセレクタを用意せずに済む
+- **`@view-transition { navigation: auto; }`**: ページ遷移時のクロスフェードを、ブラウザ標準のView Transitions APIで宣言的に有効化
+- **`:has()`**: 親要素から子要素の状態を見て分岐できる関係擬似クラス。「ポップオーバーが開いている間はヘッダーを表示したままにする」といった条件分岐に使用
+- **コンテナクエリ / コンテナスタイルクエリ**: `@container (max-width: ...)` によるレイアウトの出し分けに加え、前述の `@container style(--変数: 値)` で独自カスタムプロパティの値に応じた分岐にも活用
+- **`oklch()`**: カラーパレットの定義に採用。知覚的に均等な色空間なので、明度違いのバリエーション(neutral-100〜950など)を作っても見た目のコントラスト感が揃いやすい
+- **`@layer`**: CSSのカスケードレイヤーで `tokens → base → components → utilities` の優先順位を明示的に固定し、詳細度の衝突を避ける
+
+## デザイントークン: CSS Custom Propertiesの3層構造
+
+スタイリングは `hono/css`(CSS-in-JS)と、CSS Custom Propertiesを組み合わせています。トークンは以下の3層構造にしています。
+
+1. **Primitive**: `--color-neutral-500`、`--size-400` のような、生の値
+2. **Semantic**: `--color-primary`、`--spacing-md` のような、用途を表す値。Primitiveを参照する
+3. **Component**: `--card-bg`、`--card-shadow` のような、特定のUIコンポーネント専用の値。Semanticを参照する
+
+この3層構造については、以前 Meta の Astryx というデザインシステムと見比べながら別記事にまとめているので、詳しくはそちらに譲ります。
+
+## デプロイ: Cloudflare Workers + Wrangler
+
+ビルドとデプロイは、こんな構成です。
+
+```jsonc
+// wrangler.jsonc
+{
+  "name": "app",
+  "main": "./dist/index.js",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [
+    {
+      "pattern": "hiraaaken.dev",
+      "custom_domain": true
+    }
+  ]
+}
+```
+
+`aube run build` で、クライアント向けビルド(`vite build --mode client`)→ サーバー向けビルド(`vite build`)の順に実行され、`@hono/vite-ssg` によって各ルートが静的HTMLとして事前生成されます。`aube run deploy` は、このビルドに続けて `wrangler deploy` を叩くだけのシンプルな構成です。
+
+MDXの記事はすべてビルド時に静的HTMLへ変換されるので、実行時にCloudflare Workers側で行っているのは、静的アセットの配信とテーマ切り替えのCookie処理くらいです。サーバーレスな実行環境と、SSGの相性の良さを感じています。
+
+## おわりに
+
+「JSを書かずにどこまでできるか」を意識しながら手を動かしてみると、Popover API・CSS Anchor Positioning・スクロール駆動アニメーション・コンテナスタイルクエリなど、ここ数年で使えるようになったCSSの機能だけで、思っていたよりずっと多くのことが実現できることが分かりました。
+
+もちろん、複雑な状態管理が必要な場面ではJSに頼ることになると思いますが、少なくとも個人ブログのようなコンテンツ中心のサイトでは、こうした宣言的なHTML/CSSの機能だけでかなり戦える、という手応えがありました。
+
+今後もこのブログを実験場にしながら、少しずつ手を入れていこうと思います。

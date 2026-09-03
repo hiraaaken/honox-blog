@@ -1,0 +1,234 @@
+---
+title: "Astryx から考える CSS custome properties 設計"
+publishedAt: 2026-08-19
+updatedAt: 2026-08-19
+tags: ["CSS", "デザインシステム", "CSS Custom Properties"]
+description: "Metaが公開したデザインシステム Astryx の実装から、各CSS Custom Propertiesの指定の仕方にどのような特徴があるのか調査し、そこから自身のCSS設計に活かせる知見を整理しました。"
+draft: true
+---
+
+## はじめに
+
+CSSを使って各スタイルの値を定義する際、`width: 100px` のように直接値を指定することがあるかと思います。  
+個人的には、この指定の仕方は好きじゃありません...。
+
+理由としては以下が挙げられます。  
+
+- 値の意味（意図）がコードから読み取れない
+  - 「なぜ 100px なのか」「デザイン上のどういうルールに基づいているのか」が抽象化されていないため、コードの意図（マジックナンバー化）を理解するのが難しくなります。
+- 変更や展開に弱い
+  - デザインの改修やダークモード対応...などが発生した際、ハードコードされた値を1つずつ検索・置換していく作業が大変なのは容易です。基本的なプログラミングでは変数を使いますよね。そういうことです。
+
+こうした課題を解決するために導入されるのが CSS Custom Properties（CSS変数） です。
+
+本ブログを実装する上でも、ある文脈におけるスタイルの値を、`--color-bg-primary` のような名前付きの変数として定義し、コンポーネントやテーマ間で再利用するようにしています。
+
+ただ、各値に対して意味のある名前つけて管理をするとなると、それなりに一貫した設計が必要になります。
+
+何か参考になるものはないかなと思っていたところ、Meta 社が Astryx というデザインシステムをオープンソースとして割と最近公開した（執筆時点：2026年8月）というニュースを目にしました。
+
+Astryx の実装をみてみることで、**CSS Custom Properties の命名規則・階層設計を考える際に参考になる知見が得られるのではないか**と思い、調査してみました。
+
+そこで本記事では、Meta が公開したデザインシステム Astryx の実装アプローチを紐解きながら、各CSS Custom Propertiesがどのように定義・生成されているのかを調査しました。そこから得られた、実務の CSS 設計に活かせる知見を整理してまとめます。
+
+## 用語の整理
+
+「はじめに」で色々書いたものの、そもそも CSS Custom Properties とは何か、という点を整理しておきます。
+
+### CSS Custom Properties とは
+
+CSS変数、カスタム変数などと呼ばれることもありますが、これらは全て同じ機能を指す呼び名です。  
+CSSの仕様上の正式名称が「Custom Properties for Cascading Variables」であるため「カスタムプロパティ」と呼ばれ、口語的には「CSS変数」と呼ばれることが多い、というだけの違いで、機能的な差はありません。
+
+```css
+:root {
+  --color-text-foreground: #000000;
+}
+
+.text {
+  color: var(--color-text-foreground);
+}
+```
+
+`:root` のようなセレクタのスコープ内で `--任意の名前: 値;` の形で定義し、`var(--任意の名前)` で参照します。  
+値には他のCustom Propertiesを指定することもできるため、`--spacing-md: var(--size-400);` のように、ある変数を別の変数の定義に使う、という階層的な組み方も可能です。
+
+なお、こうした「名前付きの値でスタイルを管理する」という設計思想は一般に**デザイントークン**とも呼ばれますが、本記事ではCSS Custom Propertiesとしての実装そのものに絞って見ていきます。  
+実際、後述するAstryxは値をTypeScriptのオブジェクトとして定義しており、それをStyleXというライブラリがビルド時にCSS Custom Propertiesへと変換しています。
+
+
+## Astryx とは何か
+
+Astryxは公式サイトで次のように紹介されています。
+
+> An open source design system that's fully customizable and agent ready
+
+React 19+ と `@stylexjs/stylex`（Metaが開発したゼロランタイムのCSS-in-JSライブラリ。全てのスタイルに対して型が定義されていて型安全に使用できるCSS-in-JSです）を基盤に構築されています。  
+
+テーマの実体は `defineTheme()` という関数に設定オブジェクトを渡して作る仕組みで、170以上のコンポーネントがこのテーマシステムからトークンを受け取ります。
+
+## Astryx のトークンを実際に読んでみる
+
+`packages/core/src/theme/tokens.stylex.ts` に、全トークンのデフォルト値が `stylex.defineVars()` で定義されています。  
+カテゴリは `color` / `spacing` / `size` / `border` / `focus` / `radius` / `shadow` / `duration` / `ease` / `typography` / `textSize` / `fontWeight` / `typeScale` の13種類です。
+
+### スペーシングは「意味」ではなく「数直線」
+
+```ts
+export const spacingDefaults = {
+  '--spacing-0': '0px',
+  '--spacing-0-5': '2px',
+  '--spacing-1': '4px',
+  '--spacing-1-5': '6px',
+  '--spacing-2': '8px',
+  '--spacing-3': '12px',
+  '--spacing-4': '16px',
+  // ...
+  '--spacing-12': '48px',
+} as const;
+```
+
+`xs` / `sm` / `md` のような意味的な命名ではなく、4pxを1単位とした数値インデックス（`spacing-N` ≒ `4px × N`、間に`0.5`刻みの半端値も用意）です。  
+
+Tailwind CSSに馴染みがある方なら、`p-4` や `gap-2` のようなクラス名の方がイメージしやすいかもしれません。  
+Tailwindのスペーシングも `p-0` / `p-1` / `p-2` / `p-4` ... という数値インデックスで、Astryxの `--spacing-N` と発想は同じです。  
+逆にTailwindが `sm` / `md` / `lg` を使うのは、フォントサイズ（`text-md`）や角丸（`rounded-lg`）、ブレークポイント（`md:`）といった**スペーシング以外のカテゴリ**であり、この使い分け自体もAstryxと共通しています。
+
+### Radiusは「意味的な名前 + 生成式」のハイブリッド
+
+トークン名自体は `--radius-inner` / `--radius-element` / `--radius-container` / `--radius-page` と意味重視ですが、値は次の式で生成されています（`expandRadiusScale.ts` のコメントより）。
+
+```
+--radius-inner     → base × 1 × multiplier   (4px)
+--radius-element   → base × 2 × multiplier   (8px, ボタン・インプット)
+--radius-container → base × 3 × multiplier   (12px, カード・パネル)
+--radius-page      → base × 7 × multiplier   (28px, ページレベルのコンテナ)
+```
+
+`defineTheme({ radius: { base: 4, multiplier: 1.5 } })` のように base と multiplier の2値を渡すだけで、意味的な命名を保ったまま全段階の実値を一括で作り直せます。  
+「名前は意味的に、値は数式で」という、両取りの設計になっている点が印象的でした。
+
+### Durationは「3バンド × min/base/max」を1つの式で生成
+
+```ts
+export const durationDefaults = {
+  '--duration-fast-min': '130ms',
+  '--duration-fast': '175ms',
+  '--duration-fast-max': '230ms',
+  '--duration-medium-min': '310ms',
+  '--duration-medium': '410ms',
+  '--duration-medium-max': '550ms',
+  '--duration-slow-min': '730ms',
+  '--duration-slow': '975ms',
+  '--duration-slow-max': '1300ms',
+} as const;
+```
+
+コメントには「fast: micro-interactions（ホバー、トグル）、medium: entrance/exit（ダイアログ、ドロワー）、slow: 継続的アニメーション」という役割説明があります。  
+`defineTheme({ motion: { fast: 175, medium: 410, slow: 975, ratio: 0.75 } })` の**たった4つの数値**（3つの基準値+比率）から、`min = base × ratio` / `max = base / ratio` という式で9個のトークン全部が導出されます。  
+基準値を1つ変えるだけで、min/maxも連動して追従する設計です。
+
+### タイポグラフィは幾何学スケール + 意味的なタイプスケールの2層
+
+フォントサイズは `round(14 × 1.2^step)` という等比数列で生成されています。
+
+```ts
+export const textSizeDefaults = {
+  '--font-size-sm': '0.75rem',    // step -1: 12px (14 × 1.2⁻¹ ≈ 11.67 → 12)
+  '--font-size-base': '0.875rem', // step  0: 14px — base anchor
+  '--font-size-lg': '1.0625rem',  // step +1: 17px (14 × 1.2¹ ≈ 16.8 → 17)
+  // ...
+} as const;
+```
+
+さらにその上に、見出しレベル（h1〜h6）や本文・ラベル・コードといった意味的な役割ごとに「サイズ・ウェイト・行高」の3点セットをまとめた `typeScale` という層があります。
+
+```ts
+'--text-heading-1-size': 'var(--font-size-2xl)',   // step +3: 24px
+'--text-heading-1-weight': 'var(--font-weight-semibold)',
+'--text-heading-1-leading': '1.3333', // 24px → 32px(4pxグリッドにスナップ)
+```
+
+行高までもが「目標比率1.4を4pxグリッドにスナップした結果」として計算されている点に、8年の実運用で積み上がった細部への気配りを感じました。
+
+### 色だけは別格だった: HCTモデルによる自動生成
+
+一番驚いたのがカラートークンです。  
+`colorDefaults` を見ると `--color-text-primary: light-dark(#0A1317, #DFE2E5)` のように大量の16進値が並んでいて、一見ただの手打ちリストに見えます。  
+ところが `expandColorScale.ts` を読むと、実はこれらは**アクセントカラーの種（シード）1色から自動生成できる**仕組みになっていました。
+
+```
+// アクセント色1つを渡すだけで、
+{ accent: '#0064E0' }
+
+// ニュートラル系ランプを含む配色全体が導出される
+```
+
+内部では `hct.ts`（HCT: Hue, Chroma, Tone、Google Material Designが使う知覚色空間）を使い、色相・彩度を保ったまま明度（トーン）だけを段階的にずらすことで、テキスト色や背景色を生成しています。  
+しかもコード内のコメントには「HCTのトーンはCIE L*（相対輝度）に一致するため、どんなアクセント色・ニュートラルスタイルであってもテキストは背景に対して4.5:1以上のコントラストを確保できる」という**WCAG準拠がアルゴリズムレベルで保証されている**旨が明記されていました。  
+色を「選ぶ」のではなく「生成し、検証する」フェーズまでコード化されているわけです。
+
+## Astryxの本質は「値のリスト」ではなく「生成ルール」
+
+ここまで見てきたスペーシング・Radius・duration・タイポグラフィ・カラー、その全てに共通するのは、**トークンの実体は数十〜数百のCSS変数だが、人間が直接編集するのはそのうち数個の「生成パラメータ」だけ**という設計です。  
+`defineTheme()` の型定義を見ると、これがはっきり表れています。
+
+```ts
+defineTheme({
+  name: 'my-brand',
+  typography: { scale: { base: 14, ratio: 1.2 } },
+  motion: { fast: 175, medium: 410, slow: 975, ratio: 0.75 },
+  radius: { base: 4, multiplier: 1 },
+  tokens: {
+    '--color-accent': ['#0064E0', '#48CAE4'], // [light, dark]
+  },
+});
+```
+
+個別のトークンを直接上書きする `tokens` フィールドも用意されていますが、それはあくまでエスケープハッチです。  
+Astryx本体が主に頼っているのは、そこではなく `typography` / `motion` / `radius` のような**スケール設定**の方でした。  
+テーマを新しく作るとき、デザイナーやエンジニアが向き合うのは「数百個の値」ではなく「数個のパラメータ」で済む、というのがこの設計の核心だと思います。
+
+## StyleXでの参照方法
+
+Astryxのトークンは、CSS変数としてだけでなく、StyleXの世界でも型付きの値として参照できます。
+
+```tsx
+import * as stylex from '@stylexjs/stylex';
+import {colorVars, spacingVars, radiusVars} from '@astryxdesign/core';
+
+const styles = stylex.create({
+  card: {
+    padding: spacingVars['--spacing-4'],
+    backgroundColor: colorVars['--color-background-surface'],
+    borderRadius: radiusVars['--radius-container'],
+  },
+});
+```
+
+`spacingVars['--spacing-4']` のように、トークン名がオブジェクトのキーとして存在するので、存在しないトークン名を参照しようとすればTypeScriptの型チェックで弾かれます。  
+StyleXはビルド時にこの参照をアトミックCSSクラスへコンパイルするため、型検査を経た上で未使用スタイルの静的除去まで行えます。  
+170以上のコンポーネントを抱える規模のライブラリでは、この型安全性とデッドコード除去の恩恵は大きいはずです。
+
+## light-dark() という共通言語
+
+Astryxの `colorDefaults` は、デフォルト値の文字列自体に `light-dark()` がそのまま埋め込まれています。
+
+```ts
+'--color-accent': 'light-dark(#0064E0, #2694FE)',
+'--color-text-primary': 'light-dark(#0A1317, #DFE2E5)',
+```
+
+`defineTheme()` に渡すアクセント色も `['#0064E0', '#48CAE4']` という `[light, dark]` のタプル形式が使え、内部で `light-dark()` に変換される仕様になっています。  
+CSS標準の `light-dark()` 関数は、もう単なる小技ではなく、大規模なデザインシステムのテーマ切り替えを支える基盤として採用されるレベルまで定着してきているようです。
+
+## まとめ
+
+Astryxのソースコードを読んで一番強く感じたのは、優れたトークン設計というのは「良い値をたくさん揃えること」ではなく、「少数のパラメータから多数の値を一貫したルールで導出できること」にある、ということでした。
+
+- スペーシングは意味的な命名を捨て、数値インデックスで距離関係を表現する
+- Radius・Duration・Typographyは、意味的な名前を保ったまま、値そのものは数式（base・ratio・multiplier）から導出する
+- カラーはさらに一歩進んで、知覚色空間（HCT）とWCAGコントラスト基準をアルゴリズムに埋め込み、「選ぶ」作業自体を自動化する
+- テーマの差分は `light-dark()` という共通言語に集約する
+
+8年間の実運用で磨かれてきただけあって、トークン設計というものが「値の一覧表を作る作業」ではなく「値を生み出す仕組みを設計する作業」なのだと、改めて考えさせられました。

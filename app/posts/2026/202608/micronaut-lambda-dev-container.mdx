@@ -1,0 +1,229 @@
+---
+title: "Java/Kotlin の開発環境をコンテナで作りたいんだ"
+publishedAt: 2026-08-19
+updatedAt: 2026-08-19
+tags: ["Docker", "Kotlin", "開発環境"]
+description: "IDEに頼らずターミナルやVimでもJava/Kotlinの開発ができる、汎用的な開発環境をDockerコンテナで構築しました。非rootユーザー化とバインドマウントの関係、ボリュームの3つの使い分け、Postgres 18でのマウント作法の変更などを整理しつつ、この環境をどう開発に活かしていくかを考えます。"
+draft: false
+---
+
+## はじめに
+
+Java や Kotlin の開発というと、ローカルに [OpenJDK](https://openjdk.org/)や、[sdkman](https://sdkman.io/) 経由で JDK を入れたりして、IntelliJ IDEA や Eclipse のようなIDEを使って開発する、というのが一般的なイメージかと思います（みんなそうだよね…?）
+
+ただ個人開発や、サクッと検証したい時に、ローカルにJava/Kotlinの環境を入れたくないなあ、ローカルを汚したくないなあって思うことがよくあります。
+また、プライベートでは、Neovim やターミナルを使って開発することが多いため、なるべく IDE に依存したくないなあと思ったりもします。
+
+なので、コンテナでの開発環境の構築の勉強もかねて、Java/Kotlin の汎用的な開発環境コンテナを作ってみることにしました。
+本記事は、その過程や各設定の理由をまとめていきます。
+
+## コンテナを作る上で...
+
+コンテナを作るに当たって、以下の3つを意識してみます。
+
+- **パッケージを入れすぎない**
+  - 素のJDKとGradleくらいに留めて、必要になったらそのとき追加する、というスタンスにしました
+- **特定のアーキテクチャに縛られないようにする**
+  - SpringBootのようなWebアプリケーションだけでなく、AWS Lambdaのようなサーバーレス関数の検証にも使えるようにしたいと考えました
+- **さっと作って、さっと壊せるようにする**
+  - 検証用途で使うことが多いので、`docker compose up` してすぐ使えて、不要になったら `docker compose down -v` で綺麗に消せる、使い捨てやすさを重視しました
+
+## コンテナの役割を2つに分ける
+
+今回試した検証プロジェクトは、AWS Lambda関数、つまり常駐サーバーを持たないアプリケーションでした。「開発サーバーを立てて `curl` で叩く」といった、Webアプリでよくある確認方法はそのままでは使えません。
+
+そこで、コンテナの役割を2つに分けてみます。
+
+1. **開発用コンテナ**: ソースコードをマウントして、コンパイルとテストを回すためのもの
+2. **実行用コンテナ**: AWS公式のLambdaベースイメージを使い、実際にハンドラー関数を呼び出して動作確認するためのもの
+
+この記事で扱うのは主に1つ目、開発用コンテナです。今回のLambda関数に限らず、Java/Kotlinのプロジェクトなら広く使い回せる土台を意識しています。
+
+## 開発用コンテナ(Dockerfile.dev)を作る
+
+最終的に、こういう形になりました。
+
+```dockerfile
+FROM eclipse-temurin:25-jdk-jammy
+
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd --gid ${USER_GID} dev \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash dev
+
+ENV GRADLE_USER_HOME=/home/dev/.gradle
+
+WORKDIR /app
+RUN mkdir -p /app/build /app/.gradle && chown -R dev:dev /app
+
+COPY --chown=dev:dev demo/gradle/ /opt/bootstrap/gradle/
+COPY --chown=dev:dev demo/gradlew /opt/bootstrap/gradlew
+
+USER dev
+
+RUN chmod +x /opt/bootstrap/gradlew && cd /opt/bootstrap && ./gradlew --version
+
+CMD ["sleep", "infinity"]
+```
+
+`eclipse-temurin:25-jdk-jammy` は Adoptium(OpenJDKのディストリビューションの1つ)が配布する公式イメージで、素のJDK以外は何も入っていません。`build.gradle.kts` の `sourceCompatibility = JavaVersion.toVersion("25")` と揃えています。
+
+余計なツールを足したくなかったので、カスタマイズは非rootユーザー化とGradleの事前ウォームだけに絞りました。
+
+1行ずつ、なぜこう書いたのかを説明していきます。
+
+### 非rootユーザーで動かす理由
+
+```dockerfile
+ARG USER_UID=1000
+ARG USER_GID=1000
+RUN groupadd --gid ${USER_GID} dev \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash dev
+```
+
+Linuxでは、ユーザーは名前ではなく整数のUID(ユーザーID)で管理されています。
+
+バインドマウント(ホストのディレクトリをコンテナ内に直接見せる仕組み)を使うと、コンテナ内で作られたファイルの所有者情報は、Linuxホスト上ではUIDの数字そのまま記録されます。
+
+コンテナをrootで動かすと、Linuxホスト上でそのファイルがroot所有になり、ホストユーザーが消せなくなる、という事故が起きます。macOSのDocker Desktop/Colimaは共有ファイルシステム層がこの差を吸収してくれるので気づきにくいのですが、Linuxホストや CI では直撃します。
+
+「macOSでは動くがLinuxで壊れる」典型パターンなので、最初から避けることにしました。
+
+なお `1000` という数字自体は、Debian/Ubuntu系ディストリビューションで「最初に作られる一般ユーザー」に割り当てられがちな慣習的な値で、絶対的な決まりではありません。実際のホストのUIDに合わせたい場合は、ビルド時に `--build-arg USER_UID=$(id -u)` のように上書きします。
+
+### バインドマウントは COPY を完全に隠す
+
+初版では `COPY demo/src/ /app/src/` のようにソースをコピーしていましたが、これは無駄でした。
+
+実行時に `./demo:/app` とバインドマウントすると、マウントが `/app` 配下のイメージの中身を丸ごと覆い隠してしまいます。「COPYするか、マウントするか、どちらかに決める」というのが鉄則で、開発用イメージではソースをCOPYしないことにしました。
+
+### Gradle Wrapperのダウンロードは10秒でタイムアウトする
+
+```
+Downloading https://services.gradle.org/distributions/gradle-9.6.0-bin.zip
+.........10%......20%...(略)...90%...
+Attempt 1/1 failed. Reason: ... failed: timeout (10000ms)
+```
+
+Gradle Wrapperの配布物ダウンロードは、読み取りタイムアウトが10秒固定で、`GRADLE_OPTS` の `socketTimeout` 設定も `--offline` フラグも効きません。Wrapperが引数を解釈する前に、ダウンロード処理が走ってしまうからです。
+
+対処として、イメージビルド時にあらかじめ配布物を取得しておく手順を入れました。
+
+```dockerfile
+COPY --chown=dev:dev demo/gradle/ /opt/bootstrap/gradle/
+COPY --chown=dev:dev demo/gradlew /opt/bootstrap/gradlew
+RUN chmod +x /opt/bootstrap/gradlew && cd /opt/bootstrap && ./gradlew --version
+```
+
+`/app` ではなく `/opt/bootstrap` に置いているのは、`/app` は実行時にバインドマウントで隠れてしまうからです。
+
+Dockerには「名前付きボリュームのマウント先が空なら、イメージ側の同じパスの中身をボリュームへコピーする」という初回限定の挙動があります。これを利用して、`GRADLE_USER_HOME`(`/home/dev/.gradle`)配下にビルド時ダウンロードした配布物を置いておくことで、実行時のボリュームにもそのまま複製されるようにしています。
+
+## docker-compose.yaml: ボリュームは3種類を使い分ける
+
+```yaml
+volumes:
+  - ./demo:/app                            # バインドマウント
+  - gradle-user-home:/home/dev/.gradle     # 名前付きボリューム
+  - build-output:/app/build                # 名前付きボリューム
+  - gradle-project-cache:/app/.gradle      # 名前付きボリューム
+```
+
+| 種類 | 書き方 | 寿命 | 用途 |
+|---|---|---|---|
+| バインドマウント | `./demo:/app` | ホスト次第 | ソース。双方向同期したいもの |
+| 名前付き | `build-output:/app/build` | 明示的に消すまで | キャッシュ・成果物。永続させたいもの |
+| 匿名 | `- /app/build` | コンテナと同じ | 使い捨て。永続不要なものだけ |
+
+最初は名前付きボリュームの部分を匿名ボリューム(`- /app/build` のような書き方)で書いていましたが、これでは不十分でした。
+
+匿名ボリュームの寿命はコンテナに紐づくため、`docker compose run --rm` するたびに空のボリュームが割り当てられ、毎回フルビルドになってしまいます。名前付きに変えたことで、コンテナをまたいでインクリメンタルビルドの恩恵を受けられるようになりました。
+
+名前付きボリュームの実体は、Dockerデーモンが管理する、コンテナのライフサイクルから独立した領域にあります。macOS(今回はColima)の場合、実体は隠れたLinux仮想マシンの中にあり、直接は見えません。中身を確認したいときは、使い捨てコンテナ経由で覗きます。
+
+```bash
+docker run --rm -v micronaut-lambda-test_gradle-user-home:/g alpine ls /g
+```
+
+コンテナが停止・削除されても、名前付きボリュームの中身は残ります。「コピーを読み込んでいる」というよりは、「外付けディスクを繋ぎ直している」イメージの方が実態に近いと感じました。
+
+## Postgresをコンテナで用意する
+
+仮に、Postgresのようなデータベースもコンテナで管理するようになった場合を考えて、DBのコンテナも用意してみました。
+
+```yaml
+postgres:
+  image: postgres:18-alpine
+  container_name: micronaut-lambda-postgres
+  environment:
+    POSTGRES_DB: ${DB_NAME:-notesdb}
+    POSTGRES_USER: ${DB_USER:-notes}
+    POSTGRES_PASSWORD: ${DB_PASSWORD:-notes}
+  volumes:
+    - postgres-data:/var/lib/postgresql
+    - ./demo/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+  ports:
+    - "5432:5432"
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-notes}"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+```
+
+ここでも2つハマりました。
+
+### Postgres 18から、データディレクトリのマウント作法が変わっていた
+
+Postgres 17以前の知識で `postgres-data:/var/lib/postgresql/data` とボリュームを当てたところ、コンテナが `Exited (1)` で即座に落ちました。
+
+```
+in 18+, these Docker images are configured to store database data in a
+format which is compatible with "pg_ctlcluster" ...
+The suggested container configuration for 18+ is to place a single mount
+at /var/lib/postgresql which will then place PostgreSQL data in a
+subdirectory
+```
+
+バージョン18から、推奨されるマウント先が `/var/lib/postgresql`(`data` を付けない、1階層上)に変更されていました。将来の `pg_upgrade` をしやすくするための変更とのことです。
+
+ちなみに `docker compose ps`(オプション無し)はデフォルトで起動中のコンテナしか表示しないため、最初は落ちていることにすら気づかず、`docker compose ps -a` で初めて `Exited` の状態を確認できました。
+
+バージョンが変われば、以前は正しかった知識がそのまま通用しなくなることがある、という実例でした。
+
+### 起動順序は healthcheck で制御する
+
+`depends_on` は、デフォルトでは「相手のコンテナが起動し始めたら」次に進んでしまいます。Postgresは起動直後の数秒間はまだ接続を受け付けられないため、`pg_isready`(Postgres公式イメージに同梱されている接続確認コマンド)によるヘルスチェックを定義し、アプリ側の `depends_on` を `condition: service_healthy` にしました。
+
+これが無いと、起動直後のテストがPostgres起動待ちで「たまに」失敗する、という不安定な状態になります。
+
+また、`docker-entrypoint-initdb.d` による `schema.sql` の自動実行は、**データディレクトリが空の状態で初めてコンテナが起動したときに限り**実行される、という点にも注意が必要です。一度データが入ったボリュームに対して `schema.sql` を書き換えても、再実行はされません。スキーマをやり直したいときは、対象のボリュームだけを明示的に削除します。
+
+```bash
+docker compose down
+docker volume rm micronaut-lambda-test_postgres-data
+```
+
+## これからどう開発を進めていくか
+
+ここまでで、開発用コンテナと、そのデータストアであるPostgresコンテナが揃いました。
+
+ここからは、この環境をどう使っていくか、少し想像してみます。
+
+- **日常のビルド・テストはコンテナの中で回す**
+  - `docker compose exec dev ./gradlew test` のような形で、エディタはVimやターミナルのまま、コンテナ内のGradleでビルド・テストを回していくことになりそうです
+- **動作確認は実行用コンテナに任せる**
+  - 開発用コンテナだけでは、Lambdaハンドラーとして正しく動くかまでは分かりません。「実行用コンテナ」(AWS公式のLambdaベースイメージ)を別途立ち上げ、Composeのネットワークに参加させたうえで `curl` で叩いて確認する、という流れになりそうです
+- **他のAWSサービスが増えても同じ役割分担で対応する**
+  - この先DynamoDB LocalやS3互換のストレージが増えても、「開発用・データストア用・実行用」という役割分担と、ボリュームの使い分けの考え方は、そのまま踏襲できるはずです
+- **この開発用コンテナ自体を、他のJava/Kotlinプロジェクトでも使い回す**
+  - 今回の検証プロジェクト専用にせず、次に別のプロジェクトをVimやターミナルで書きたくなったときのベースイメージにしたいと考えています。CI(GitHub Actionsなど)でも同じ `Dockerfile.dev` を使い回せれば、「ローカルでは通ったのにCIでだけ落ちる」を減らせそうです
+
+ただ、これらはまだ試していない部分なので、あくまで想像の域を出ません。
+
+## おわりに
+
+環境構築はどうしても地味な作業になりがちですが、「なぜこう書くのか」を1つずつ確認しながら進めると、後から振り返ったときにちゃんと資産として残る、という実感がありました。
+
+IDEに頼らず、ターミナルやVimだけでJava/Kotlinを気持ちよく開発できるかどうかも含めて、実際に手を動かしながら検証していこうと思います。
