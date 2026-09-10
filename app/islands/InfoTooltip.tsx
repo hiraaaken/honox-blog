@@ -71,10 +71,12 @@ const tooltipClass = css`
   margin: 0;
   margin-top: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  /* 反転面。ページの地から常に独立する（ライト 16.39 / ダーク 12.21）。
+     旧実装は neutral-800 固定で、ダークでは地(0.29)とほぼ同じ明度だった */
+  border: 1px solid var(--on-inverse);
   border-radius: var(--round-md);
-  background-color: var(--color-neutral-800);
-  color: var(--color-neutral-200);
+  background-color: var(--inverse);
+  color: var(--on-inverse);
   font-size: var(--text-body-sm);
   font-weight: normal;
   line-height: 1.6;

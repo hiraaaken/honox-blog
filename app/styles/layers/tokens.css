@@ -5,7 +5,8 @@
 }
 
 :root {
-  color-scheme: light;
+  /* 属性が付かない状態＝システム設定に従う。明示的な選択だけを下で上書きする */
+  color-scheme: light dark;
 
   /* ═══════════════════════════════════════════════════════════
      Primitive
@@ -109,6 +110,9 @@
   --text-body-lg: var(--text-lg);
   --text-label: var(--text-xs);
 
+  /* 記事の説明文。本文より一段大きくして役割を分ける */
+  --text-base: var(--text-body-lg);
+
   /* 見出しサイズ */
   --text-heading-xl: var(--text-4xl);
   --text-heading-lg: var(--text-3xl);
@@ -121,19 +125,49 @@
   --text-button: var(--text-sm);
   --text-caption: var(--text-xs);
 
+  /* ═══════════════════════════════════════════════════════════
+     Foundation — 配色はすべてここから引く
+     コントラストは scripts/check-contrast.mjs が実測する
+     ═══════════════════════════════════════════════════════════ */
+
+  --ground: light-dark(oklch(0.965 0 90), oklch(0.29 0.012 285));
+  --surface: light-dark(oklch(0.973 0 90), oklch(0.345 0.014 285));
+  --ink: light-dark(oklch(0.218 0.019 285), oklch(0.96 0.005 285));
+  --ink-muted: light-dark(oklch(0.50 0.014 285), oklch(0.78 0.014 285));
+
+  /* --edge はモノの輪郭、--rule は領域の切れ目。役割が違うので分けてある */
+  --edge: light-dark(oklch(0.218 0.019 285), oklch(0.62 0.014 285));
+  --rule: light-dark(oklch(0.82 0.006 285), oklch(0.47 0.014 285));
+
+  --shadow: light-dark(oklch(0.218 0.019 285), oklch(0.05 0.008 285));
+
+  --accent: oklch(0.897 0.196 126.665);
+  --on-accent: oklch(0.24 0.03 126.665);
+
+  --inverse: light-dark(oklch(0.20 0.02 285), oklch(0.95 0.005 285));
+  --on-inverse: light-dark(oklch(0.97 0.006 285), oklch(0.20 0.02 285));
+
+  --link: light-dark(oklch(0.55 0.25 292.717), oklch(0.75 0.13 292.717));
+
+  /* 吹き出しはテーマ不変の色の島。文字色まで固定しないと
+     ダークで白文字が白い紙に乗る */
+  --bubble-bg: oklch(0.99 0.002 90);
+  --bubble-fg: oklch(0.20 0.02 285);
+  --bubble-fg-2: oklch(0.46 0.014 285);
+  --bubble-edge: oklch(0.20 0.02 285);
+
   /* --- Color: Brand --- */
-  --color-primary: var(--color-lime-300);
-  --color-primary-lighten: var(--color-lime-200);
-  --color-secondary: var(--color-violet-500);
+  --color-primary: var(--accent);
+  --color-secondary: var(--link);
 
   /* --- Color: Semantic --- */
-  --color-muted: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-  --color-background: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-  --color-foreground: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-  --color-border: light-dark(var(--color-neutral-800), var(--color-neutral-400));
-  --color-shadow: light-dark(var(--color-neutral-700), var(--color-neutral-950));
+  /* Foundation へのエイリアス。既存の参照を壊さず配色だけ差し替える */
+  --color-muted: var(--ink-muted);
+  --color-background: var(--ground);
+  --color-foreground: var(--ink);
+  --color-border: var(--edge);
   --color-shadow-light: var(--color-neutral-400);
-  --color-shadow-dark: light-dark(var(--color-neutral-700), var(--color-neutral-950));
+  --color-shadow-dark: var(--shadow);
 
   /* --- Spacing --- */
   --spacing-xs: var(--size-100);
@@ -256,8 +290,7 @@
     4.91px -0.98px 0.3px var(--color-shadow-dark);
 
   /* --- Color: Semantic Extensions --- */
-  --color-muted-light: var(--color-neutral-500);
-  --color-hover-background: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+  --color-muted-light: var(--ink-muted);
 
   /* --- Animation: Easing --- */
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -278,6 +311,16 @@
   animation: track-scroll linear both, cross-threshold linear both;
   animation-timeline: scroll(root), scroll(root);
   animation-range: 0 100%, 299px 300px;
+}
+
+/* data-theme="light" は必須。無いと「OS はダークだが明示的にライトを選んだ人」が
+   light dark の解決でダークに落ちる */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 /* Mobile Typography */

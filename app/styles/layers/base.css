@@ -325,12 +325,6 @@
   navigation: auto;
 }
 
-/* Dark Mode */
-.dark,
-[data-theme="dark"] {
-  color-scheme: dark;
-}
-
 /* ベーススタイル */
 body {
   font-family: var(--font-sans);
