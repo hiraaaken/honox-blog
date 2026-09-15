@@ -127,7 +127,6 @@
 
   /* ═══════════════════════════════════════════════════════════
      Foundation — 配色はすべてここから引く
-     コントラストは scripts/check-contrast.mjs が実測する
      ═══════════════════════════════════════════════════════════ */
 
   --ground: light-dark(oklch(0.965 0 90), oklch(0.29 0.012 285));
@@ -149,12 +148,11 @@
 
   --link: light-dark(oklch(0.55 0.25 292.717), oklch(0.75 0.13 292.717));
 
-  /* 吹き出しはテーマ不変の色の島。文字色まで固定しないと
-     ダークで白文字が白い紙に乗る */
-  --bubble-bg: oklch(0.99 0.002 90);
-  --bubble-fg: oklch(0.20 0.02 285);
-  --bubble-fg-2: oklch(0.46 0.014 285);
-  --bubble-edge: oklch(0.20 0.02 285);
+  --speech-bubble-bg: oklch(0.99 0.002 90);
+  --speech-bubble-fg: oklch(0.20 0.02 285);
+  --speech-bubble-border: oklch(0.218 0.019 285);
+  --speech-bubble-shadow: oklch(0.218 0.019 285);
+
 
   /* --- Color: Brand --- */
   --color-primary: var(--accent);

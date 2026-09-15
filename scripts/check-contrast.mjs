@@ -146,8 +146,7 @@ const CHECKS = [
   ["カードのホバー面",      "--ink",            "--color-card-background-hover", AA_TEXT],
   ["トグルのつまみ",       "--color-toggle-knob", "--color-toggle-bg", AA_UI],
   ["区切り線",           "--rule",           "--ground",  1.3],
-  ["吹き出しの見出し",     "--bubble-fg",      "--bubble-bg", AA_TEXT],
-  ["吹き出しの説明文",     "--bubble-fg-2",    "--bubble-bg", AA_TEXT],
+  ["吹き出しの文字",       "--speech-bubble-fg", "--speech-bubble-bg", AA_TEXT],
 ];
 
 /**
@@ -159,7 +158,7 @@ const CHECKS = [
 const COMPLEMENTARY = [
   ["ヘッダー", "--color-header-background", "--color-header-border"],
   ["カード", "--color-card-background", "--color-card-border"],
-  ["吹き出し", "--bubble-bg", "--bubble-edge"],
+  ["吹き出し", "--speech-bubble-bg", "--speech-bubble-border"],
 ];
 
 /* 影は「常に地より暗い」ことだけを検証する。比の大小は問わない */

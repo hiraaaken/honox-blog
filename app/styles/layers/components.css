@@ -1,11 +1,5 @@
 :root {
-  /* ═══════════════════════════════════════════════════════════
-     Component
-     ═══════════════════════════════════════════════════════════ */
-
   /* --- Header --- */
-  /* テーマ不変。--accent や --bubble-* と同じ色の島として扱う。
-     ライトは塗りが、ダークは細い輪郭が形を定義する */
   --color-header-background: oklch(0.20 0.02 285);
   --color-header-foreground: oklch(0.97 0.006 285);
   --color-header-border: oklch(0.97 0.006 285);
@@ -56,7 +50,6 @@
   --table-cell-padding: 0.5em 1em;
 
   /* --- Theme Toggle --- */
-  /* ヘッダーの中なのでヘッダーと同じくテーマ不変 */
   --toggle-size: var(--size-800);
   --color-toggle-bg: oklch(0.33 0.02 285);
   --color-toggle-knob: var(--color-header-foreground);
@@ -76,7 +69,6 @@
   --heading-border-width: 2px;
   --heading-h2-padding-bottom: var(--size-150);
   --color-heading-border: var(--rule);
-
 
   /* --- TOC (Table of Contents) --- */
   --toc-padding: var(--size-400);
@@ -105,11 +97,26 @@
   --toc-fab-radius: var(--round-full);
 
   /* --- Hero --- */
-  --hero-padding-top: var(--size-1200);
-  --hero-title-font-size: clamp(var(--size-800), 8vw, var(--size-1600));
-  --hero-description-font-size: clamp(var(--text-md), 8vw, var(--text-xs));
-  --hero-letter-spacing: calc(var(--size-50) / 3 * -1);
-  --color-hero-foreground: var(--on-accent);
+  --hero-padding-top: clamp(6.5rem, 11vw, 9rem);
+  --hero-padding-bottom: clamp(1rem, 4vw, 4.5rem);
+  --hero-title-font-size: clamp(28px, 4.2vw, 62px);
+  --hero-description-font-size: clamp(var(--text-sm), 1.4vw, var(--text-lg));
+  --hero-letter-spacing: -0.02em;
+  --hero-line-height: 1.2;
+  --hero-mascot-size: clamp(118px, 17vw, 240px);
+
+  --speech-bubble-bg: var(--color-neutral-50);
+  --speech-bubble-fg: var(--color-neutral-900);
+  --color-speech-bubble-border: var(--color-neutral-900);
+  --speech-bubble-border: var(--border-width-thick) solid var(--color-speech-bubble-border);
+  --color-speech-bubble-shadow: var(--shadow);
+  --speech-bubble-shadow: 4px 4px 0 var(--color-speech-bubble-shadow);
+
+  /* 思考の泡。影は径に比例させる（親と同じ 4px だと小さい丸で影が勝つ） */
+  --thought-bubble-size-lg: clamp(20px, 2.4vw, 32px);
+  --thought-bubble-size-sm: clamp(11px, 1.4vw, 18px);
+  --thought-bubble-shadow-lg: 3px 3px 0 var(--color-speech-bubble-shadow);
+  --thought-bubble-shadow-sm: 2px 2px 0 var(--color-speech-bubble-shadow);
 
   /* --- New Label (Comic Burst) --- */
   --new-label-text: oklch(0.95 0.18 95);
@@ -128,12 +135,7 @@
   --color-profile-border: var(--edge);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Theme Toggle — 表示中のテーマに応じてどちらのボタンを見せるか
 
-   hono/css は非レイヤーで注入され、レイヤー付きの指定に常に勝つ。
-   ボタン側が display を宣言していないので、ここが唯一の宣言になる。
-   ═══════════════════════════════════════════════════════════ */
 [data-to="dark"] { display: inline-flex; }
 [data-to="light"] { display: none; }
 
