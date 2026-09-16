@@ -148,6 +148,12 @@
 
   --link: light-dark(oklch(0.55 0.25 292.717), oklch(0.75 0.13 292.717));
 
+  /* 吹き出しはテーマ不変の色の島。light-dark() を使わず素の値で持つ。
+     文字色まで固定しないと、ダークで白文字が白い紙に乗る。
+     インクは純黒にせず微かに青紫を帯びさせる（--ink と同じ原理） */
+  --speech-bubble-bg: oklch(0.99 0.002 90);
+  --speech-bubble-fg: oklch(0.20 0.02 285);
+  --color-speech-bubble-border: oklch(0.218 0.019 285);
 
   /* --- Color: Brand --- */
   --color-primary: var(--accent);

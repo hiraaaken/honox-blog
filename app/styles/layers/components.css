@@ -108,9 +108,7 @@
   --hero-line-height: 1.2;
   --hero-mascot-size: clamp(118px, 17vw, 240px);
 
-  --speech-bubble-bg: var(--color-neutral-50);
-  --speech-bubble-fg: var(--color-neutral-900);
-  --color-speech-bubble-border: var(--color-neutral-900);
+  /* 色は Foundation（tokens.css）が持つ。ここは合成値だけを組む */
   --speech-bubble-border: var(--border-width-thick) solid var(--color-speech-bubble-border);
   --color-speech-bubble-shadow: var(--shadow);
   --speech-bubble-shadow: 4px 4px 0 var(--color-speech-bubble-shadow);
