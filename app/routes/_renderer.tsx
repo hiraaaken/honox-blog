@@ -51,7 +51,10 @@ export default jsxRenderer(
     { children, title, description, path, type, image, publishedAt, updatedAt },
     c,
   ) => {
-    const currentTheme = (getCookie(c, "theme") || "light") as "light" | "dark";
+    // 属性を付けないことが「システム設定に従う」状態を意味する
+    const cookieTheme = getCookie(c, "theme");
+    const currentTheme =
+      cookieTheme === "light" || cookieTheme === "dark" ? cookieTheme : undefined;
     const currentPath = c.req.path;
 
     const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
@@ -73,11 +76,7 @@ export default jsxRenderer(
     });
 
     return (
-      <html
-        lang="ja"
-        class={currentTheme === "dark" ? "dark" : ""}
-        data-theme={currentTheme}
-      >
+      <html lang="ja" data-theme={currentTheme}>
         <head>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -116,27 +115,12 @@ export default jsxRenderer(
               dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
             />
           )}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-            (function() {
-              const savedTheme = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('theme='))
-                ?.split('=')[1];
-              const theme = savedTheme || 'light';
-              document.documentElement.dataset.theme = theme;
-              document.documentElement.className = theme === 'dark' ? 'dark' : '';
-            })();
-          `,
-            }}
-          />
           <Link href="/app/styles/index.css" rel="stylesheet" />
           <Script src="/app/client.ts" async />
           <Style />
         </head>
         <body>
-          <Header initialTheme={currentTheme} currentPath={currentPath} />
+          <Header currentPath={currentPath} />
 
           <main class={mainClass}>{children}</main>
 

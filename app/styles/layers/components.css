@@ -1,21 +1,18 @@
 :root {
-  /* ═══════════════════════════════════════════════════════════
-     Component
-     ═══════════════════════════════════════════════════════════ */
-
   /* --- Header --- */
-  --color-header-background: var(--color-neutral-750);
-  --color-header-foreground: var(--color-light-500);
-  --color-header-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
-  --color-header-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
-  --header-border: var(--border-width-thick) solid var(--color-header-border);
+  --color-header-background: oklch(0.20 0.02 285);
+  --color-header-foreground: oklch(0.97 0.006 285);
+  --color-header-border: oklch(0.97 0.006 285);
+  --color-header-shadow: var(--shadow);
+  --header-border: var(--border-width-thin) solid var(--color-header-border);
   --header-shadow: 0 2px 0 var(--color-header-shadow);
 
   /* --- Card --- */
-  --color-card-background: light-dark(var(--color-neutral-100), var(--color-neutral-750));
-  --color-card-background-hover: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-  --color-card-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
-  --color-card-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
+  --color-card-background: var(--surface);
+  --color-card-background-hover: light-dark(oklch(0.94 0 90), oklch(0.40 0.014 285));
+  --color-card-foreground: var(--ink);
+  --color-card-border: var(--edge);
+  --color-card-shadow: var(--shadow);
   --card-border: var(--border-width-thick) solid var(--color-card-border);
   --card-shadow: 4px 4px 0 var(--color-card-shadow);
   --card-shadow-hover: 2px 2px 0 var(--color-card-shadow);
@@ -23,39 +20,39 @@
   --card-title-font-size: clamp(var(--text-lg), 5vw, var(--text-2xl));
 
   /* --- Tag --- */
-  --color-tag-background: var(--color-primary);
-  --color-tag-foreground: var(--color-neutral-800);
-  --color-tag-border: light-dark(var(--color-neutral-900), var(--color-neutral-600));
-  --color-tag-shadow: light-dark(var(--color-neutral-900), var(--color-neutral-950));
+  --color-tag-background: var(--accent);
+  --color-tag-foreground: var(--on-accent);
+  --color-tag-border: var(--edge);
+  --color-tag-shadow: var(--shadow);
   --tag-border: var(--border-width-thick) solid var(--color-tag-border);
   --tag-shadow: 3px 3px 0 var(--color-tag-shadow);
   --tag-shadow-hover: 1.5px 1.5px 0 var(--color-tag-shadow);
   --tag-shadow-active: 0 0 0 var(--color-tag-shadow);
 
   /* --- Code Blocks --- */
-  --color-code-inline-bg: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-  --color-code-inline-fg: light-dark(var(--color-neutral-800), var(--color-neutral-200));
-  --color-code-block-bg: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+  --color-code-inline-bg: light-dark(oklch(0.92 0 90), oklch(0.24 0.012 285));
+  --color-code-inline-fg: var(--ink);
+  --color-code-block-bg: light-dark(oklch(0.94 0 90), oklch(0.235 0.012 285));
   --code-inline-padding: 0.2em 0.4em;
   --code-block-padding: var(--size-700);
   --code-block-padding-mobile: var(--size-500);
 
   /* --- Blockquote --- */
-  --color-blockquote-bg: light-dark(var(--color-neutral-100), var(--color-neutral-800));
-  --color-blockquote-fg: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+  --color-blockquote-bg: var(--surface);
+  --color-blockquote-fg: var(--ink-muted);
   --blockquote-padding-x: var(--size-600);
   --blockquote-padding-x-mobile: var(--size-400);
   --blockquote-padding-y: var(--size-400);
 
   /* --- Table --- */
-  --color-table-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-  --color-table-header-bg: light-dark(var(--color-neutral-100), var(--color-neutral-800));
+  --color-table-border: var(--rule);
+  --color-table-header-bg: var(--surface);
   --table-cell-padding: 0.5em 1em;
 
   /* --- Theme Toggle --- */
   --toggle-size: var(--size-800);
-  --color-toggle-bg: var(--color-neutral-800);
-  --color-toggle-knob: var(--color-neutral-600);
+  --color-toggle-bg: oklch(0.33 0.02 285);
+  --color-toggle-knob: var(--color-header-foreground);
 
   /* --- Post Card --- */
   --card-padding-compact: var(--size-350);
@@ -66,13 +63,14 @@
   --post-nav-link-padding: var(--size-300);
 
   /* --- Post --- */
-  --post-title-color: var(--color-neutral-900);
+  /* 字の実質的な背景は地ではなく --text-outline のライム輪郭。
+     ライムは反転しないので前景も反転させない */
+  --post-title-color: var(--on-accent);
 
   /* --- Heading Border --- */
   --heading-border-width: 2px;
   --heading-h2-padding-bottom: var(--size-150);
-  --color-heading-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-
+  --color-heading-border: var(--rule);
 
   /* --- TOC (Table of Contents) --- */
   --toc-padding: var(--size-400);
@@ -81,10 +79,11 @@
   --toc-item-padding: var(--size-100) var(--size-150);
   --toc-nested-margin-left: var(--size-200);
   --toc-nested-item-padding: var(--size-50) var(--size-150);
-  --color-toc-border: light-dark(var(--color-neutral-300), var(--color-neutral-700));
-  --toc-selected-item-color: var(--color-neutral-900);
-  --toc-target-before-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-  --toc-target-after-color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+  --color-toc-border: var(--rule);
+  /* 選択項目はライム面に乗る。反転させると暗地で白文字がライムに乗る */
+  --toc-selected-item-color: var(--on-accent);
+  --toc-target-before-color: var(--ink-muted);
+  --toc-target-after-color: var(--ink-muted);
 
   /* --- Mobile TOC --- */
   --mobile-toc-padding: var(--size-400);
@@ -95,17 +94,43 @@
 
   /* --- TOC FAB --- */
   --toc-fab-size: var(--size-1000);
-  --toc-fab-bg: var(--color-primary);
-  --toc-fab-color: var(--color-neutral-900);
+  --toc-fab-bg: var(--accent);
+  --toc-fab-color: var(--on-accent);
   --toc-fab-shadow: var(--shadow-md);
   --toc-fab-radius: var(--round-full);
 
   /* --- Hero --- */
-  --hero-padding-top: var(--size-1200);
-  --hero-title-font-size: clamp(var(--size-800), 8vw, var(--size-1600));
-  --hero-description-font-size: clamp(var(--text-md), 8vw, var(--text-xs));
-  --hero-letter-spacing: calc(var(--size-50) / 3 * -1);
-  --color-hero-foreground: var(--color-neutral-800);
+  --hero-padding-top: clamp(6.5rem, 11vw, 9rem);
+  --hero-padding-bottom: clamp(1rem, 4vw, 4.5rem);
+  --hero-title-font-size: clamp(1.5rem, 4.2vw, 62px);
+  --hero-description-font-size: clamp(var(--text-sm), 1.4vw, var(--text-lg));
+  --hero-letter-spacing: -0.02em;
+  --hero-line-height: 1.2;
+  --hero-mascot-size: clamp(118px, 17vw, 240px);
+
+  /* 色は Foundation（tokens.css）が持つ。ここは合成値だけを組む */
+  --speech-bubble-border: var(--border-width-thick) solid var(--color-speech-bubble-border);
+  --color-speech-bubble-shadow: var(--shadow);
+  --speech-bubble-shadow: 4px 4px 0 var(--color-speech-bubble-shadow);
+
+  --thought-bubble-size-lg: clamp(20px, 2.4vw, 32px);
+  --thought-bubble-size-sm: clamp(11px, 1.4vw, 18px);
+  --thought-bubble-shadow-lg: 3px 3px 0 var(--color-speech-bubble-shadow);
+  --thought-bubble-shadow-sm: 2px 2px 0 var(--color-speech-bubble-shadow);
+  --thought-bubble-delay-sm: 0s;
+  --thought-bubble-delay-lg: 0.2s;
+  --speech-bubble-delay: 0.3s;
+
+  /* --- Focus Ring --- */
+  /* ライムは地に対してライトで 1.18 しかなく、線に単独で使うと消える。
+     design-system.md「塗りが地に沈むなら、輪郭が形を定義する」に従って環を回す。
+     外側の環は --ink なので両テーマで地から 12:1 以上離れる。
+     リングの構成: 0-2px 環 / 2-4px ライム / 4-6px 環 */
+  --color-focus-ring: var(--accent);
+  --color-focus-ring-halo: var(--ink);
+  --focus-ring-offset: 2px;
+  --focus-ring: 2px solid var(--color-focus-ring);
+  --focus-ring-halo: 0 0 0 6px var(--color-focus-ring-halo);
 
   /* --- New Label (Comic Burst) --- */
   --new-label-text: oklch(0.95 0.18 95);
@@ -121,15 +146,17 @@
   --shadow-hamburger: 0px 0px 4px var(--color-hamburger-foreground);
 
   /* --- Profile Avatar --- */
-  --color-profile-border: light-dark(var(--color-neutral-800), var(--color-neutral-400));
+  --color-profile-border: var(--edge);
 }
 
-.dark,
-[data-theme="dark"] {
-  --color-header-border: oklch(0 0 0);
-  --color-card-border: oklch(0 0 0);
-  --color-card-shadow: oklch(0 0 0);
-  --color-tag-border: oklch(0 0 0);
-  --color-tag-shadow: oklch(0 0 0);
-  --color-profile-border: oklch(0 0 0);
+
+[data-to="dark"] { display: inline-flex; }
+[data-to="light"] { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-to="dark"] { display: none; }
+  :root:not([data-theme="light"]) [data-to="light"] { display: inline-flex; }
 }
+
+:root[data-theme="dark"] [data-to="dark"] { display: none; }
+:root[data-theme="dark"] [data-to="light"] { display: inline-flex; }

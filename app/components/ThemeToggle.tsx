@@ -2,16 +2,18 @@ import { MoonIcon } from "@/components/ui/MoonIcon";
 import { SunIcon } from "@/components/ui/SunIcon";
 import { css } from "hono/css";
 
-type Theme = "light" | "dark";
-
 const themeToggleFormClass = css`
   display: flex;
 `
 
+/**
+ * 切り替え先を明示して送る。cookie が無い状態ではサーバは表示中のテーマを
+ * 知り得ないので、出し分けは CSS 側（components.css）に任せる。
+ * display をここで宣言すると非レイヤーの hono/css がそれに勝つため書かない。
+ */
 const themeToggleClass = css`
   --_size: var(--toggle-size);
   position: relative;
-  display: inline-flex;
   align-items: center;
   width: calc(var(--_size) * 1.9);
   height: var(--_size);
@@ -32,17 +34,22 @@ const themeToggleClass = css`
     scale: 0.75;
     border-radius: var(--round-circle);
     background-color: var(--color-toggle-knob);
-    translate: calc(var(--_size) * 0.9) 0;
     transition: translate var(--duration-slow) var(--ease-bounce);
   }
 
-  &[aria-checked="true"]::before {
-    translate: 0 0;
+  /* 切り替え先がダーク＝今はライト表示 */
+  &[data-to="dark"]::before {
+    translate: calc(var(--_size) * 0.9) 0;
   }
-  &[aria-checked="true"] [data-icon="sun"] {
+  &[data-to="dark"] [data-icon="moon"] {
     opacity: 0;
   }
-  &[aria-checked="false"] [data-icon="moon"] {
+
+  /* 切り替え先がライト＝今はダーク表示 */
+  &[data-to="light"]::before {
+    translate: 0 0;
+  }
+  &[data-to="light"] [data-icon="sun"] {
     opacity: 0;
   }
 
@@ -62,30 +69,36 @@ const toggleIconClass = css`
   }
 `;
 
-export function ThemeToggle({ theme }: { theme: Theme }) {
+type ThemeSwitchProps = {
+  to: "light" | "dark";
+  label: string;
+};
 
+function ThemeSwitch({ to, label }: ThemeSwitchProps) {
+  return (
+    <button
+      type="submit"
+      name="to"
+      value={to}
+      data-to={to}
+      class={themeToggleClass}
+      aria-label={label}
+    >
+      <span class={toggleIconClass} data-icon="moon">
+        <MoonIcon />
+      </span>
+      <span class={toggleIconClass} data-icon="sun">
+        <SunIcon color="var(--color-primary)" />
+      </span>
+    </button>
+  );
+}
+
+export function ThemeToggle() {
   return (
     <form action="/theme" method="post" class={themeToggleFormClass}>
-      <button 
-        type="submit" 
-        class={themeToggleClass}
-        role="switch"
-        aria-checked={theme === "dark" ? "true" : "false"}
-        aria-label="Toggle Theme"
-      >
-        <span
-          class={toggleIconClass}
-          data-icon="moon"
-        >
-          <MoonIcon />
-        </span>
-        <span
-          class={toggleIconClass}
-          data-icon="sun"
-        >
-          <SunIcon color="var(--color-primary)" />
-        </span>
-      </button>
+      <ThemeSwitch to="dark" label="ダークテーマに切り替える" />
+      <ThemeSwitch to="light" label="ライトテーマに切り替える" />
     </form>
   );
 }

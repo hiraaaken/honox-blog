@@ -45,10 +45,7 @@ const cardTitleClass = css`
   font-weight: var(--font-bold);
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid light-dark(
-    var(--color-neutral-200),
-    var(--color-neutral-700)
-  );
+  border-bottom: 1px solid var(--rule);
 
   & button {
     margin-left: var(--spacing-sm);
@@ -62,7 +59,7 @@ const profileWrapperClass = css`
   align-items: center;
   gap: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid light-dark( var(--color-neutral-200), var(--color-neutral-700));
+  border-bottom: 1px solid var(--rule);
 
   @media (max-width: 768px) {
     flex-direction: column;

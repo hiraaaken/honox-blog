@@ -203,7 +203,7 @@ const postContent = css`
   }
   
   a {
-    color: light-dark(var(--color-secondary), var(--color-secondary-lighten));
+    color: var(--link);
     text-decoration: underline;
     transition: color var(--duration-base);
     

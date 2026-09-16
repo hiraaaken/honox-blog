@@ -3,8 +3,6 @@ import { css } from "hono/css";
 import HamburgerIcon from "@/components/ui/HamburgerIcon";
 import CloseIcon from "@/components/ui/CloseIcon";
 
-type Theme = 'light' | 'dark';
-
 const headerClass = css`
   background-color: var(--color-header-background);
   color: var(--color-header-foreground);
@@ -269,7 +267,7 @@ const drawerFooterClass = css`
   padding-bottom: env(safe-area-inset-bottom);
 `
 
-export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, currentPath: string }) => {
+export const Header = ({ currentPath }: { currentPath: string }) => {
 
   return (
     <header
@@ -284,7 +282,7 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
           <li><a href="/tags" data-current={currentPath.startsWith('/tags') ? 'true' : 'false'}>Tags</a></li>
           <li><a href="/about" data-current={currentPath.startsWith('/about') ? 'true' : 'false'}>About</a></li>
           <li>
-            <ThemeToggle theme={initialTheme} />
+            <ThemeToggle />
           </li>
           <li>
             <button popovertarget="nav-menu" class={hamburgerButtonClass} aria-label="Open menu">
@@ -310,7 +308,7 @@ export const Header = ({ initialTheme, currentPath }: { initialTheme: Theme, cur
           <li><a href="/about" data-current={currentPath.startsWith('/about') ? 'true' : 'false'}>About</a></li>
         </ul>
         <div class={drawerFooterClass}>
-          <ThemeToggle theme={initialTheme} />
+          <ThemeToggle />
         </div>
       </dialog>
     </header>

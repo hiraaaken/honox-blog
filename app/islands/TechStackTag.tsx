@@ -46,14 +46,17 @@ const tagClass = css`
   border-radius: var(--round-pill);
   font-size: var(--text-body-sm);
   font-weight: var(--font-medium);
-  background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
-  color: light-dark(var(--color-neutral-700), var(--color-neutral-300));
-  border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  /* 面に置いても輪郭が形を定義する。
+     旧実装のダーク(neutral-800 = 0.269)は地(0.29)より暗く、面が沈んでいた */
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--edge);
   cursor: default;
 
   &:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    box-shadow: var(--focus-ring-halo);
   }
 `;
 
@@ -63,10 +66,11 @@ const tooltipClass = css`
   position-try-fallbacks: flip-block;
   margin: 0;
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  /* 反転面。ライムは反転面のダーク側(0.95)に対して 1.13 で消えるため使わない */
+  border: 1px solid var(--on-inverse);
   border-radius: var(--round-md);
-  background-color: var(--color-neutral-800);
-  color: var(--color-primary);
+  background-color: var(--inverse);
+  color: var(--on-inverse);
   font-size: var(--text-body-sm);
   white-space: nowrap;
   pointer-events: none;
