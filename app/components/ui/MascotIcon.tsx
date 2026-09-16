@@ -1,13 +1,18 @@
 /**
  * 本体は暗い色だがダーク地では白い輪郭が形を定義するので、テーマ分岐は要らない。
+ *
+ * 大きさは呼び出し側が CSS で決める（ヒーローは --hero-mascot-size）。
+ * width/height 属性は intrinsic size のフォールバックで、CSS が上書きする。
+ * 203x150 に対して viewBox は 203x200 なので preserveAspectRatio の既定 meet
+ * でレターボックスされ、絵は幅の 75% に収まって水平中央に置かれる。
  * Figma の書き出しは同一パスが4回ずつ重複していたため 28要素 → 16要素に整理した
  * （見た目は同じ）。display-p3 の style 属性も外してある。
  */
-export const MascotIcon = ({ size = 200 }: { size?: number }) => {
+export const MascotIcon = () => {
   return (
     <svg
-      width={size}
-      height={(size * 150) / 203}
+      width="203"
+      height="150"
       viewBox="0 0 203 200"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

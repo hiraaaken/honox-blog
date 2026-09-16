@@ -132,6 +132,20 @@ Safari 18）。非対応なら即座に切り替わるだけで、壊れない�
 > ここで `prefers-color-scheme` を見てはいけない。システムが今どちらに解決されて
 > いようと、選択されているのは「システム」というセグメントだから。
 
+> **`ThemeToggle` 側で `background-color` / `color` を宣言しない。**
+> `hono/css` は**非レイヤー**で注入され、特異度に関係なくレイヤー付きの指定に**常に勝つ**。
+> `components.css` は `@layer components` の中にあるので、ボタン側が色を宣言した瞬間に
+> 上の出し分けが効かなくなり、**選択中のセグメントが光らなくなる**。
+>
+> ```
+> dist/static/index-*.css   @layer tokens / base / components / utilities
+> dist/index.html           @layer の出現回数: 0     ← hono/css はここ
+> ```
+>
+> エラーも警告も出ず、ただ光らなくなるだけなので気づきにくい。ホバーの背景を
+> 足したくなったときが危ない。色は `components.css` に置く。
+> `transition` に `background-color` を並べるのは問題ない（値を決めていないため）。
+
 JS を切っている閲覧者はテーマを選べず、①（システム設定に従う）で固定される。個人ブログとして許容している。
 
 ---

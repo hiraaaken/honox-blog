@@ -24,6 +24,14 @@ const heroIconClass = css`
   align-items: flex-end;
   height: 100%;
   width: 100%;
+
+  /* 大きさはここで決める。比率は SVG の intrinsic size (203x150) と同じなので
+     絵の構図は変わらない */
+  > svg {
+    width: var(--hero-mascot-size);
+    height: auto;
+    aspect-ratio: 203 / 150;
+  }
 `
 
 const speechBubbleClass = css`

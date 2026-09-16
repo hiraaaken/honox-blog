@@ -1,9 +1,12 @@
+/* 回転は独立変換プロパティ rotate に持たせ、ここでは scale だけを動かす。
+   隠す状態を base ではなく from に置くことで、animation: none にしたとき
+   素の見える状態（scale 1）に戻る */
 @keyframes new-label-pop {
-  0% {
-    transform: rotate(12deg) scale(0);
+  from {
+    scale: 0;
   }
-  100% {
-    transform: rotate(12deg) scale(1);
+  to {
+    scale: 1;
   }
 }
 
