@@ -84,6 +84,29 @@ function readTokens() {
   return tokens;
 }
 
+/**
+ * 同じ名前が SOURCES の複数ファイルで宣言されていないか調べる。
+ *
+ * ブラウザのカスケードは後勝ち（components が勝つ）、readTokens は先勝ち
+ * （tokens が勝つ）で precedence が逆を向く。重複を許すと「検査は通るが
+ * 画面に出ている値を検査していない」状態になるため、値が同じでも落とす。
+ * 同一ファイル内の再宣言（メディアクエリ等）は正当なので数えない。
+ */
+function findCrossFileDuplicates() {
+  const seen = new Map();
+  for (const file of SOURCES) {
+    const css = readFileSync(join(ROOT, file), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    const inFile = new Set(
+      [...css.matchAll(/(--[a-zA-Z0-9-]+)\s*:\s*[^;]+;/g)].map((m) => m[1]),
+    );
+    for (const name of inFile) {
+      if (!seen.has(name)) seen.set(name, []);
+      seen.get(name).push(file);
+    }
+  }
+  return [...seen].filter(([, files]) => files.length > 1);
+}
+
 /** トークン名をテーマごとの OKLCH 値へ解決する。theme は "light" | "dark" */
 function resolve(tokens, name, theme, seen = new Set()) {
   if (seen.has(name)) throw new Error(`循環参照: ${name}`);
@@ -161,7 +184,7 @@ const CHECKS = [
 const COMPLEMENTARY = [
   ["ヘッダー", "--color-header-background", "--color-header-border"],
   ["カード", "--color-card-background", "--color-card-border"],
-  ["吹き出し", "--speech-bubble-bg", "--speech-bubble-border"],
+  ["吹き出し", "--speech-bubble-bg", "--color-speech-bubble-border"],
 ];
 
 /* 影は「常に地より暗い」ことだけを検証する。比の大小は問わない */
@@ -224,6 +247,19 @@ for (const theme of ["light", "dark"]) {
                   luminance(resolve(tokens, "--ground", theme));
   if (!lighter) failed++;
   console.log(`  ${lighter ? "✓" : "✗"} 面が地より明るい（${theme}）`);
+}
+
+/* 定義の一意性。ブラウザとこのスクリプトで解決値がズレる構造を禁じる */
+console.log("\n  定義の一意性");
+console.log("  " + "─".repeat(62));
+const dups = findCrossFileDuplicates();
+if (dups.length === 0) {
+  console.log("  ✓ 複数ファイルで宣言されているトークンは無い");
+} else {
+  failed += dups.length;
+  for (const [name, files] of dups) {
+    console.log(`  ✗ ${name} が ${files.join(" と ")} の両方で宣言されている`);
+  }
 }
 
 console.log(
