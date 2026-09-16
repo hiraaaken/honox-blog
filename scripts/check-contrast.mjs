@@ -185,6 +185,9 @@ const COMPLEMENTARY = [
   ["ヘッダー", "--color-header-background", "--color-header-border"],
   ["カード", "--color-card-background", "--color-card-border"],
   ["吹き出し", "--speech-bubble-bg", "--color-speech-bubble-border"],
+  /* フォーカスリングは二重環。ライトではライムが地に沈む(1.18)ので環が
+     指標を担い、ダークではライム自身が 10.86 で立つ。どちらかが立てばよい */
+  ["フォーカスリング", "--color-focus-ring", "--color-focus-ring-halo"],
 ];
 
 /* 影は「常に地より暗い」ことだけを検証する。比の大小は問わない */

@@ -54,8 +54,9 @@ const tagClass = css`
   cursor: default;
 
   &:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    box-shadow: var(--focus-ring-halo);
   }
 `;
 

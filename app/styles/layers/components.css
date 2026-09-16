@@ -121,6 +121,17 @@
   --thought-bubble-delay-lg: 0.2s;
   --speech-bubble-delay: 0.3s;
 
+  /* --- Focus Ring --- */
+  /* ライムは地に対してライトで 1.18 しかなく、線に単独で使うと消える。
+     design-system.md「塗りが地に沈むなら、輪郭が形を定義する」に従って環を回す。
+     外側の環は --ink なので両テーマで地から 12:1 以上離れる。
+     リングの構成: 0-2px 環 / 2-4px ライム / 4-6px 環 */
+  --color-focus-ring: var(--accent);
+  --color-focus-ring-halo: var(--ink);
+  --focus-ring-offset: 2px;
+  --focus-ring: 2px solid var(--color-focus-ring);
+  --focus-ring-halo: 0 0 0 6px var(--color-focus-ring-halo);
+
   /* --- New Label (Comic Burst) --- */
   --new-label-text: oklch(0.95 0.18 95);
   --new-label-burst: oklch(0.55 0.22 27);
