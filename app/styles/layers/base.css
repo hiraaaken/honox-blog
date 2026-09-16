@@ -382,3 +382,17 @@ h3 {
   }
 }
 
+/* テーマ切り替えの全画面クロスフェード。
+   既定の 0.25s は地と面が同時に入れ替わるには少し長い */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-base);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

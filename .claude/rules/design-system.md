@@ -49,13 +49,61 @@ GET /posts/:slug          → Worker が起動する
 | `app/components/ThemeToggle.tsx` | 3分割セグメント。マークアップだけを持つ |
 | `components.css` | どのセグメントが選択中かの出し分け |
 
-`_renderer.tsx` は `<head>` に**同期スクリプトを1つ**置く。役割は3つ。
+`_renderer.tsx` は `<head>` に**同期スクリプトを1つ**置く。役割は5つ。
 
-1. 描画前に `data-theme` を確定させる（`client.ts` は `async` で読まれるのでハイドレーション後では間に合わない）
-2. `[data-theme-option]` のクリックを `document` で委譲して受ける
-3. `aria-pressed` を選択状態に合わせる
+1. 描画前に `data-theme` を確定させる
+2. クリックを `document` で委譲して受ける
+3. 矢印キーで選択とフォーカスを動かす（radiogroup のキーボード規約）
+4. `aria-checked` と `tabindex` を選択状態に合わせる
+5. 別タブでの変更に `storage` イベントで追従する
 
 切り替えにサーバ往復は無い＝**画面は再読み込みされない**。
+
+> **`type="module"` にはできない。**
+> モジュールは**常に defer される**ので描画前に走らず、ちらつきを防げない。
+> ここだけは今でもクラシックスクリプト一択で、`client.ts`（`async`）でも間に合わない。
+>
+> ```
+> クラシックスクリプト実行時に body が存在したか: false   ← 描画前
+> module がクラシックより後に走ったか:            true   ← 手遅れ
+> ```
+
+> **`matchMedia` で OS 設定を監視しない。**
+> `system` を選んでいる閲覧者の配色は、`color-scheme: light dark` と `light-dark()` が
+> **CSS だけで** OS 設定の変化に追従する。JS で張るリスナーは丸ごと無駄になる。
+
+### `var` を使わない
+
+このサイトの下限は `light-dark()` が決めている（Baseline low / 2024-05-13、Chrome 123・
+Firefox 120・Safari 17.5）。無いとトークンが全部無効値になって配色が崩壊するので、
+**そこで `const` / `let` が動かないことはあり得ない。** `<head>` 直書きのテーマスクリプトに
+`var` と IIFE が付いている定型は IE 対応の化石で、ブロックスコープで足りる。
+
+### 相互排他なので radiogroup にする
+
+3つのセグメントは「3つの独立したトグル」ではなく「3つのうち1つ」。
+`role="group"` + `aria-pressed` で書くと、支援技術にはその情報が落ちる。
+
+```
+役割:     role="radiogroup" / role="radio" / aria-checked
+キー操作: 矢印キーで選択とフォーカスが同時に動く（端で回り込む）
+タブ:     グループ全体で1つのタブストップ（roving tabindex）
+```
+
+`tabindex` はサーバが既定（`system`）を `0`、残りを `-1` で描き、
+保存値が違う閲覧者の分はスクリプトが読み込み時に直す。
+
+### 切り替えは View Transition でクロスフェードする
+
+`document.startViewTransition()`（Baseline low / 2025-10-14、Chrome 111・Firefox 144・
+Safari 18）。非対応なら即座に切り替わるだけで、壊れない。
+
+`prefers-reduced-motion: reduce` は**二重に**尊重する。JS 側で `startViewTransition` を
+呼ばず、CSS 側でも `::view-transition-*` のアニメーションを止める（`base.css`）。
+
+> **View Transition を挟むと `data-theme` の反映が1フレーム遅れる。**
+> callback は次フレームに回るので、状態変数は callback の外で**同期に**確定させること。
+> でないと連打したとき2回目が古い値から計算して巻き戻る。
 
 > **切り替えを island にしない。**
 > HonoX（honox 0.1.x）は**1ページにつき最初の island しか `<honox-island>` で包まない**。
@@ -70,9 +118,10 @@ GET /posts/:slug          → Worker が起動する
 >
 > `document` でクリックを委譲すれば、ハイドレーションに一切依存せず全部が動く。
 
-> **選択状態をサーバでも JS の状態でも描かない。**
+> **選択中の「見た目」をサーバでも JS の状態でも描かない。**
 > サーバは閲覧者の選択を知り得ない。どのセグメントが光るかは `:root[data-theme]` から
-> CSS で引く。そうすれば初回描画の時点で既に正しい。
+> CSS で引く。そうすれば初回描画の時点で既に正しい
+> （`aria-checked` と `tabindex` は CSS から書けないのでスクリプトが付ける）。
 >
 > ```css
 > :root:not([data-theme]) [data-theme-option="system"],

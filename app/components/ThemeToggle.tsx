@@ -2,7 +2,7 @@ import { css } from "hono/css";
 import { DisplayIcon } from "@/components/ui/DisplayIcon";
 import { MoonIcon } from "@/components/ui/MoonIcon";
 import { SunIcon } from "@/components/ui/SunIcon";
-import { THEME_CHOICES, type ThemeChoice } from "@/lib/theme";
+import { DEFAULT_THEME_CHOICE, THEME_CHOICES, type ThemeChoice } from "@/lib/theme";
 
 const ICONS: Record<ThemeChoice, (props: { color?: string }) => any> = {
   system: DisplayIcon,
@@ -45,21 +45,29 @@ const switchButtonClass = css`
 `;
 
 /**
- * island ではない。クリックも `aria-pressed` も `<head>` の THEME_INIT_SCRIPT が
- * document で委譲して受ける。選択中の見た目は `:root[data-theme]` から CSS が引く。
+ * island ではない。クリックも矢印キーも radio の状態も、`<head>` の
+ * THEME_INIT_SCRIPT が document で委譲して受ける。
+ * 選択中の見た目は `:root[data-theme]` から CSS が引く。
+ *
+ * サーバは閲覧者の選択を知り得ないので、既定（system）を選択中として描く。
+ * 別の値を保存している閲覧者の分はスクリプトが読み込み時に直す。
  */
 export function ThemeToggle() {
   return (
-    <div class={switchGroupClass} role="group" aria-label="テーマ">
+    <div class={switchGroupClass} role="radiogroup" aria-label="テーマ">
       {THEME_CHOICES.map(({ value, label }) => {
         const Icon = ICONS[value];
+        const selected = value === DEFAULT_THEME_CHOICE;
         return (
           <button
             type="button"
+            role="radio"
             class={switchButtonClass}
             data-theme-option={value}
+            aria-checked={selected ? "true" : "false"}
             aria-label={label}
             title={label}
+            tabindex={selected ? 0 : -1}
           >
             <Icon color="currentColor" />
           </button>
