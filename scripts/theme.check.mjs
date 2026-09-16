@@ -1,36 +1,24 @@
 /**
- * テーマの3状態を検証する。
+ * テーマ切り替えを検証する。
  *
  *   node scripts/theme.check.mjs
  *
- * 前身の theme-route.check.mjs は app/routes/theme.ts のロジックを別ファイルへ
- * 複製して検証していた。ハンドラの中身は正しかったので検査は通り続けたが、
- * 実際には `/` `/posts` `/tags` `/about` が SSG されて Workers Assets に
- * 先取りされ、そのハンドラは一度も呼ばれていなかった。
- * 複製したロジックをテストしても、ロジックが到達不能になったことは検出できない。
- *
- * そこでこの検査は
- *   1. app/lib/theme.ts を「複製せずに import して」写像を検証し、
- *   2. `<head>` に入る実物のスクリプトを偽の DOM の上で実行し、
- *   3. 到達経路（renderer が実際にそれを出力しているか、cookie 方式の残骸が
- *      無いか）を静的に確認する。
+ * 前身の theme-route.check.mjs はハンドラのロジックを別ファイルへ複製して
+ * 検証していた。中身は正しかったので緑のままだったが、そのハンドラは
+ * Workers Assets に先取りされて一度も呼ばれていなかった（#78）。
+ * だからここでは複製を作らず、`<head>` に入る実物のスクリプトを
+ * 偽 DOM 上で走らせ、さらにそれが出力される経路まで見る。
  */
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import {
-  THEME_CHOICES,
-  THEME_INIT_SCRIPT,
-  THEME_STORAGE_KEY,
-  normalizeThemeChoice,
-  themeAttribute,
-} from "../app/lib/theme.ts";
+import { THEME_CHOICES, THEME_INIT_SCRIPT } from "../app/lib/theme.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(join(ROOT, file), "utf8");
 
-/** app/ 配下の .ts / .tsx を全部見る。対象をベタ書きすると追加漏れで腐る */
+/** 対象をベタ書きすると追加漏れで腐るので app/ 配下を全部見る */
 function* walk(dir) {
   for (const entry of readdirSync(join(ROOT, dir), { withFileTypes: true })) {
     const path = `${dir}/${entry.name}`;
@@ -45,87 +33,54 @@ const check = (ok, label, detail) => {
   console.log(`  ${ok ? "✓" : "✗"} ${label.padEnd(34)}${detail}`);
 };
 
-/* ── 1. 3状態 → data-theme の写像 ──────────────────────────── */
+const heading = (text) => {
+  console.log(`\n  ${text}`);
+  console.log("  " + "─".repeat(62));
+};
 
-console.log("\n  3状態と data-theme の対応");
-console.log("  " + "─".repeat(62));
-
+/** system は属性の不在に写る。3状態のうちここだけが値を持たない */
 const EXPECTED = { system: null, light: "light", dark: "dark" };
+const VALUES = THEME_CHOICES.map((c) => c.value);
 
-check(
-  THEME_CHOICES.length === 3,
-  "状態は3つある",
-  THEME_CHOICES.join(" / "),
-);
-
-for (const choice of THEME_CHOICES) {
-  const got = themeAttribute(choice);
-  check(
-    got === EXPECTED[choice],
-    `${choice} →`,
-    got === null ? "属性を付けない（システムに従う）" : `data-theme="${got}"`,
-  );
-}
-
-check(
-  normalizeThemeChoice("dark-mode") === "system" &&
-    normalizeThemeChoice(null) === "system",
-  "壊れた保存値は system に倒す",
-  "normalizeThemeChoice",
-);
-
-/* ── 2. <head> に入る実物のスクリプトを走らせる ────────────── */
-
-console.log("\n  初期化スクリプト（実物を偽 DOM 上で実行）");
-console.log("  " + "─".repeat(62));
+/* ── 実物のスクリプトを偽 DOM 上で走らせる ─────────────────── */
 
 /**
- * THEME_INIT_SCRIPT を最小の偽 DOM の上で実行する。
- * スクリプトは `<head>` に入る実物をそのまま走らせる（複製しない）。
- *
- * ボタンは2組用意する。ヘッダーとハンバーガー内の2箇所に置いてあり、
- * クリックの委譲と `aria-pressed` の同期が両方に効くことを見たいため。
+ * ボタンは2組。ヘッダーとハンバーガー内の2箇所に置いてあり、
+ * クリックの委譲と aria-pressed の同期が両方に効くことを見たい。
  */
-function mountInitScript({ stored = null, cookie = "", storageThrows = false } = {}) {
+function mount({ stored = null, cookie = "", storageThrows = false } = {}) {
   const store = new Map();
-  if (stored !== null) store.set(THEME_STORAGE_KEY, stored);
+  if (stored !== null) store.set("theme", stored);
 
-  const buttons = ["system", "light", "dark", "system", "light", "dark"].map(
-    (option) => ({
-      attributes: { "data-theme-option": option },
-      getAttribute(name) {
-        return name in this.attributes ? this.attributes[name] : null;
-      },
-      setAttribute(name, value) {
-        this.attributes[name] = String(value);
-      },
-      closest(selector) {
-        return selector === "[data-theme-option]" ? this : null;
-      },
-    }),
-  );
+  const buttons = [...VALUES, ...VALUES].map((option) => ({
+    attributes: { "data-theme-option": option },
+    getAttribute(name) {
+      return name in this.attributes ? this.attributes[name] : null;
+    },
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    },
+    closest(selector) {
+      return selector === "[data-theme-option]" ? this : null;
+    },
+  }));
 
   const listeners = {};
   const dataset = {};
   const doc = {
     documentElement: { dataset },
     cookie,
-    querySelectorAll: (selector) =>
-      selector === "[data-theme-option]" ? buttons : [],
+    querySelectorAll: (s) => (s === "[data-theme-option]" ? buttons : []),
     addEventListener: (type, handler) => {
       (listeners[type] ??= []).push(handler);
     },
   };
 
+  const throwing = () => {
+    throw new Error("denied");
+  };
   const localStorage = storageThrows
-    ? {
-        getItem() {
-          throw new Error("denied");
-        },
-        setItem() {
-          throw new Error("denied");
-        },
-      }
+    ? { getItem: throwing, setItem: throwing }
     : {
         getItem: (k) => (store.has(k) ? store.get(k) : null),
         setItem: (k, v) => store.set(k, String(v)),
@@ -141,144 +96,116 @@ function mountInitScript({ stored = null, cookie = "", storageThrows = false } =
       return "theme" in dataset ? dataset.theme : null;
     },
     get stored() {
-      try {
-        return localStorage.getItem(THEME_STORAGE_KEY);
-      } catch {
-        return null;
-      }
+      return store.get("theme") ?? null;
     },
     get cookie() {
       return doc.cookie;
     },
-    buttons,
-    pressed: () => buttons.map((b) => b.getAttribute("aria-pressed")),
-    click: (option) =>
-      fire("click", {
-        target: buttons.find((b) => b.attributes["data-theme-option"] === option),
-      }),
+    pressed: () => buttons.map((b) => b.getAttribute("aria-pressed")).join(","),
     clickAt: (index) => fire("click", { target: buttons[index] }),
+    click: (value) => fire("click", { target: buttons[VALUES.indexOf(value)] }),
     ready: () => fire("DOMContentLoaded", {}),
   };
 }
 
-const runInitScript = mountInitScript;
+heading("保存値の復元（実物のスクリプトを実行）");
 
-for (const choice of THEME_CHOICES) {
-  const r = runInitScript({ stored: choice });
+check(VALUES.length === 3, "状態は3つある", VALUES.join(" / "));
+
+for (const value of VALUES) {
+  const dom = mount({ stored: value });
   check(
-    r.attribute === EXPECTED[choice],
-    `保存値 ${choice} を復元する`,
-    r.attribute === null ? "属性なし" : `data-theme="${r.attribute}"`,
+    dom.attribute === EXPECTED[value],
+    `${value} を復元する`,
+    dom.attribute === null ? "属性なし（システムに従う）" : `data-theme="${dom.attribute}"`,
   );
 }
 
 {
-  const r = runInitScript();
+  const dom = mount();
   check(
-    r.attribute === null && r.stored === "system",
+    dom.attribute === null && dom.stored === "system",
     "未設定は system",
     "属性なし / localStorage=system",
   );
 }
 
-// 旧 cookie 方式からの移行。一度だけ引き継いで cookie は捨てる
 {
-  const r = runInitScript({ cookie: "foo=1; theme=dark; bar=2" });
+  const dom = mount({ stored: "dark-mode" });
+  check(dom.attribute === null, "壊れた保存値は system に倒す", "属性なし");
+}
+
+// 旧 cookie 方式（#78 以前）からの移行
+{
+  const dom = mount({ cookie: "foo=1; theme=dark; bar=2" });
   check(
-    r.attribute === "dark" && r.stored === "dark",
+    dom.attribute === "dark" && dom.stored === "dark",
     "旧 cookie を引き継ぐ",
-    `data-theme="${r.attribute}" / localStorage=${r.stored}`,
+    `data-theme="${dom.attribute}" / localStorage=${dom.stored}`,
   );
-  check(
-    /Max-Age=0/.test(r.cookie),
-    "引き継いだら cookie を捨てる",
-    r.cookie,
-  );
+  check(/Max-Age=0/.test(dom.cookie), "引き継いだら cookie を捨てる", dom.cookie);
 }
 
-// localStorage が使えない環境（プライベートモード等）で落ちない
-{
-  let threw = false;
-  let dom = null;
-  try {
-    dom = mountInitScript({ storageThrows: true });
-  } catch {
-    threw = true;
-  }
-  check(
-    !threw && dom.attribute === null,
-    "localStorage が読めなくても落ちない",
-    "例外を投げず、属性も付けない",
-  );
-  if (!threw) {
-    dom.click("dark");
-    check(
-      dom.attribute === "dark",
-      "保存できなくても切り替えは効く",
-      `data-theme="${dom.attribute}"`,
-    );
-  }
-}
-
-/* ── 切り替え（クリックの委譲） ─────────────────────────────── */
-
-console.log("\n  切り替え（リロードなし）");
-console.log("  " + "─".repeat(62));
+heading("切り替え（リロードなし）");
 
 {
-  const dom = mountInitScript();
+  const dom = mount();
   dom.ready();
-
   check(
-    dom.pressed().join(",") === "true,false,false,true,false,false",
+    dom.pressed() === "true,false,false,true,false,false",
     "初期は system が押された状態",
     "ヘッダーとハンバーガーの両方",
   );
 
-  for (const choice of ["dark", "light", "system"]) {
-    dom.click(choice);
+  for (const value of ["dark", "light", "system"]) {
+    dom.click(value);
     check(
-      dom.attribute === EXPECTED[choice] && dom.stored === choice,
-      `${choice} を押すと切り替わる`,
+      dom.attribute === EXPECTED[value] && dom.stored === value,
+      `${value} を押すと切り替わる`,
       `data-theme=${dom.attribute ?? "（無し）"} / localStorage=${dom.stored}`,
     );
   }
 
   dom.click("dark");
   check(
-    dom.pressed().join(",") === "false,false,true,false,false,true",
+    dom.pressed() === "false,false,true,false,false,true",
     "aria-pressed が両方の組で追従する",
-    dom.pressed().join(","),
+    dom.pressed(),
   );
 
-  // ハンバーガー側（2組目 = index 3..5）から押しても効く。
-  // honox は1ページにつき最初の island しかハイドレートしないので、
-  // island にしていたらここが死んでいた
-  dom.clickAt(4); // 2組目の "light"
+  // honox は1ページにつき最初の island しかハイドレートしない。
+  // island にしていたらハンバーガー側（2組目）が死んでいた
+  dom.clickAt(4);
   check(
     dom.attribute === "light" && dom.stored === "light",
     "2組目のボタンでも切り替わる",
-    `data-theme="${dom.attribute}"（document への委譲なのでハイドレーション不要）`,
-  );
-  check(
-    dom.pressed().join(",") === "false,true,false,false,true,false",
-    "2組目から押しても両方の aria-pressed が揃う",
-    dom.pressed().join(","),
+    "document への委譲なのでハイドレーション不要",
   );
 }
 
-/* ── 3. 到達経路 ───────────────────────────────────────────── */
+// プライベートモード等、localStorage が投げる環境
+{
+  let dom = null;
+  try {
+    dom = mount({ storageThrows: true });
+  } catch {
+    /* 落ちたら dom は null のまま */
+  }
+  check(dom !== null && dom.attribute === null, "localStorage が読めなくても落ちない", "例外を投げない");
+  if (dom) {
+    dom.click("dark");
+    check(dom.attribute === "dark", "保存できなくても切り替えは効く", 'data-theme="dark"');
+  }
+}
 
-console.log("\n  到達経路（検査が通るのに壊れていた状態を防ぐ）");
-console.log("  " + "─".repeat(62));
+/* ── 到達経路（検査が通るのに壊れていた状態を防ぐ） ─────────── */
+
+heading("到達経路");
 
 const renderer = read("app/routes/_renderer.tsx");
 
 check(
-  /THEME_INIT_SCRIPT/.test(renderer) &&
-    /dangerouslySetInnerHTML=\{\{\s*__html:\s*THEME_INIT_SCRIPT\s*\}\}/.test(
-      renderer,
-    ),
+  /dangerouslySetInnerHTML=\{\{\s*__html:\s*THEME_INIT_SCRIPT\s*\}\}/.test(renderer),
   "renderer が実際に出力している",
   "_renderer.tsx → <script>",
 );
@@ -289,15 +216,14 @@ check(
   "SSG されたページでは cookie を読めないため",
 );
 
-// cookie 方式の残骸。正が2箇所にあると片方だけ古い値が残る
+// 正が2箇所にあると片方だけ古い値が残る
 const COOKIE_USE = /(?:get|set)Cookie\s*\(|from\s+["']hono\/cookie["']/;
-const cookieUse = [...walk("app")].filter((f) => COOKIE_USE.test(read(f)));
+const files = [...walk("app")];
+const cookieUse = files.filter((f) => COOKIE_USE.test(read(f)));
 check(
   cookieUse.length === 0,
   "cookie 方式の残骸が無い",
-  cookieUse.length === 0
-    ? `app/ 配下 ${[...walk("app")].length} ファイルを走査`
-    : cookieUse.join(", "),
+  cookieUse.length === 0 ? `app/ 配下 ${files.length} ファイルを走査` : cookieUse.join(", "),
 );
 
 check(
@@ -306,50 +232,43 @@ check(
   "切り替えにサーバ往復は要らない",
 );
 
-/* honox は1ページにつき最初の island しか <honox-island> で包まない。
-   ヘッダーの切り替えを island にすると常にそれが「最初」になり、
-   /about の TechStackTag などが巻き添えで死ぬ */
 check(
   existsSync(join(ROOT, "app/components/ThemeToggle.tsx")) &&
     !existsSync(join(ROOT, "app/islands/ThemeToggle.tsx")),
   "切り替えは island ではない",
-  "ハイドレーションに依存させない",
+  "honox は最初の island しか包まない",
 );
 
-/* ── 4. CSS の出し分け ─────────────────────────────────────── */
+/* ── CSS の出し分け ────────────────────────────────────────── */
 
-console.log("\n  CSS の出し分け");
-console.log("  " + "─".repeat(62));
+heading("CSS の出し分け");
 
 const componentsCss = read("app/styles/layers/components.css");
 
 check(
-  /:root:not\(\[data-theme\]\)\s+\[data-theme-option="system"\]/.test(
-    componentsCss,
-  ),
+  /:root:not\(\[data-theme\]\)\s+\[data-theme-option="system"\]/.test(componentsCss),
   "system は属性の不在で引いている",
-  ':root:not([data-theme])',
+  ":root:not([data-theme])",
 );
 
 for (const value of ["light", "dark"]) {
   check(
-    new RegExp(
-      `:root\\[data-theme="${value}"\\]\\s+\\[data-theme-option="${value}"\\]`,
-    ).test(componentsCss),
+    new RegExp(`:root\\[data-theme="${value}"\\]\\s+\\[data-theme-option="${value}"\\]`).test(
+      componentsCss,
+    ),
     `${value} を引いている`,
     `:root[data-theme="${value}"]`,
   );
 }
 
-/* `data-theme-option` は CSS からは定数を参照できないので3箇所に直書きされる。
-   ずれると黙って壊れる（クリックが拾われない / 選択が光らない）ので押さえる */
+// CSS からは定数を参照できないので3箇所に直書きされる。ずれると黙って壊れる
 const SPELLED_IN = {
   "app/lib/theme.ts": /\[data-theme-option\]/,
   "app/components/ThemeToggle.tsx": /data-theme-option=\{/,
   "app/styles/layers/components.css": /\[data-theme-option[\]=]/,
 };
 for (const [file, pattern] of Object.entries(SPELLED_IN)) {
-  check(pattern.test(read(file)), `${file} が同じ綴りを使っている`, "data-theme-option");
+  check(pattern.test(read(file)), `${file}`, "data-theme-option");
 }
 
 console.log(

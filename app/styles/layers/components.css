@@ -50,9 +50,8 @@
   --table-cell-padding: 0.5em 1em;
 
   /* --- Theme Switch ---
-     ヘッダー（常に暗い面）にもハンバーガー内（テーマに追従する面）にも置くので、
-     制御自体を一つの暗い面として閉じさせ、テーマで反転させない。
-     選択中は面を反転させて示す。塗りの差だけで判別できるようにする */
+     ヘッダーにもハンバーガー内にも置くので、制御自体を一つの暗い面として
+     閉じさせ、テーマで反転させない。選択中は面を反転させて示す */
   --theme-switch-gap: var(--size-50);
   --theme-switch-padding: var(--size-100);
   --theme-switch-button-size: var(--size-700);
@@ -159,12 +158,8 @@
 
 
 /* --- Theme Switch の出し分け ---
-   3状態を `data-theme` の有無で直接引く。属性が無い＝システム設定に従う。
-   `prefers-color-scheme` は見ない：システムが今どちらに解決されていようと、
-   選択中なのは「システム」というセグメントだから。
-
-   ハイドレーション前でも正しい位置が光るように、選択状態は JS の状態ではなく
-   `<head>` のスクリプトが確定させた `data-theme` から引く。 */
+   属性が無い＝システム設定に従う。`prefers-color-scheme` は見ない：
+   システムが今どちらに解決されていようと、選択中なのは「システム」だから */
 
 [data-theme-option] {
   background-color: transparent;
@@ -187,6 +182,7 @@
     color: var(--color-theme-switch-selected-background);
   }
 
+  /* 選択中は面が反転しているので、ホバーでも前景を反転させたままにする */
   :root:not([data-theme]) [data-theme-option="system"]:hover,
   :root[data-theme="light"] [data-theme-option="light"]:hover,
   :root[data-theme="dark"] [data-theme-option="dark"]:hover {

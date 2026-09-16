@@ -2,27 +2,15 @@ import { css } from "hono/css";
 import { DisplayIcon } from "@/components/ui/DisplayIcon";
 import { MoonIcon } from "@/components/ui/MoonIcon";
 import { SunIcon } from "@/components/ui/SunIcon";
-import { THEME_CHOICES, THEME_LABELS, type ThemeChoice } from "@/lib/theme";
+import { THEME_CHOICES, type ThemeChoice } from "@/lib/theme";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-type IconProps = { color?: string };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-const ICONS: Record<ThemeChoice, (props: IconProps) => any> = {
+const ICONS: Record<ThemeChoice, (props: { color?: string }) => any> = {
   system: DisplayIcon,
   light: SunIcon,
   dark: MoonIcon,
 };
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
-
-/**
- * 色は一切ここに書かない。どのセグメントが選択中かは `:root[data-theme]` を見て
- * components.css が出し分ける。非レイヤーの hono/css はレイヤーに勝つため、
- * ここで color / background-color を宣言すると出し分けが効かなくなる。
- */
+/** 色は components.css が持つ。非レイヤーの hono/css で宣言すると出し分けに勝ってしまう */
 const switchGroupClass = css`
   display: inline-flex;
   align-items: center;
@@ -56,31 +44,22 @@ const switchButtonClass = css`
   }
 `;
 
-// ─── Component ───────────────────────────────────────────────────────────────
-
 /**
- * システム / ライト / ダークの3状態。
- *
- * island ではない。クリックは `<head>` の `THEME_INIT_SCRIPT` が document で
- * 委譲して受ける（理由は app/lib/theme.ts のコメント）。押下時に localStorage と
- * `data-theme` を書き換えるだけなので、画面の再読み込みは起きない。
- *
- * `aria-pressed` はサーバでは書けない（閲覧者の選択を知り得ない）。同スクリプトが
- * DOMContentLoaded で付ける。見た目の選択状態は CSS が `data-theme` から引くので、
- * 初回描画の時点で既に正しい。
+ * island ではない。クリックも `aria-pressed` も `<head>` の THEME_INIT_SCRIPT が
+ * document で委譲して受ける。選択中の見た目は `:root[data-theme]` から CSS が引く。
  */
 export function ThemeToggle() {
   return (
     <div class={switchGroupClass} role="group" aria-label="テーマ">
-      {THEME_CHOICES.map((value) => {
+      {THEME_CHOICES.map(({ value, label }) => {
         const Icon = ICONS[value];
         return (
           <button
             type="button"
             class={switchButtonClass}
             data-theme-option={value}
-            aria-label={THEME_LABELS[value]}
-            title={THEME_LABELS[value]}
+            aria-label={label}
+            title={label}
           >
             <Icon color="currentColor" />
           </button>

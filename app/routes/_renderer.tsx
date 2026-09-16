@@ -72,14 +72,11 @@ export default jsxRenderer(
     });
 
     return (
-      /* data-theme はサーバでは決めない。`/` `/posts` `/tags` `/about` は SSG され
-         Workers Assets が Worker より先に応答するため、サーバは閲覧者の選択を
-         読めない。描画前に下のスクリプトが localStorage を見て属性を確定させる */
       <html lang="ja">
         <head>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          {/* 同期スクリプト。client.ts は async なのでハイドレーション後では間に合わない */}
+          {/* data-theme を描画前に確定させる。同期でなければちらつく */}
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <link rel="icon" href="/icon.png" type="image/png" />
           <title>{pageTitle}</title>
