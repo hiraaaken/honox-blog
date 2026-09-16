@@ -2,7 +2,7 @@ import { css } from "hono/css";
 import { DisplayIcon } from "@/components/ui/DisplayIcon";
 import { MoonIcon } from "@/components/ui/MoonIcon";
 import { SunIcon } from "@/components/ui/SunIcon";
-import { DEFAULT_THEME_CHOICE, THEME_CHOICES, type ThemeChoice } from "@/lib/theme";
+import { THEME_CHOICES, type ThemeChoice } from "@/lib/theme";
 
 const ICONS: Record<ThemeChoice, (props: { color?: string }) => any> = {
   system: DisplayIcon,
@@ -57,7 +57,7 @@ export function ThemeToggle() {
     <div class={switchGroupClass} role="radiogroup" aria-label="テーマ">
       {THEME_CHOICES.map(({ value, label }) => {
         const Icon = ICONS[value];
-        const selected = value === DEFAULT_THEME_CHOICE;
+        const selected = value === "system";
         return (
           <button
             type="button"

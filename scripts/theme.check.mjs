@@ -54,7 +54,6 @@ const SEL = "[data-theme-option]";
  */
 function mount({
   stored = null,
-  cookie = "",
   storageThrows = false,
   reducedMotion = false,
   viewTransitions = false,
@@ -101,7 +100,6 @@ function mount({
 
   const document = {
     documentElement: { dataset },
-    cookie,
     querySelectorAll: (selector) => (selector === SEL ? radios : []),
     addEventListener: (type, handler) => {
       (docListeners[type] ??= []).push(handler);
@@ -145,9 +143,6 @@ function mount({
     },
     get stored() {
       return store.get("theme") ?? null;
-    },
-    get cookie() {
-      return document.cookie;
     },
     get focused() {
       return focused?.dataset.themeOption ?? null;
@@ -196,24 +191,13 @@ for (const value of VALUES) {
 {
   const dom = mount();
   check(
-    dom.attribute === null && dom.stored === "system",
+    dom.attribute === null && dom.stored === null,
     "未設定は system",
-    "属性なし / localStorage=system",
+    "属性なし / 既定を書き戻さない",
   );
 }
 
 check(mount({ stored: "dark-mode" }).attribute === null, "壊れた保存値は system に倒す", "属性なし");
-
-// 旧 cookie 方式（#78 以前）からの移行
-{
-  const dom = mount({ cookie: "foo=1; theme=dark; bar=2" });
-  check(
-    dom.attribute === "dark" && dom.stored === "dark",
-    "旧 cookie を引き継ぐ",
-    `data-theme="${dom.attribute}" / localStorage=${dom.stored}`,
-  );
-  check(/Max-Age=0/.test(dom.cookie), "引き継いだら cookie を捨てる", dom.cookie);
-}
 
 heading("切り替え（リロードなし）");
 
@@ -339,10 +323,10 @@ heading("別タブとの同期");
   check(dom.attribute === "dark", "別タブの変更に追従する", 'storage イベント → data-theme="dark"');
   check(dom.checked() === "false,false,true,false,false,true", "checked も追従する", dom.checked());
 
-  const written = dom.stored;
   dom.storage("theme", "light");
   check(dom.attribute === "light", "続けて届いても追従する", 'data-theme="light"');
-  check(written === "system" && dom.stored === "system", "書き戻さない", "他タブ発の変更は保存しない");
+  // このタブは一度もボタンを押していないので、何も保存していないはず
+  check(dom.stored === null, "書き戻さない", "他タブ発の変更は保存しない");
 
   dom.storage("other-key", "dark");
   check(dom.attribute === "light", "別のキーは無視する", "theme 以外に反応しない");

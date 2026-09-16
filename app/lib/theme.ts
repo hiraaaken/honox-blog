@@ -11,8 +11,6 @@ export const THEME_CHOICES = [
 
 export type ThemeChoice = (typeof THEME_CHOICES)[number]["value"];
 
-export const DEFAULT_THEME_CHOICE: ThemeChoice = "system";
-
 /**
  * `<head>` に同期スクリプトとして置く。ハイドレーションには依存しない。
  *
@@ -28,21 +26,12 @@ export const THEME_INIT_SCRIPT = `{
   const VALUES = ${JSON.stringify(THEME_CHOICES.map((c) => c.value))};
   const root = document.documentElement;
 
-  const save = (choice) => { try { window.localStorage.setItem(KEY, choice); } catch {} };
-
-  let current = ${JSON.stringify(DEFAULT_THEME_CHOICE)};
-  try { current = window.localStorage.getItem(KEY); } catch {}
-
-  if (!VALUES.includes(current)) {
-    current = ${JSON.stringify(DEFAULT_THEME_CHOICE)};
-    try {
-      // 旧 cookie 方式（#78 以前）の選択を一度だけ引き継いで捨てる
-      const cookie = document.cookie.match(/(?:^|;\\s*)theme=(light|dark)/);
-      if (cookie) current = cookie[1];
-      document.cookie = "theme=; Max-Age=0; Path=/";
-    } catch {}
-    save(current);
-  }
+  // 未設定も壊れた値も system。既定を書き戻さないので、触らない閲覧者には何も保存しない
+  let current = "system";
+  try {
+    const stored = window.localStorage.getItem(KEY);
+    if (VALUES.includes(stored)) current = stored;
+  } catch {}
 
   /** DOM への反映だけを行う。状態の更新は apply() が同期で済ませている */
   const paint = (choice) => {
@@ -59,43 +48,44 @@ export const THEME_INIT_SCRIPT = `{
     }
   };
 
-  const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   const apply = (choice) => {
     // View Transition の callback は次フレームなので、状態はここで同期に確定させる。
     // でないと連打したとき2回目が古い current から計算してしまう
     current = choice;
-    if (document.startViewTransition && !reduced()) document.startViewTransition(() => paint(choice));
+    if (document.startViewTransition && !window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      document.startViewTransition(() => paint(choice));
     else paint(choice);
+  };
+
+  /** この閲覧者自身の選択。別タブ発の変更は保存しないので apply() と分けている */
+  const select = (choice) => {
+    apply(choice);
+    try { window.localStorage.setItem(KEY, choice); } catch {}
   };
 
   paint(current); // <head> の時点ではボタンがまだ無いので data-theme だけ付く
 
   document.addEventListener("click", (e) => {
     const radio = e.target.closest?.(SEL);
-    if (!radio) return;
-    const next = radio.dataset.themeOption;
-    if (next === current) return;
-    apply(next);
-    save(next);
+    if (radio && radio.dataset.themeOption !== current) select(radio.dataset.themeOption);
   });
 
   // radiogroup は矢印キーでフォーカスと選択が同時に動く
   document.addEventListener("keydown", (e) => {
     const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
-    const radio = step === undefined ? null : e.target.closest?.(SEL);
+    if (!step) return;
+    const radio = e.target.closest?.(SEL);
     if (!radio) return;
     e.preventDefault();
     const next = VALUES[(VALUES.indexOf(current) + step + VALUES.length) % VALUES.length];
-    apply(next);
-    save(next);
+    select(next);
     radio.closest('[role="radiogroup"]')?.querySelector(\`[data-theme-option="\${next}"]\`)?.focus();
   });
 
   // 別タブでの変更に追従する。localStorage への書き込みは他タブにだけ届く
   window.addEventListener("storage", (e) => {
     if (e.key !== KEY) return;
-    const next = VALUES.includes(e.newValue) ? e.newValue : ${JSON.stringify(DEFAULT_THEME_CHOICE)};
+    const next = VALUES.includes(e.newValue) ? e.newValue : "system";
     if (next !== current) apply(next);
   });
 
