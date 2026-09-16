@@ -15,6 +15,7 @@ const heroSectionClass = css`
     gap: var(--spacing-md);
     display: flex;
     flex-direction: column-reverse;
+    font-size: var(--text-body-sm);
   }
 `
 
@@ -27,12 +28,6 @@ const heroIconClass = css`
 
 const speechBubbleClass = css`
   position: relative;
-  background-color: var(--speech-bubble-bg);
-  color: var(--speech-bubble-fg);
-  border: var(--speech-bubble-border);
-  box-shadow: var(--speech-bubble-shadow);
-  padding: calc(var(--spacing-2xl) * 1.5);
-  border-radius: 50%;
 
   &::before,
   &::after {
@@ -42,6 +37,8 @@ const speechBubbleClass = css`
     border-radius: 50%;
     background-color: var(--speech-bubble-bg);
     border: var(--speech-bubble-border);
+    transform-origin: bottom left;
+    animation: bubble-pop var(--duration-spring) var(--ease-bounce) backwards;
   }
 
   &::before {
@@ -49,6 +46,7 @@ const speechBubbleClass = css`
     left: -4%;
     bottom: 22%;
     box-shadow: var(--thought-bubble-shadow-lg);
+    animation-delay: var(--thought-bubble-delay-lg);
   }
 
   &::after {
@@ -56,25 +54,50 @@ const speechBubbleClass = css`
     left: -10%;
     bottom: 15%;
     box-shadow: var(--thought-bubble-shadow-sm);
+    animation-delay: var(--thought-bubble-delay-sm);
   }
 
   @container (max-width: 720px) {
     &::before {
       left: 50%;
       bottom: -10%;
-      transform: translateX(-140%);
+      translate: -140% 0;
+      transform-origin: center;
     }
 
     &::after {
       left: 40%;
       bottom: -15%;
-      transform: translateX(-60%);
+      translate: -60% 0;
+      transform-origin: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &::before,
+    &::after {
+      animation: none;
     }
   }
 `
 
 const speechBubbleBodyClass = css`
+  background-color: var(--speech-bubble-bg);
+  color: var(--speech-bubble-fg);
+  border: var(--speech-bubble-border);
+  box-shadow: var(--speech-bubble-shadow);
+  padding: calc(var(--spacing-2xl) * 1.5);
+  border-radius: 50%;
+  transform-origin: bottom left;
+animation: bubble-pop var(--duration-spring) var(--ease-bounce) var(--speech-bubble-delay) backwards;
 
+  @container (max-width: 720px) {
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 `
 
 const heroTitleClass = css`

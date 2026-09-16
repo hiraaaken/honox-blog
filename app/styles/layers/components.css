@@ -99,7 +99,7 @@
   /* --- Hero --- */
   --hero-padding-top: clamp(6.5rem, 11vw, 9rem);
   --hero-padding-bottom: clamp(1rem, 4vw, 4.5rem);
-  --hero-title-font-size: clamp(28px, 4.2vw, 62px);
+  --hero-title-font-size: clamp(1.5rem, 4.2vw, 62px);
   --hero-description-font-size: clamp(var(--text-sm), 1.4vw, var(--text-lg));
   --hero-letter-spacing: -0.02em;
   --hero-line-height: 1.2;
@@ -112,11 +112,13 @@
   --color-speech-bubble-shadow: var(--shadow);
   --speech-bubble-shadow: 4px 4px 0 var(--color-speech-bubble-shadow);
 
-  /* 思考の泡。影は径に比例させる（親と同じ 4px だと小さい丸で影が勝つ） */
   --thought-bubble-size-lg: clamp(20px, 2.4vw, 32px);
   --thought-bubble-size-sm: clamp(11px, 1.4vw, 18px);
   --thought-bubble-shadow-lg: 3px 3px 0 var(--color-speech-bubble-shadow);
   --thought-bubble-shadow-sm: 2px 2px 0 var(--color-speech-bubble-shadow);
+  --thought-bubble-delay-sm: 0s;
+  --thought-bubble-delay-lg: 0.2s;
+  --speech-bubble-delay: 0.3s;
 
   /* --- New Label (Comic Burst) --- */
   --new-label-text: oklch(0.95 0.18 95);
