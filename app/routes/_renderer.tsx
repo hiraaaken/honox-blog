@@ -1,9 +1,9 @@
 import { jsxRenderer } from "hono/jsx-renderer";
-import { getCookie } from "hono/cookie";
 import { Link, Script } from "honox/server";
 import { Header } from "../components/Header";
 import RssIcon from "@/components/ui/RssIcon";
 import { css, Style } from "hono/css";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import {
   DEFAULT_DESCRIPTION,
   SITE_NAME,
@@ -51,10 +51,6 @@ export default jsxRenderer(
     { children, title, description, path, type, image, publishedAt, updatedAt },
     c,
   ) => {
-    // 属性を付けないことが「システム設定に従う」状態を意味する
-    const cookieTheme = getCookie(c, "theme");
-    const currentTheme =
-      cookieTheme === "light" || cookieTheme === "dark" ? cookieTheme : undefined;
     const currentPath = c.req.path;
 
     const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
@@ -76,10 +72,15 @@ export default jsxRenderer(
     });
 
     return (
-      <html lang="ja" data-theme={currentTheme}>
+      /* data-theme はサーバでは決めない。`/` `/posts` `/tags` `/about` は SSG され
+         Workers Assets が Worker より先に応答するため、サーバは閲覧者の選択を
+         読めない。描画前に下のスクリプトが localStorage を見て属性を確定させる */
+      <html lang="ja">
         <head>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          {/* 同期スクリプト。client.ts は async なのでハイドレーション後では間に合わない */}
+          <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <link rel="icon" href="/icon.png" type="image/png" />
           <title>{pageTitle}</title>
           <meta name="description" content={pageDescription} />

@@ -1,104 +1,91 @@
+import { css } from "hono/css";
+import { DisplayIcon } from "@/components/ui/DisplayIcon";
 import { MoonIcon } from "@/components/ui/MoonIcon";
 import { SunIcon } from "@/components/ui/SunIcon";
-import { css } from "hono/css";
+import { THEME_CHOICES, THEME_LABELS, type ThemeChoice } from "@/lib/theme";
 
-const themeToggleFormClass = css`
-  display: flex;
-`
+// ─── Types ───────────────────────────────────────────────────────────────────
 
-/**
- * 切り替え先を明示して送る。cookie が無い状態ではサーバは表示中のテーマを
- * 知り得ないので、出し分けは CSS 側（components.css）に任せる。
- * display をここで宣言すると非レイヤーの hono/css がそれに勝つため書かない。
- */
-const themeToggleClass = css`
-  --_size: var(--toggle-size);
-  position: relative;
-  align-items: center;
-  width: calc(var(--_size) * 1.9);
-  height: var(--_size);
-  padding: 0;
-  border: none;
-  border-radius: var(--round-pill);
-  background-color: var(--color-toggle-bg);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+type IconProps = { color?: string };
 
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    z-index: 1;
-    width: var(--_size);
-    height: var(--_size);
-    scale: 0.75;
-    border-radius: var(--round-circle);
-    background-color: var(--color-toggle-knob);
-    transition: translate var(--duration-slow) var(--ease-bounce);
-  }
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-  /* 切り替え先がダーク＝今はライト表示 */
-  &[data-to="dark"]::before {
-    translate: calc(var(--_size) * 0.9) 0;
-  }
-  &[data-to="dark"] [data-icon="moon"] {
-    opacity: 0;
-  }
-
-  /* 切り替え先がライト＝今はダーク表示 */
-  &[data-to="light"]::before {
-    translate: 0 0;
-  }
-  &[data-to="light"] [data-icon="sun"] {
-    opacity: 0;
-  }
-
-  @media (hover: hover) {
-    &:hover { box-shadow: inset 0 0 2px var(--color-primary); }
-  }
-`;
-
-const toggleIconClass = css`
-  position: absolute;
-  display: flex;
-  &[data-icon="sun"] {
-    left: 8%;
-  }
-  &[data-icon="moon"]{
-    right: 8%;
-  }
-`;
-
-type ThemeSwitchProps = {
-  to: "light" | "dark";
-  label: string;
+const ICONS: Record<ThemeChoice, (props: IconProps) => any> = {
+  system: DisplayIcon,
+  light: SunIcon,
+  dark: MoonIcon,
 };
 
-function ThemeSwitch({ to, label }: ThemeSwitchProps) {
-  return (
-    <button
-      type="submit"
-      name="to"
-      value={to}
-      data-to={to}
-      class={themeToggleClass}
-      aria-label={label}
-    >
-      <span class={toggleIconClass} data-icon="moon">
-        <MoonIcon />
-      </span>
-      <span class={toggleIconClass} data-icon="sun">
-        <SunIcon color="var(--color-primary)" />
-      </span>
-    </button>
-  );
-}
+// ─── Styles ──────────────────────────────────────────────────────────────────
 
+/**
+ * 色は一切ここに書かない。どのセグメントが選択中かは `:root[data-theme]` を見て
+ * components.css が出し分ける。非レイヤーの hono/css はレイヤーに勝つため、
+ * ここで color / background-color を宣言すると出し分けが効かなくなる。
+ */
+const switchGroupClass = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--theme-switch-gap);
+  padding: var(--theme-switch-padding);
+  border-radius: var(--round-pill);
+`;
+
+const switchButtonClass = css`
+  display: grid;
+  place-items: center;
+  width: var(--theme-switch-button-size);
+  height: var(--theme-switch-button-size);
+  padding: 0;
+  border: none;
+  border-radius: var(--round-circle);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color var(--duration-base) var(--ease-standard);
+
+  & svg {
+    width: var(--theme-switch-icon-size);
+    height: var(--theme-switch-icon-size);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
+`;
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+/**
+ * システム / ライト / ダークの3状態。
+ *
+ * island ではない。クリックは `<head>` の `THEME_INIT_SCRIPT` が document で
+ * 委譲して受ける（理由は app/lib/theme.ts のコメント）。押下時に localStorage と
+ * `data-theme` を書き換えるだけなので、画面の再読み込みは起きない。
+ *
+ * `aria-pressed` はサーバでは書けない（閲覧者の選択を知り得ない）。同スクリプトが
+ * DOMContentLoaded で付ける。見た目の選択状態は CSS が `data-theme` から引くので、
+ * 初回描画の時点で既に正しい。
+ */
 export function ThemeToggle() {
   return (
-    <form action="/theme" method="post" class={themeToggleFormClass}>
-      <ThemeSwitch to="dark" label="ダークテーマに切り替える" />
-      <ThemeSwitch to="light" label="ライトテーマに切り替える" />
-    </form>
+    <div class={switchGroupClass} role="group" aria-label="テーマ">
+      {THEME_CHOICES.map((value) => {
+        const Icon = ICONS[value];
+        return (
+          <button
+            type="button"
+            class={switchButtonClass}
+            data-theme-option={value}
+            aria-label={THEME_LABELS[value]}
+            title={THEME_LABELS[value]}
+          >
+            <Icon color="currentColor" />
+          </button>
+        );
+      })}
+    </div>
   );
 }

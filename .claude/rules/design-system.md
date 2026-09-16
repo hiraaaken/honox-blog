@@ -32,9 +32,58 @@
 
 ### 切り替え
 
-`app/routes/theme.ts` は cookie を反転させず、**フォームから切り替え先を明示的に受け取る**。cookie が無い状態ではサーバは表示中のテーマを知り得ないため。どちらのボタンを見せるかは `components.css` が3状態すべてを書いて出し分ける。
+**正は `localStorage` ただ一つ。サーバは `data-theme` を決めない。**
 
-cookie が無ければ `_renderer.tsx` は `data-theme` を出力しない。テーマ適用のインラインスクリプトは持たない（同じ cookie をサーバ側で読んでいるため不要）。
+cookie で持ってはいけない。`vite.config.ts` の `@hono/vite-ssg` が `/` `/posts` `/tags` `/about` を静的 HTML として `dist/` に吐き、`wrangler.jsonc` の `assets` 設定により Workers Assets が Worker より先に応答する（`run_worker_first` の既定は false）。**これらのパスでは Worker が起動しないので、サーバは cookie を読めない。** 実際それで切り替えが効かなくなっていた（#78）。
+
+```
+GET /                     → dist/index.html（Worker は起動しない）
+GET /posts/:slug          → Worker が起動する
+```
+
+サイトの半分がサーバを通らない以上、cookie は権威を持てない。静的・動的どちらのページでも同じに読める場所は `localStorage` しかない。
+
+| 置き場所 | 役割 |
+|---|---|
+| `app/lib/theme.ts` | 3状態の定義、`data-theme` への写像、`<head>` に入る初期化スクリプト |
+| `app/components/ThemeToggle.tsx` | 3分割セグメント。マークアップだけを持つ |
+| `components.css` | どのセグメントが選択中かの出し分け |
+
+`_renderer.tsx` は `<head>` に**同期スクリプトを1つ**置く。役割は3つ。
+
+1. 描画前に `data-theme` を確定させる（`client.ts` は `async` で読まれるのでハイドレーション後では間に合わない）
+2. `[data-theme-option]` のクリックを `document` で委譲して受ける
+3. `aria-pressed` を選択状態に合わせる
+
+切り替えにサーバ往復は無い＝**画面は再読み込みされない**。
+
+> **切り替えを island にしない。**
+> HonoX（honox 0.1.x）は**1ページにつき最初の island しか `<honox-island>` で包まない**。
+> ヘッダーの切り替えを island にすると常にそれが「最初」になり、`/about` の
+> `TechStackTag` などが巻き添えで死ぬ。ハンバーガー内に置いたもう一つの切り替えも、
+> 2つ目なのでハイドレートされない。
+>
+> ```
+> $ grep -o '<honox-island' dist/about.html | wc -l
+> 1                      # TechStackTag は16個描画されているが、包まれるのは1つだけ
+> ```
+>
+> `document` でクリックを委譲すれば、ハイドレーションに一切依存せず全部が動く。
+
+> **選択状態をサーバでも JS の状態でも描かない。**
+> サーバは閲覧者の選択を知り得ない。どのセグメントが光るかは `:root[data-theme]` から
+> CSS で引く。そうすれば初回描画の時点で既に正しい。
+>
+> ```css
+> :root:not([data-theme]) [data-theme-option="system"],
+> :root[data-theme="light"] [data-theme-option="light"],
+> :root[data-theme="dark"]  [data-theme-option="dark"] { /* 選択中 */ }
+> ```
+>
+> ここで `prefers-color-scheme` を見てはいけない。システムが今どちらに解決されて
+> いようと、選択されているのは「システム」というセグメントだから。
+
+JS を切っている閲覧者はテーマを選べず、①（システム設定に従う）で固定される。個人ブログとして許容している。
 
 ---
 
@@ -117,6 +166,7 @@ Foundation を参照し、特定の UI に割り当てる。**Primitive を直�
 ```
 aube run check           # 型 + コントラスト + テーマ切り替え
 aube run check:contrast  # コントラストのみ
+aube run check:theme     # テーマ切り替えのみ
 ```
 
 `scripts/check-contrast.mjs` は **`app/styles/` に実際に書かれた値を読んで** OKLCH → OKLab → linear sRGB → 相対輝度 → WCAG 2.x の比を計算する。ハードコードした色ではないので、トークンを書き換えれば結果もそのまま追従する。
@@ -126,6 +176,17 @@ aube run check:contrast  # コントラストのみ
 - 本文・補助文字・リンクが両テーマで **4.5:1**（WCAG 1.4.3）
 - 輪郭が両テーマで **3:1**（WCAG 1.4.11）
 - 面が地より明るい / 影が地より暗い
+
+`scripts/theme.check.mjs` は3状態が `data-theme` へどう写るかを検証する。
+
+> **ロジックの複製をテストしても、そのロジックが呼ばれるかは検証できない。**
+> 前身の `theme-route.check.mjs` は `app/routes/theme.ts` の中身を別ファイルへ
+> コピーして検証していた。ハンドラは正しかったので検査は緑のままだったが、
+> Workers Assets に先取りされてそのハンドラは一度も呼ばれていなかった。
+>
+> だから現在の検査は `app/lib/theme.ts` を**複製せず import** し、`<head>` に
+> 入る実物のスクリプトを偽の DOM 上で実行し、さらに「`_renderer.tsx` が実際に
+> それを出力しているか」「cookie 方式の残骸が `app/` に無いか」まで見る。
 
 > **暗い側では、暗くしても直らない。**
 > コントラスト比は `(明るい方の輝度 + 0.05) / (暗い方の輝度 + 0.05)`。この `+0.05` は分母が小さいときに支配的になるため、暗い側では輝度差が比に反映されない。影を 0.09 から 0.05 に落としても 1.17 → 1.18 でしか動かない。**対処は「暗くする」ではなく「地を上げて余地を作る」。**
