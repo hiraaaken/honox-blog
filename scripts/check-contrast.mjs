@@ -139,8 +139,11 @@ const CHECKS = [
   ["ツールチップの文字",    "--on-inverse",     "--inverse", AA_TEXT],
   ["アクセント上の文字",    "--on-accent",      "--accent",  AA_TEXT],
   ["タグの文字",          "--color-tag-foreground", "--color-tag-background", AA_TEXT],
-  ["記事タイトル",        "--post-title-color", "--ground",  AA_TEXT],
-  ["目次の選択項目",       "--toc-selected-item-color", "--surface", AA_TEXT],
+  /* ライムに接する前景。ライトでは --ink ≒ --on-accent で偶然通るため、
+     地や面を背景にして検査するとダーク側の破綻を取りこぼす */
+  ["記事タイトル / 輪郭",   "--post-title-color", "--accent",  AA_TEXT],
+  ["目次の選択項目",       "--toc-selected-item-color", "--color-primary", AA_TEXT],
+  ["年別リンクのホバー",    "--on-accent",      "--color-primary", AA_TEXT],
   ["引用の文字",          "--color-blockquote-fg", "--color-blockquote-bg", AA_TEXT],
   ["インラインコード",     "--color-code-inline-fg", "--color-code-inline-bg", AA_TEXT],
   ["カードのホバー面",      "--ink",            "--color-card-background-hover", AA_TEXT],

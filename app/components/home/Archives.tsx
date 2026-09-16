@@ -27,8 +27,7 @@ const archiveLinkClass = css`
   color: inherit;
 
   &:hover {
-    color-scheme: light;
-    color: var(--color-foreground);
+    color: var(--on-accent);
     background-color: var(--color-primary);
   }
 `

@@ -63,7 +63,9 @@
   --post-nav-link-padding: var(--size-300);
 
   /* --- Post --- */
-  --post-title-color: var(--ink);
+  /* 字の実質的な背景は地ではなく --text-outline のライム輪郭。
+     ライムは反転しないので前景も反転させない */
+  --post-title-color: var(--on-accent);
 
   /* --- Heading Border --- */
   --heading-border-width: 2px;
@@ -78,7 +80,8 @@
   --toc-nested-margin-left: var(--size-200);
   --toc-nested-item-padding: var(--size-50) var(--size-150);
   --color-toc-border: var(--rule);
-  --toc-selected-item-color: var(--ink);
+  /* 選択項目はライム面に乗る。反転させると暗地で白文字がライムに乗る */
+  --toc-selected-item-color: var(--on-accent);
   --toc-target-before-color: var(--ink-muted);
   --toc-target-after-color: var(--ink-muted);
 
