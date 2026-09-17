@@ -3,6 +3,7 @@ import { Link, Script } from "honox/server";
 import { Header } from "../components/Header";
 import RssIcon from "@/components/ui/RssIcon";
 import { css, Style } from "hono/css";
+import { raw } from "hono/html";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import {
   DEFAULT_DESCRIPTION,
@@ -77,7 +78,7 @@ export default jsxRenderer(
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           {/* data-theme を描画前に確定させる。同期でなければちらつく */}
-          <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+          <script>{raw(THEME_INIT_SCRIPT)}</script>
           <link rel="icon" href="/icon.png" type="image/png" />
           <title>{pageTitle}</title>
           <meta name="description" content={pageDescription} />

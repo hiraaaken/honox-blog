@@ -378,7 +378,7 @@ const renderer = read("app/routes/_renderer.tsx");
 const themeSource = read("app/lib/theme.ts");
 
 check(
-  /dangerouslySetInnerHTML=\{\{\s*__html:\s*THEME_INIT_SCRIPT\s*\}\}/.test(renderer),
+  /<script>\{raw\(THEME_INIT_SCRIPT\)\}<\/script>/.test(renderer),
   "renderer が実際に出力している",
   "_renderer.tsx → <script>",
 );
