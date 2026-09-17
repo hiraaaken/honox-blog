@@ -49,10 +49,17 @@
   --color-table-header-bg: var(--surface);
   --table-cell-padding: 0.5em 1em;
 
-  /* --- Theme Toggle --- */
-  --toggle-size: var(--size-800);
-  --color-toggle-bg: oklch(0.33 0.02 285);
-  --color-toggle-knob: var(--color-header-foreground);
+  /* --- Theme Switch ---
+     ヘッダーにもハンバーガー内にも置くので、制御自体を一つの暗い面として
+     閉じさせ、テーマで反転させない。選択中は面を反転させて示す */
+  --theme-switch-gap: var(--size-50);
+  --theme-switch-padding: var(--size-100);
+  --theme-switch-button-size: var(--size-700);
+  --theme-switch-icon-size: var(--size-450);
+  --color-theme-switch-track: oklch(0.33 0.02 285);
+  --color-theme-switch-foreground: oklch(0.78 0.012 285);
+  --color-theme-switch-selected-background: oklch(0.97 0.006 285);
+  --color-theme-switch-selected-foreground: oklch(0.20 0.02 285);
 
   /* --- Post Card --- */
   --card-padding-compact: var(--size-350);
@@ -150,13 +157,35 @@
 }
 
 
-[data-to="dark"] { display: inline-flex; }
-[data-to="light"] { display: none; }
+/* --- Theme Switch の出し分け ---
+   属性が無い＝システム設定に従う。`prefers-color-scheme` は見ない：
+   システムが今どちらに解決されていようと、選択中なのは「システム」だから */
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) [data-to="dark"] { display: none; }
-  :root:not([data-theme="light"]) [data-to="light"] { display: inline-flex; }
+[data-theme-option] {
+  background-color: transparent;
+  color: var(--color-theme-switch-foreground);
 }
 
-:root[data-theme="dark"] [data-to="dark"] { display: none; }
-:root[data-theme="dark"] [data-to="light"] { display: inline-flex; }
+:root:not([data-theme]) [data-theme-option="system"],
+:root[data-theme="light"] [data-theme-option="light"],
+:root[data-theme="dark"] [data-theme-option="dark"] {
+  background-color: var(--color-theme-switch-selected-background);
+  color: var(--color-theme-switch-selected-foreground);
+}
+
+[role="group"]:has([data-theme-option]) {
+  background-color: var(--color-theme-switch-track);
+}
+
+@media (hover: hover) {
+  [data-theme-option]:hover {
+    color: var(--color-theme-switch-selected-background);
+  }
+
+  /* 選択中は面が反転しているので、ホバーでも前景を反転させたままにする */
+  :root:not([data-theme]) [data-theme-option="system"]:hover,
+  :root[data-theme="light"] [data-theme-option="light"]:hover,
+  :root[data-theme="dark"] [data-theme-option="dark"]:hover {
+    color: var(--color-theme-switch-selected-foreground);
+  }
+}

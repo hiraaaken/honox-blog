@@ -32,9 +32,107 @@
 
 ### 切り替え
 
-`app/routes/theme.ts` は cookie を反転させず、**フォームから切り替え先を明示的に受け取る**。cookie が無い状態ではサーバは表示中のテーマを知り得ないため。どちらのボタンを見せるかは `components.css` が3状態すべてを書いて出し分ける。
+**正は `localStorage` ただ一つ。サーバは `data-theme` を決めない。**
 
-cookie が無ければ `_renderer.tsx` は `data-theme` を出力しない。テーマ適用のインラインスクリプトは持たない（同じ cookie をサーバ側で読んでいるため不要）。
+cookie で持ってはいけない。`vite.config.ts` の `@hono/vite-ssg` が `/` `/posts` `/tags` `/about` を静的 HTML として `dist/` に吐き、`wrangler.jsonc` の `assets` 設定により Workers Assets が Worker より先に応答する（`run_worker_first` の既定は false）。**これらのパスでは Worker が起動しないので、サーバは cookie を読めない。** 実際それで切り替えが効かなくなっていた（#78）。
+
+```
+GET /                     → dist/index.html（Worker は起動しない）
+GET /posts/:slug          → Worker が起動する
+```
+
+サイトの半分がサーバを通らない以上、cookie は権威を持てない。静的・動的どちらのページでも同じに読める場所は `localStorage` しかない。
+
+| 置き場所 | 役割 |
+|---|---|
+| `app/lib/theme.ts` | 3状態の定義と、`<head>` に入る初期化スクリプト |
+| `app/components/ThemeToggle.tsx` | 3分割セグメント。マークアップだけを持つ |
+| `components.css` | どのセグメントが選択中かの出し分け |
+
+`_renderer.tsx` は `<head>` に**同期スクリプトを1つ**置く。役割は5つ。
+
+1. 描画前に `data-theme` を確定させる
+2. クリックを `document` で委譲して受ける
+3. 矢印キーで選択とフォーカスを動かす（radiogroup のキーボード規約）
+4. `aria-checked` と `tabindex` を選択状態に合わせる
+5. 別タブでの変更に `storage` イベントで追従する
+
+切り替えにサーバ往復は無い＝**画面は再読み込みされない**。
+
+> **`type="module"` にはできない。**
+> モジュールは**常に defer される**ので描画前に走らず、ちらつきを防げない。
+> ここだけは今でもクラシックスクリプト一択で、`client.ts`（`async`）でも間に合わない。
+>
+> ```
+> クラシックスクリプト実行時に body が存在したか: false   ← 描画前
+> module がクラシックより後に走ったか:            true   ← 手遅れ
+> ```
+
+> **`matchMedia` で OS 設定を監視しない。**
+> `system` を選んでいる閲覧者の配色は、`color-scheme: light dark` と `light-dark()` が
+> **CSS だけで** OS 設定の変化に追従する。JS で張るリスナーは丸ごと無駄になる。
+
+### `var` を使わない
+
+このサイトの下限は `light-dark()` が決めている（Baseline low / 2024-05-13、Chrome 123・
+Firefox 120・Safari 17.5）。無いとトークンが全部無効値になって配色が崩壊するので、
+**そこで `const` / `let` が動かないことはあり得ない。** `<head>` 直書きのテーマスクリプトに
+`var` と IIFE が付いている定型は IE 対応の化石で、ブロックスコープで足りる。
+
+### 相互排他なので radiogroup にする
+
+3つのセグメントは「3つの独立したトグル」ではなく「3つのうち1つ」。
+`role="group"` + `aria-pressed` で書くと、支援技術にはその情報が落ちる。
+
+```
+役割:     role="radiogroup" / role="radio" / aria-checked
+キー操作: 矢印キーで選択とフォーカスが同時に動く（端で回り込む）
+タブ:     グループ全体で1つのタブストップ（roving tabindex）
+```
+
+`tabindex` はサーバが既定（`system`）を `0`、残りを `-1` で描き、
+保存値が違う閲覧者の分はスクリプトが読み込み時に直す。
+
+### 切り替えは View Transition でクロスフェードする
+
+`document.startViewTransition()`（Baseline low / 2025-10-14、Chrome 111・Firefox 144・
+Safari 18）。非対応なら即座に切り替わるだけで、壊れない。
+
+`prefers-reduced-motion: reduce` は**二重に**尊重する。JS 側で `startViewTransition` を
+呼ばず、CSS 側でも `::view-transition-*` のアニメーションを止める（`base.css`）。
+
+> **View Transition を挟むと `data-theme` の反映が1フレーム遅れる。**
+> callback は次フレームに回るので、状態変数は callback の外で**同期に**確定させること。
+> でないと連打したとき2回目が古い値から計算して巻き戻る。
+
+> **切り替えを island にしない。**
+> HonoX（honox 0.1.x）は**1ページにつき最初の island しか `<honox-island>` で包まない**。
+> ヘッダーの切り替えを island にすると常にそれが「最初」になり、`/about` の
+> `TechStackTag` などが巻き添えで死ぬ。ハンバーガー内に置いたもう一つの切り替えも、
+> 2つ目なのでハイドレートされない。
+>
+> ```
+> $ grep -o '<honox-island' dist/about.html | wc -l
+> 1                      # TechStackTag は16個描画されているが、包まれるのは1つだけ
+> ```
+>
+> `document` でクリックを委譲すれば、ハイドレーションに一切依存せず全部が動く。
+
+> **選択中の「見た目」をサーバでも JS の状態でも描かない。**
+> サーバは閲覧者の選択を知り得ない。どのセグメントが光るかは `:root[data-theme]` から
+> CSS で引く。そうすれば初回描画の時点で既に正しい
+> （`aria-checked` と `tabindex` は CSS から書けないのでスクリプトが付ける）。
+>
+> ```css
+> :root:not([data-theme]) [data-theme-option="system"],
+> :root[data-theme="light"] [data-theme-option="light"],
+> :root[data-theme="dark"]  [data-theme-option="dark"] { /* 選択中 */ }
+> ```
+>
+> ここで `prefers-color-scheme` を見てはいけない。システムが今どちらに解決されて
+> いようと、選択されているのは「システム」というセグメントだから。
+
+JS を切っている閲覧者はテーマを選べず、①（システム設定に従う）で固定される。個人ブログとして許容している。
 
 ---
 
@@ -117,6 +215,7 @@ Foundation を参照し、特定の UI に割り当てる。**Primitive を直�
 ```
 aube run check           # 型 + コントラスト + テーマ切り替え
 aube run check:contrast  # コントラストのみ
+aube run check:theme     # テーマ切り替えのみ
 ```
 
 `scripts/check-contrast.mjs` は **`app/styles/` に実際に書かれた値を読んで** OKLCH → OKLab → linear sRGB → 相対輝度 → WCAG 2.x の比を計算する。ハードコードした色ではないので、トークンを書き換えれば結果もそのまま追従する。
@@ -126,6 +225,21 @@ aube run check:contrast  # コントラストのみ
 - 本文・補助文字・リンクが両テーマで **4.5:1**（WCAG 1.4.3）
 - 輪郭が両テーマで **3:1**（WCAG 1.4.11）
 - 面が地より明るい / 影が地より暗い
+
+`scripts/theme.check.mjs` は3状態が `data-theme` へどう写るかを検証する。
+
+> **ロジックの複製をテストしても、そのロジックが呼ばれるかは検証できない。**
+> 前身の `theme-route.check.mjs` は `app/routes/theme.ts` の中身を別ファイルへ
+> コピーして検証していた。ハンドラは正しかったので検査は緑のままだったが、
+> Workers Assets に先取りされてそのハンドラは一度も呼ばれていなかった。
+>
+> だから現在の検査はロジックを複製せず、`<head>` に入る実物のスクリプトを
+> 偽の DOM 上で実行し、さらに「`_renderer.tsx` が実際にそれを出力しているか」
+> 「cookie 方式の残骸が `app/` に無いか」まで見る。
+>
+> **同じ理由で、スクリプトの写像を TypeScript 側に持たせない。**
+> 検査のためだけの `themeAttribute()` のような関数は、本番で一度も実行されない
+> 複製そのものになる。
 
 > **暗い側では、暗くしても直らない。**
 > コントラスト比は `(明るい方の輝度 + 0.05) / (暗い方の輝度 + 0.05)`。この `+0.05` は分母が小さいときに支配的になるため、暗い側では輝度差が比に反映されない。影を 0.09 から 0.05 に落としても 1.17 → 1.18 でしか動かない。**対処は「暗くする」ではなく「地を上げて余地を作る」。**

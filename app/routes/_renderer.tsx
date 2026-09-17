@@ -1,9 +1,10 @@
 import { jsxRenderer } from "hono/jsx-renderer";
-import { getCookie } from "hono/cookie";
 import { Link, Script } from "honox/server";
 import { Header } from "../components/Header";
 import RssIcon from "@/components/ui/RssIcon";
 import { css, Style } from "hono/css";
+import { raw } from "hono/html";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import {
   DEFAULT_DESCRIPTION,
   SITE_NAME,
@@ -51,10 +52,6 @@ export default jsxRenderer(
     { children, title, description, path, type, image, publishedAt, updatedAt },
     c,
   ) => {
-    // 属性を付けないことが「システム設定に従う」状態を意味する
-    const cookieTheme = getCookie(c, "theme");
-    const currentTheme =
-      cookieTheme === "light" || cookieTheme === "dark" ? cookieTheme : undefined;
     const currentPath = c.req.path;
 
     const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
@@ -76,10 +73,12 @@ export default jsxRenderer(
     });
 
     return (
-      <html lang="ja" data-theme={currentTheme}>
+      <html lang="ja">
         <head>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          {/* data-theme を描画前に確定させる。同期でなければちらつく */}
+          <script>{raw(THEME_INIT_SCRIPT)}</script>
           <link rel="icon" href="/icon.png" type="image/png" />
           <title>{pageTitle}</title>
           <meta name="description" content={pageDescription} />

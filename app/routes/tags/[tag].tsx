@@ -45,6 +45,8 @@ const postsGrid = css`
 
 export default createRoute(async (c) => {
   const tag = c.req.param("tag");
+  if (!tag) return c.notFound();
+
   const posts = await getPostsByTag(tag);
 
   return c.render(

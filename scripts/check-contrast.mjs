@@ -170,7 +170,11 @@ const CHECKS = [
   ["引用の文字",          "--color-blockquote-fg", "--color-blockquote-bg", AA_TEXT],
   ["インラインコード",     "--color-code-inline-fg", "--color-code-inline-bg", AA_TEXT],
   ["カードのホバー面",      "--ink",            "--color-card-background-hover", AA_TEXT],
-  ["トグルのつまみ",       "--color-toggle-knob", "--color-toggle-bg", AA_UI],
+  ["テーマ切替の未選択",    "--color-theme-switch-foreground", "--color-theme-switch-track", AA_UI],
+  ["テーマ切替の選択中",    "--color-theme-switch-selected-foreground", "--color-theme-switch-selected-background", AA_TEXT],
+  /* どのセグメントが選択中かは塗りの差だけで示す。面が track から立たないと
+     「今どれなのか」が分からなくなるので UI 部品として 3:1 を課す */
+  ["テーマ切替の選択面",    "--color-theme-switch-selected-background", "--color-theme-switch-track", AA_UI],
   ["区切り線",           "--rule",           "--ground",  1.3],
   ["吹き出しの文字",       "--speech-bubble-fg", "--speech-bubble-bg", AA_TEXT],
 ];
