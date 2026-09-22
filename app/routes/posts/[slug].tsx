@@ -55,7 +55,7 @@ const postHeader = css`
   }
 
   >.description {
-    font-size: var(--text-base);
+    font-size: var(--text-body);
     color: var(--color-muted);
     margin-bottom: var(--spacing-md);
     line-height: 1.6;
@@ -162,34 +162,18 @@ const postContent = css`
   }
   
   h1 {
-    font-size: var(--text-responsive-h1);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h1-mobile);
-    }
+    font-size: var(--text-article-h1);
   }
   h2 {
-    font-size: var(--text-responsive-h2);
+    font-size: var(--text-article-h2);
     padding-bottom: var(--heading-h2-padding-bottom);
     border-bottom: var(--heading-border-width) solid var(--color-heading-border);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h2-mobile);
-    }
   }
   h3 {
-    font-size: var(--text-responsive-h3);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h3-mobile);
-    }
+    font-size: var(--text-article-h3);
   }
   h4 {
-    font-size: var(--text-responsive-h4);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h4-mobile);
-    }
+    font-size: var(--text-article-h4);
   }
   
   p {
