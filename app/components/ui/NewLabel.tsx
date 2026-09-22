@@ -9,8 +9,12 @@ const newLabelClass = css`
   filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.2));
   z-index: 10;
   pointer-events: none;
-  transform: rotate(12deg) scale(0);
-  animation: new-label-pop 0.4s var(--ease-bounce) 0.6s forwards;
+  rotate: 12deg;
+  animation: new-label-pop 0.4s var(--ease-bounce) 0.6s backwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 `;
 
 const newLabelShapeClass = css`

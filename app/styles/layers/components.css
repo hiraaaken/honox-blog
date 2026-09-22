@@ -1,5 +1,7 @@
 :root {
   /* --- Header --- */
+  /* テーマ不変。--accent や --speech-bubble-* と同じ色の島として扱う。
+     ライトは塗りが、ダークは細い輪郭が形を定義する */
   --color-header-background: oklch(0.20 0.02 285);
   --color-header-foreground: oklch(0.97 0.006 285);
   --color-header-border: oklch(0.97 0.006 285);
@@ -159,7 +161,11 @@
 
 /* --- Theme Switch の出し分け ---
    属性が無い＝システム設定に従う。`prefers-color-scheme` は見ない：
-   システムが今どちらに解決されていようと、選択中なのは「システム」だから */
+   システムが今どちらに解決されていようと、選択中なのは「システム」だから
+
+   hono/css は非レイヤーで注入され、レイヤー付きの指定に常に勝つ（特異度に
+   関係なく）。ThemeToggle 側が background-color / color を宣言していないので、
+   ここが唯一の宣言になる。ボタン側に足すと選択中が光らなくなる。 */
 
 [data-theme-option] {
   background-color: transparent;
