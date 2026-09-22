@@ -14,7 +14,7 @@ const postLayout = css`
   @media (max-width: 768px) {
     padding: 6rem var(--spacing-sm) 2rem;
     max-width: 100vw;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 `;
 

@@ -224,6 +224,42 @@ Foundation を参照し、特定の UI に割り当てる。**Primitive を直�
 
 ---
 
+## 横漏れを封じるときは `clip`。`hidden` を使わない
+
+記事の目次は `scroll-target-group` と `:target-current` で、JS なしにアクティブな見出しを出し分けている。
+この選択は**見出しの最近傍スクロールコンテナ**を基準に解決される。
+
+`overflow-x: hidden` は、もう片方の軸にも効く。
+
+```
+overflow-x: hidden + overflow-y: visible
+  → 仕様により overflow-y が auto に計算される
+  → その要素がスクロールコンテナになる
+```
+
+記事レイアウト（`app/routes/posts/[slug].tsx` の `postLayout`）がそうなると、見出しの基準スクローラが
+`document` ではなくそのレイアウトになる。レイアウト自身は縦に溢れないので
+`scrollHeight === clientHeight`、つまり**常にスクロール終端**。`scroll-target-group` は終端では
+最後のターゲットを選ぶので、**目次が最後の項目に固定され、スクロールしても一切動かなくなる**。
+実際それで ≤768px の目次が「まとめ」から動かなくなっていた。
+
+```
+≤768px  見出しの祖先 = overflow-x:hidden / overflow-y:auto (scrollH==clientH) → 「まとめ」固定
+>768px  見出しの祖先にスクロールコンテナなし = document              → 正常に追従
+```
+
+`clip` はクリップするがスクロールコンテナを作らない。`overflow-y` も `visible` のままになる。
+クリップの見た目は `hidden` と同じで、横漏れの封じ込めも同等（実測でページの
+`scrollWidth === clientWidth`、コードブロックは `pre` 内部のスクロールを維持）。
+
+> **スクロールコンテナを増やすと、それを基準に動く機能が全部ズレる。**
+> `scroll-target-group` だけでなく、`position: sticky` の基準、`IntersectionObserver` の `root`、
+> スクロール連動アニメーションも同じ。「はみ出しを隠したいだけ」なら `clip` で足りる。
+>
+> エラーも警告も出ず、目次が黙って最後の項目で固まるだけなので気づきにくい。
+
+---
+
 ## 検証
 
 ```
