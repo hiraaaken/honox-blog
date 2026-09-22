@@ -2,6 +2,7 @@ import { css } from "hono/css";
 import { PostSummary } from "@/types";
 import { Tag } from "@/components/Tag";
 import { NewLabel } from "@/components/ui/NewLabel";
+import { PostDate } from "@/components/PostDate";
 
 const isNewPost = (publishedAt: string, withinDays = 3): boolean => {
   const published = new Date(publishedAt);
@@ -82,10 +83,10 @@ const footerClass = css`
     z-index: 2;
   }
 
-  & time {
+  & [data-post-date] {
+    align-self: flex-end;
     font-size: var(--text-xs);
     color: var(--color-muted);
-    text-align: right;
   }
 `;
 
@@ -126,7 +127,7 @@ export const PostCard = ({
             <Tag tag={tag} size="sm" />
           ))}
         </section>
-        <time>{new Date(publishedAt).toLocaleDateString("ja-JP")}</time>
+        <PostDate publishedAt={publishedAt} />
       </div>
     </article>
   );

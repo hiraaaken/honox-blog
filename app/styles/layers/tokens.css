@@ -211,15 +211,11 @@
   --text-responsive-title: clamp(var(--size-600), 4vw, var(--size-1000));
   --text-responsive-title-mobile: clamp(var(--size-700), 7vw, var(--size-900));
 
-  /* コンテンツ見出し用（h1-h4） */
-  --text-responsive-h1: clamp(var(--size-600), 4vw, var(--size-900));
-  --text-responsive-h1-mobile: clamp(var(--size-500), 5vw, var(--size-600));
-  --text-responsive-h2: clamp(var(--size-500), 3.5vw, var(--size-700));
-  --text-responsive-h2-mobile: clamp(var(--size-400), 4vw, var(--size-500));
-  --text-responsive-h3: clamp(var(--size-450), 3vw, var(--size-700));
-  --text-responsive-h3-mobile: clamp(var(--size-350), 3.5vw, var(--size-450));
-  --text-responsive-h4: clamp(var(--size-400), 2.5vw, var(--size-600));
-  --text-responsive-h4-mobile: clamp(var(--size-300), 3vw, var(--size-400));
+  /* コンテンツ見出し用（h1-h4）。本文サイズに対する比率で持つ */
+  --text-article-h1: 2.25em;
+  --text-article-h2: 1.75em;
+  --text-article-h3: 1.375em;
+  --text-article-h4: 1.125em;
 
   --text-outline:
     3px 0 0.3px var(--color-primary),

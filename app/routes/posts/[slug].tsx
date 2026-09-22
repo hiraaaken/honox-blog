@@ -2,6 +2,7 @@ import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
 import { TableOfContents, MobileTOC } from "../../components/TableOfContents";
+import { PostDate } from "../../components/PostDate";
 import { css } from "hono/css";
 
 const postLayout = css`
@@ -55,7 +56,7 @@ const postHeader = css`
   }
 
   >.description {
-    font-size: var(--text-base);
+    font-size: var(--text-body);
     color: var(--color-muted);
     margin-bottom: var(--spacing-md);
     line-height: 1.6;
@@ -162,34 +163,18 @@ const postContent = css`
   }
   
   h1 {
-    font-size: var(--text-responsive-h1);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h1-mobile);
-    }
+    font-size: var(--text-article-h1);
   }
   h2 {
-    font-size: var(--text-responsive-h2);
+    font-size: var(--text-article-h2);
     padding-bottom: var(--heading-h2-padding-bottom);
     border-bottom: var(--heading-border-width) solid var(--color-heading-border);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h2-mobile);
-    }
   }
   h3 {
-    font-size: var(--text-responsive-h3);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h3-mobile);
-    }
+    font-size: var(--text-article-h3);
   }
   h4 {
-    font-size: var(--text-responsive-h4);
-
-    @media (max-width: 768px) {
-      font-size: var(--text-responsive-h4-mobile);
-    }
+    font-size: var(--text-article-h4);
   }
   
   p {
@@ -431,17 +416,7 @@ export default createRoute(async (c) => {
             <h1 class="title">{title}</h1>
             <p class="description">{description}</p>
             <div class="meta">
-              <time dateTime={publishedAt}>
-                公開日: {new Date(publishedAt).toLocaleDateString("ja-JP")}
-              </time>
-              {updatedAt && (
-                <>
-                  {" | "}
-                  <time dateTime={updatedAt}>
-                    更新日: {new Date(updatedAt).toLocaleDateString("ja-JP")}
-                  </time>
-                </>
-              )}
+              <PostDate publishedAt={publishedAt} updatedAt={updatedAt} />
             </div>
             <div class="tags">
               {tags.map((tag) => (
