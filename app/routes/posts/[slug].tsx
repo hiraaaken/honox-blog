@@ -2,7 +2,27 @@ import { createRoute } from "honox/factory";
 import { getPostBySlug, getAdjacentPosts } from "../../lib/post";
 import { Tag } from "../../components/Tag";
 import { TableOfContents, MobileTOC } from "../../components/TableOfContents";
+import CalendarIcon from "../../components/ui/CalendarIcon";
+import UpdateIcon from "../../components/ui/UpdateIcon";
 import { css } from "hono/css";
+
+type FormatDate = (iso: string) => string;
+type FormatUpdatedDate = (updated: string, published: string) => string;
+
+const formatDate: FormatDate = (iso) =>
+  new Date(iso).toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const formatUpdatedDate: FormatUpdatedDate = (updated, published) =>
+  new Date(updated).getFullYear() === new Date(published).getFullYear()
+    ? new Date(updated).toLocaleDateString("ja-JP", {
+        month: "long",
+        day: "numeric",
+      })
+    : formatDate(updated);
 
 const postLayout = css`
   max-width: var(--content-max-width);
@@ -62,9 +82,26 @@ const postHeader = css`
   }
 
   .meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs) var(--spacing-md);
     font-size: var(--text-sm);
     color: var(--color-muted-light);
     margin-bottom: var(--spacing-base);
+    font-variant-numeric: tabular-nums;
+
+    .date {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    svg {
+      width: 1em;
+      height: 1em;
+      flex: none;
+    }
   }
 
   .tags {
@@ -415,16 +452,19 @@ export default createRoute(async (c) => {
             <h1 class="title">{title}</h1>
             <p class="description">{description}</p>
             <div class="meta">
-              <time dateTime={publishedAt}>
-                公開日: {new Date(publishedAt).toLocaleDateString("ja-JP")}
-              </time>
-              {updatedAt && (
-                <>
-                  {" | "}
+              <span class="date">
+                <CalendarIcon />
+                <span class="visually-hidden">公開日</span>
+                <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
+              </span>
+              {updatedAt && updatedAt !== publishedAt && (
+                <span class="date">
+                  <UpdateIcon />
+                  <span class="visually-hidden">更新日</span>
                   <time dateTime={updatedAt}>
-                    更新日: {new Date(updatedAt).toLocaleDateString("ja-JP")}
+                    {formatUpdatedDate(updatedAt, publishedAt)}
                   </time>
-                </>
+                </span>
               )}
             </div>
             <div class="tags">
