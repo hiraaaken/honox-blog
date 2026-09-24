@@ -79,6 +79,7 @@ const postHeader = css`
 
 const postContent = css`
   color: var(--color-foreground);
+  font-size: var(--text-article-body);
   word-wrap: break-word;
   overflow-wrap: break-word;
   box-sizing: border-box;
@@ -95,7 +96,6 @@ const postContent = css`
     border: var(--card-border);
     border-radius: var(--round-md);
     padding: var(--spacing-sm);
-    font-size: var(--text-sm);
   }
   
   h1, h2, h3, h4, h5, h6 {
