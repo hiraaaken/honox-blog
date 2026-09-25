@@ -211,6 +211,9 @@
   --text-responsive-title: clamp(var(--size-600), 4vw, var(--size-1000));
   --text-responsive-title-mobile: clamp(var(--size-700), 7vw, var(--size-900));
 
+  /* 記事本文。幅に対する制御点はここ一つで、見出しはこれに対する比率で決まる */
+  --text-article-body: clamp(var(--size-400), 0.9rem + 0.3vw, var(--size-450));
+
   /* コンテンツ見出し用（h1-h4）。本文サイズに対する比率で持つ */
   --text-article-h1: 2.25em;
   --text-article-h2: 1.75em;
