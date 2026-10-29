@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "vp dev --host 0.0.0.0",
     "build": "vp build --mode client && vp build",
-    "preview": "wrangler dev",
-    "deploy": "pnpm run build && wrangler deploy",
+    "preview": "wrangler dev --ip 0.0.0.0",
+    "deploy": "vp run build && wrangler deploy",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:theme": "node scripts/theme.check.mjs",
     "check": "vp check && node scripts/check-contrast.mjs && node scripts/theme.check.mjs"

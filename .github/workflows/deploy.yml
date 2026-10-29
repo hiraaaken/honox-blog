@@ -13,18 +13,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: jdx/mise-action@v2
-
-      - run: aube install --frozen-lockfile
+      # Vite+ の版は pnpm-workspace.yaml の catalog、Node は devEngines.runtime、
+      # pnpm は packageManager から自動で決まる。既定で vp install（CI では frozen）まで行う。
+      # v1 タグは更新が止まっているので SHA で固定する
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          cache: true
 
       # canonical / OGP / sitemap / feed / JSON-LD の絶対URLを本番ドメインで埋め込む。
       # SSGで事前生成されるページはビルド時のこの値が使われる（未設定だとlocalhostになる）。
-      - run: aube run build
+      - run: vp run build
         env:
           VITE_SITE_URL: https://hiraaaken.dev
 
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
+      - run: vp exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
