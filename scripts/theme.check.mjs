@@ -217,7 +217,7 @@ heading("切り替え（リロードなし）");
     );
   }
 
-  // honox は1ページにつき最初の island しかハイドレートしない。
+  // hono 4.11.8+ では先頭以外の island が包まれない（ハイドレートされない）ことがある。
   // island にしていたらハンバーガー側（2組目）が死んでいた
   dom.click("dark", 1);
   check(
@@ -428,7 +428,7 @@ check(
   existsSync(join(ROOT, "app/components/ThemeToggle.tsx")) &&
     !existsSync(join(ROOT, "app/islands/ThemeToggle.tsx")),
   "切り替えは island ではない",
-  "honox は最初の island しか包まない",
+  "先頭以外の island は包まれないことがある",
 );
 
 // 裸のグローバルを掴むと検査が偽 DOM を差し込めなくなる

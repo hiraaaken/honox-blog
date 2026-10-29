@@ -43,14 +43,14 @@ app/
 
 ### Development Commands
 
-Package manager is [aube](https://aube.jdx.dev/) (pnpm-lock.yaml compatible), toolchain managed via [mise](https://mise.jdx.dev/) (`mise.toml`).
+Toolchain is [Vite+](https://viteplus.dev/) (`vp`). It picks Node and pnpm from `devEngines.runtime` / `packageManager` in `package.json`.
 
-- `mise install` - Install toolchain (Node/aube) declared in `mise.toml`
-- `aube install` - Install dependencies
-- `aube run dev` - Development with host binding (0.0.0.0)
-- `aube run build` - Dual build: client bundle + server (required order)
-- `aube run preview` - Wrangler dev server for production testing
-- `aube run deploy` - Build and deploy to Cloudflare Workers
+- `vp install` - Install dependencies
+- `vp run dev` - Development with host binding (0.0.0.0)
+- `vp run build` - Dual build: client bundle + server (required order)
+- `vp run preview` - Wrangler dev server for production testing
+- `vp run deploy` - Build and deploy to Cloudflare Workers
+- `vp run check` - Format, lint and type check (`vp check`) plus contrast and theme checks
 
 ### Integration Points
 

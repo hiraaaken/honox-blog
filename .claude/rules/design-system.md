@@ -106,17 +106,21 @@ Safari 18）。非対応なら即座に切り替わるだけで、壊れない�
 > でないと連打したとき2回目が古い値から計算して巻き戻る。
 
 > **切り替えを island にしない。**
-> HonoX（honox 0.1.x）は**1ページにつき最初の island しか `<honox-island>` で包まない**。
-> ヘッダーの切り替えを island にすると常にそれが「最初」になり、`/about` の
-> `TechStackTag` などが巻き添えで死ぬ。ハンバーガー内に置いたもう一つの切り替えも、
-> 2つ目なのでハイドレートされない。
+> hono 4.11.8 以降の jsx は、`Context.Provider` の子の描画が非同期だと、値を戻すのを
+> 描画の完了まで遅らせる。honox は「既に island の中か」を `IslandContext` で判定するので、
+> `hono/css` を使う island の**後ろに並ぶ island が `<honox-island>` で包まれなくなる**
+> （＝ハイドレートされない）。ヘッダーの切り替えを island にすると常にそれが先頭になり、
+> `/about` の `TechStackTag` などが巻き添えで死ぬ。ハンバーガー内に置いたもう一つの
+> 切り替えも、後ろに並ぶのでハイドレートされない。
 >
 > ```
-> $ grep -o '<honox-island' dist/about.html | wc -l
-> 1                      # TechStackTag は16個描画されているが、包まれるのは1つだけ
+> hono 4.11.7   $ grep -o '<honox-island' dist/about.html | wc -l   → 17
+> hono 4.11.8+  $ grep -o '<honox-island' dist/about.html | wc -l   → 1
 > ```
 >
-> `document` でクリックを委譲すれば、ハイドレーションに一切依存せず全部が動く。
+> 今は hono を 4.11.7 に固定して避けている（CLAUDE.md「依存の固定」）。
+> それでも切り替えは `document` でクリックを委譲する。ハイドレーションに一切依存しないので、
+> 固定が外れても全部が動く。
 
 > **選択中の「見た目」をサーバでも JS の状態でも描かない。**
 > サーバは閲覧者の選択を知り得ない。どのセグメントが光るかは `:root[data-theme]` から
@@ -263,9 +267,9 @@ overflow-x: hidden + overflow-y: visible
 ## 検証
 
 ```
-aube run check           # 型 + コントラスト + テーマ切り替え
-aube run check:contrast  # コントラストのみ
-aube run check:theme     # テーマ切り替えのみ
+vp run check             # 整形・lint・型 + コントラスト + テーマ切り替え
+vp run check:contrast    # コントラストのみ
+vp run check:theme       # テーマ切り替えのみ
 ```
 
 `scripts/check-contrast.mjs` は **`app/styles/` に実際に書かれた値を読んで** OKLCH → OKLab → linear sRGB → 相対輝度 → WCAG 2.x の比を計算する。ハードコードした色ではないので、トークンを書き換えれば結果もそのまま追従する。
