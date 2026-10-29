@@ -2,7 +2,7 @@
   /* --- Header --- */
   /* テーマ不変。--accent や --speech-bubble-* と同じ色の島として扱う。
      ライトは塗りが、ダークは細い輪郭が形を定義する */
-  --color-header-background: oklch(0.20 0.02 285);
+  --color-header-background: oklch(0.2 0.02 285);
   --color-header-foreground: oklch(0.97 0.006 285);
   --color-header-border: oklch(0.97 0.006 285);
   --color-header-shadow: var(--shadow);
@@ -11,7 +11,7 @@
 
   /* --- Card --- */
   --color-card-background: var(--surface);
-  --color-card-background-hover: light-dark(oklch(0.94 0 90), oklch(0.40 0.014 285));
+  --color-card-background-hover: light-dark(oklch(0.94 0 90), oklch(0.4 0.014 285));
   --color-card-foreground: var(--ink);
   --color-card-border: var(--edge);
   --color-card-shadow: var(--shadow);
@@ -61,7 +61,7 @@
   --color-theme-switch-track: oklch(0.33 0.02 285);
   --color-theme-switch-foreground: oklch(0.78 0.012 285);
   --color-theme-switch-selected-background: oklch(0.97 0.006 285);
-  --color-theme-switch-selected-foreground: oklch(0.20 0.02 285);
+  --color-theme-switch-selected-foreground: oklch(0.2 0.02 285);
 
   /* --- Post Card --- */
   --card-padding-compact: var(--size-350);
@@ -157,7 +157,6 @@
   /* --- Profile Avatar --- */
   --color-profile-border: var(--edge);
 }
-
 
 /* --- Theme Switch の出し分け ---
    属性が無い＝システム設定に従う。`prefers-color-scheme` は見ない：

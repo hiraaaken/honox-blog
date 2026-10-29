@@ -42,9 +42,7 @@ export const PostDate = ({ publishedAt, updatedAt }: PostDateProps) => {
         <span>
           <UpdateIcon />
           <span class="visually-hidden">更新日</span>
-          <time dateTime={updatedAt}>
-            {formatUpdatedDate(updatedAt, publishedAt)}
-          </time>
+          <time dateTime={updatedAt}>{formatUpdatedDate(updatedAt, publishedAt)}</time>
         </span>
       )}
     </span>

@@ -26,7 +26,10 @@ function groupHeadings(headings: Heading[]): groupedHeading[] {
     }
     if (heading.level === 3 && groups.length > 0) {
       const last = groups[groups.length - 1];
-      return [...groups.slice(0, -1), { parent: last.parent, children: [...last.children, heading] }];
+      return [
+        ...groups.slice(0, -1),
+        { parent: last.parent, children: [...last.children, heading] },
+      ];
     }
     return groups;
   }, []);
@@ -49,13 +52,10 @@ export const getPosts: GetPosts = async () => {
     }),
   );
 
-  const posts: PostSummary[] = allPosts.filter(
-    (post) => !post.draft || import.meta.env.DEV,
-  );
+  const posts: PostSummary[] = allPosts.filter((post) => !post.draft || import.meta.env.DEV);
 
   return posts.sort(
-    (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
 };
 
@@ -65,9 +65,7 @@ export const getPosts: GetPosts = async () => {
 export const getPostBySlug: GetPostBySlug = async (slug) => {
   const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
-  const entry = Object.entries(modules).find(([path]) =>
-    path.endsWith(`${slug}.mdx`),
-  );
+  const entry = Object.entries(modules).find(([path]) => path.endsWith(`${slug}.mdx`));
 
   if (!entry) {
     return null;
@@ -92,7 +90,7 @@ export const getPostBySlug: GetPostBySlug = async (slug) => {
   };
 
   return post;
-};;
+};
 
 export const getAllTags: GetAllTags = async () => {
   const posts = await getPosts();

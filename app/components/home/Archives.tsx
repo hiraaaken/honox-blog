@@ -5,7 +5,7 @@ const archiveClass = css`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-`
+`;
 
 const archiveListClass = css`
   border: var(--card-border);
@@ -16,7 +16,7 @@ const archiveListClass = css`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-`
+`;
 
 const archiveLinkClass = css`
   display: flex;
@@ -30,7 +30,7 @@ const archiveLinkClass = css`
     color: var(--on-accent);
     background-color: var(--color-primary);
   }
-`
+`;
 
 export const Archives = async () => {
   const archives = await getArchives();
@@ -47,11 +47,13 @@ export const Archives = async () => {
             key={`${year}-${month}`}
             class={archiveLinkClass}
           >
-            <span>{year}年{month}月</span>
+            <span>
+              {year}年{month}月
+            </span>
             <span class="archive-count">({count})</span>
           </a>
         ))}
       </div>
-    </section >
-  )
-}
+    </section>
+  );
+};

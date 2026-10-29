@@ -46,7 +46,7 @@ const headerClass = css`
       opacity: 0;
     }
   }
-`
+`;
 
 const navClass = css`
   display: flex;
@@ -57,7 +57,7 @@ const navClass = css`
   & a:hover {
     transition: color var(--duration-instant);
   }
-`
+`;
 
 const blandLinkClass = css`
   font-size: var(--text-lg);
@@ -66,7 +66,7 @@ const blandLinkClass = css`
   position: relative;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: 0;
@@ -88,7 +88,7 @@ const blandLinkClass = css`
   &[data-current="true"]::after {
     width: 100%;
   }
-`
+`;
 
 const navLinkListClass = css`
   display: flex;
@@ -129,7 +129,7 @@ const navLinkListClass = css`
     padding-bottom: 2px;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       left: 0;
       bottom: -2px;
@@ -152,7 +152,7 @@ const navLinkListClass = css`
       width: 100%;
     }
   }
-`
+`;
 
 const hamburgerButtonClass = css`
   background: none;
@@ -175,7 +175,7 @@ const hamburgerButtonClass = css`
       }
     }
   }
-`
+`;
 
 const hamburgerMenuClass = css`
   inset: 0 0 0 auto;
@@ -249,7 +249,7 @@ const hamburgerMenuClass = css`
       }
     }
   }
-`
+`;
 
 const drawerCloseClass = css`
   color: inherit;
@@ -261,26 +261,35 @@ const drawerCloseClass = css`
   cursor: pointer;
   padding: var(--spacing-xs);
   -webkit-tap-highlight-color: transparent;
-`
+`;
 const drawerFooterClass = css`
   margin-top: auto;
   padding-bottom: env(safe-area-inset-bottom);
-`
+`;
 
 export const Header = ({ currentPath }: { currentPath: string }) => {
-
   return (
-    <header
-      class={headerClass}
-    >
+    <header class={headerClass}>
       <nav class={navClass}>
-        <a href="/" class={blandLinkClass} data-current={currentPath === '/' ? 'true' : 'false'}>
+        <a href="/" class={blandLinkClass} data-current={currentPath === "/" ? "true" : "false"}>
           hiraaaken.dev
         </a>
         <ul class={navLinkListClass}>
-          <li><a href="/posts" data-current={currentPath.startsWith('/posts') ? 'true' : 'false'}>Posts</a></li>
-          <li><a href="/tags" data-current={currentPath.startsWith('/tags') ? 'true' : 'false'}>Tags</a></li>
-          <li><a href="/about" data-current={currentPath.startsWith('/about') ? 'true' : 'false'}>About</a></li>
+          <li>
+            <a href="/posts" data-current={currentPath.startsWith("/posts") ? "true" : "false"}>
+              Posts
+            </a>
+          </li>
+          <li>
+            <a href="/tags" data-current={currentPath.startsWith("/tags") ? "true" : "false"}>
+              Tags
+            </a>
+          </li>
+          <li>
+            <a href="/about" data-current={currentPath.startsWith("/about") ? "true" : "false"}>
+              About
+            </a>
+          </li>
           <li>
             <ThemeToggle />
           </li>
@@ -303,14 +312,26 @@ export const Header = ({ currentPath }: { currentPath: string }) => {
           <CloseIcon />
         </button>
         <ul>
-          <li><a href="/posts" data-current={currentPath.startsWith('/posts') ? 'true' : 'false'}>Posts</a></li>
-          <li><a href="/tags" data-current={currentPath.startsWith('/tags') ? 'true' : 'false'}>Tags</a></li>
-          <li><a href="/about" data-current={currentPath.startsWith('/about') ? 'true' : 'false'}>About</a></li>
+          <li>
+            <a href="/posts" data-current={currentPath.startsWith("/posts") ? "true" : "false"}>
+              Posts
+            </a>
+          </li>
+          <li>
+            <a href="/tags" data-current={currentPath.startsWith("/tags") ? "true" : "false"}>
+              Tags
+            </a>
+          </li>
+          <li>
+            <a href="/about" data-current={currentPath.startsWith("/about") ? "true" : "false"}>
+              About
+            </a>
+          </li>
         </ul>
         <div class={drawerFooterClass}>
           <ThemeToggle />
         </div>
       </dialog>
     </header>
-  )
-}
+  );
+};

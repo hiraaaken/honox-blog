@@ -50,7 +50,9 @@ const tocItemH2 = css`
     font-weight: var(--font-medium);
     line-height: 1.5;
     border-radius: var(--round-sm);
-    transition: color var(--duration-base), background-color var(--duration-base);
+    transition:
+      color var(--duration-base),
+      background-color var(--duration-base);
 
     @media (hover: hover) {
       &:hover {
@@ -94,7 +96,9 @@ const tocItemH3 = css`
     font-size: var(--text-xs);
     line-height: 1.5;
     border-radius: var(--round-sm);
-    transition: color var(--duration-base), background-color var(--duration-base);
+    transition:
+      color var(--duration-base),
+      background-color var(--duration-base);
 
     @media (hover: hover) {
       &:hover {
@@ -118,7 +122,6 @@ const tocItemH3 = css`
     background-color: var(--color-primary);
   }
 `;
-
 
 const mobileTocContainer = css`
   display: none;

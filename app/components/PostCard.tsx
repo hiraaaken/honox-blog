@@ -24,7 +24,8 @@ const postCardClass = css`
   position: relative;
   overflow: visible;
   transform: translateY(0);
-  transition: transform var(--duration-hover) var(--ease-bounce),
+  transition:
+    transform var(--duration-hover) var(--ease-bounce),
     box-shadow var(--duration-hover) var(--ease-bounce),
     background-color var(--duration-hover) var(--ease-bounce),
     filter var(--duration-hover) var(--ease-bounce);
@@ -41,7 +42,11 @@ const postCardClass = css`
     transform: translateY(4px);
     filter: brightness(0.98);
     box-shadow: var(--card-shadow-active);
-    transition: transform var(--duration-snap) var(--ease-out), box-shadow var(--duration-snap) var(--ease-out), background-color var(--duration-snap) var(--ease-out), filter var(--duration-snap) var(--ease-out);
+    transition:
+      transform var(--duration-snap) var(--ease-out),
+      box-shadow var(--duration-snap) var(--ease-out),
+      background-color var(--duration-snap) var(--ease-out),
+      filter var(--duration-snap) var(--ease-out);
   }
 
   & > a {
@@ -70,14 +75,14 @@ const footerClass = css`
   flex-direction: column;
   margin-top: auto;
   position: relative;
-  
+
   & > section {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 0.5rem;
     gap: 0.5rem;
   }
-  
+
   & a {
     position: relative;
     z-index: 2;
@@ -96,20 +101,14 @@ const cardLinkClass = css`
   text-wrap: balance;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     z-index: 1;
   }
 `;
 
-export const PostCard = ({
-  slug,
-  title,
-  tags,
-  description,
-  publishedAt,
-}: PostSummary) => {
+export const PostCard = ({ slug, title, tags, description, publishedAt }: PostSummary) => {
   return (
     <article class={postCardClass}>
       {isNewPost(publishedAt) && <NewLabel />}

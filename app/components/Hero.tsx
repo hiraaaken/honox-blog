@@ -1,5 +1,5 @@
-import { css } from 'hono/css'
-import { MascotIcon } from '@/components/ui/MascotIcon'
+import { css } from "hono/css";
+import { MascotIcon } from "@/components/ui/MascotIcon";
 
 const heroSectionClass = css`
   max-width: var(--content-max-width);
@@ -17,7 +17,7 @@ const heroSectionClass = css`
     flex-direction: column-reverse;
     font-size: var(--text-body-sm);
   }
-`
+`;
 
 const heroIconClass = css`
   display: flex;
@@ -32,14 +32,14 @@ const heroIconClass = css`
     height: auto;
     aspect-ratio: 203 / 150;
   }
-`
+`;
 
 const speechBubbleClass = css`
   position: relative;
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     aspect-ratio: 1;
     border-radius: 50%;
@@ -87,7 +87,7 @@ const speechBubbleClass = css`
       animation: none;
     }
   }
-`
+`;
 
 const speechBubbleBodyClass = css`
   background-color: var(--speech-bubble-bg);
@@ -97,7 +97,8 @@ const speechBubbleBodyClass = css`
   padding: calc(var(--spacing-2xl) * 1.5);
   border-radius: 50%;
   transform-origin: bottom left;
-animation: bubble-pop var(--duration-spring) var(--ease-bounce) var(--speech-bubble-delay) backwards;
+  animation: bubble-pop var(--duration-spring) var(--ease-bounce) var(--speech-bubble-delay)
+    backwards;
 
   @container (max-width: 720px) {
     transform-origin: center;
@@ -106,7 +107,7 @@ animation: bubble-pop var(--duration-spring) var(--ease-bounce) var(--speech-bub
   @media (prefers-reduced-motion: reduce) {
     animation: none;
   }
-`
+`;
 
 const heroTitleClass = css`
   display: flex;
@@ -115,14 +116,13 @@ const heroTitleClass = css`
   font-weight: bold;
   letter-spacing: var(--hero-letter-spacing);
   line-height: var(--hero-line-height);
-`
+`;
 
 const heroDescriptionClass = css`
   display: block;
   line-height: var(--hero-line-height);
   letter-spacing: var(--hero-letter-spacing);
-`
-
+`;
 
 export const Hero = () => {
   return (
@@ -137,11 +137,11 @@ export const Hero = () => {
             <span>I'm Hiraaaken.</span>
           </h1>
           <p class={heroDescriptionClass}>
-          I'm a software engineer. <br/>
-          I write about programming, technology, and my thoughts.
+            I'm a software engineer. <br />
+            I write about programming, technology, and my thoughts.
           </p>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

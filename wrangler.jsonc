@@ -3,18 +3,16 @@
   "name": "app",
   "main": "./dist/index.js",
   "compatibility_date": "2025-09-25",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
   },
   "routes": [
     {
       "pattern": "hiraaaken.dev",
-      "custom_domain": true
-    }
-  ]
+      "custom_domain": true,
+    },
+  ],
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },

@@ -9,7 +9,8 @@ const tagClass = css`
   text-decoration: none;
   font-weight: 500;
   transform: translateY(0);
-  transition: transform var(--duration-hover) var(--ease-bounce),
+  transition:
+    transform var(--duration-hover) var(--ease-bounce),
     box-shadow var(--duration-hover) var(--ease-bounce);
   border: var(--tag-border);
   box-shadow: var(--tag-shadow);
@@ -24,19 +25,21 @@ const tagClass = css`
   &:active {
     transform: translateY(3px);
     box-shadow: var(--tag-shadow-active);
-    transition: transform var(--duration-snap) var(--ease-out), box-shadow var(--duration-snap) var(--ease-out);
+    transition:
+      transform var(--duration-snap) var(--ease-out),
+      box-shadow var(--duration-snap) var(--ease-out);
   }
-  
+
   &[data-size="sm"] {
     font-size: var(--text-label);
     padding: 0.125rem 0.75rem;
   }
-  
+
   &[data-size="md"] {
     font-size: var(--text-body-sm);
     padding: 0.25rem 0.75rem;
   }
-  
+
   &[data-size="lg"] {
     font-size: var(--text-body);
     padding: 0.375rem 0.75rem;
@@ -58,4 +61,3 @@ export const Tag = ({ tag, size = "md", count = null }: TagProps) => {
     </a>
   );
 };
-

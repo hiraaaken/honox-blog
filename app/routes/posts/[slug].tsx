@@ -30,7 +30,6 @@ const contentArea = css`
       gap: 0;
     }
   }
-
 `;
 
 const postArticle = css`
@@ -41,7 +40,7 @@ const postArticle = css`
 const postHeader = css`
   margin-bottom: var(--spacing-xl);
 
-  >.title {
+  > .title {
     font-size: var(--text-responsive-title);
     font-weight: var(--font-bold);
     color: var(--post-title-color);
@@ -55,7 +54,7 @@ const postHeader = css`
     }
   }
 
-  >.description {
+  > .description {
     font-size: var(--text-body);
     color: var(--color-muted);
     margin-bottom: var(--spacing-md);
@@ -74,7 +73,6 @@ const postHeader = css`
     flex-wrap: wrap;
     gap: var(--spacing-sm);
   }
-
 `;
 
 const postContent = css`
@@ -97,8 +95,13 @@ const postContent = css`
     border-radius: var(--round-md);
     padding: var(--spacing-sm);
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     margin-top: var(--spacing-xl);
     margin-bottom: var(--spacing-md);
     font-weight: var(--font-bold);
@@ -117,7 +120,7 @@ const postContent = css`
       scroll-margin-top: 5rem;
     }
   }
-  
+
   :is(h1, h2, h3, h4, h5, h6) .heading-link {
     color: inherit;
     text-decoration: none;
@@ -126,42 +129,42 @@ const postContent = css`
     transition: color var(--duration-base);
     position: relative;
 
-  @media (hover: hover) {
-    &:hover {
-      text-decoration: underline;
-      
-      &::before,
-      &::after {
-        position: absolute;
-        font-weight: normal;
-        color: inherit;
-      }
-      
-      /* 768px以上の場合：左に表示 */
-      @container style(--inline-size-md: var(--window-md)) {
-        &::before {
-          content: '#';
-          left: -0.8em;
-        }
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+
+        &::before,
         &::after {
-          content: none;
+          position: absolute;
+          font-weight: normal;
+          color: inherit;
         }
-      }
-      
-      /* 768px未満の場合：右に表示 */
-      @container style(--inline-size-md: 100vi) {
-        &::before {
-          content: none;
+
+        /* 768px以上の場合：左に表示 */
+        @container style(--inline-size-md: var(--window-md)) {
+          &::before {
+            content: "#";
+            left: -0.8em;
+          }
+          &::after {
+            content: none;
+          }
         }
-        &::after {
-          content: '#';
-          right: -0.8em;
+
+        /* 768px未満の場合：右に表示 */
+        @container style(--inline-size-md: 100vi) {
+          &::before {
+            content: none;
+          }
+          &::after {
+            content: "#";
+            right: -0.8em;
+          }
         }
       }
     }
   }
-  }
-  
+
   h1 {
     font-size: var(--text-article-h1);
   }
@@ -176,7 +179,7 @@ const postContent = css`
   h4 {
     font-size: var(--text-article-h4);
   }
-  
+
   p {
     margin-bottom: var(--spacing-lg);
     text-align: justify;
@@ -186,20 +189,21 @@ const postContent = css`
       text-align: left;
     }
   }
-  
+
   a {
     color: var(--link);
     text-decoration: underline;
     transition: color var(--duration-base);
-    
+
     @media (hover: hover) {
       &:hover {
         text-decoration: none;
       }
     }
   }
-  
-  ul, ol {
+
+  ul,
+  ol {
     margin-bottom: var(--spacing-lg);
     padding-left: var(--spacing-lg);
 
@@ -207,14 +211,15 @@ const postContent = css`
       padding-left: var(--spacing-md-lg);
     }
   }
-  
+
   li {
     line-height: 1.6;
   }
-  
+
   blockquote {
     border-left: 4px solid var(--color-primary);
-    padding: var(--blockquote-padding-y) var(--blockquote-padding-y) var(--blockquote-padding-y) var(--blockquote-padding-x);
+    padding: var(--blockquote-padding-y) var(--blockquote-padding-y) var(--blockquote-padding-y)
+      var(--blockquote-padding-x);
     margin: var(--spacing-xl) 0;
     font-style: italic;
     background: var(--color-blockquote-bg);
@@ -226,16 +231,16 @@ const postContent = css`
       margin: var(--spacing-lg) 0;
     }
   }
-  
+
   code {
     background: var(--color-code-inline-bg);
     color: var(--color-code-inline-fg);
     padding: var(--code-inline-padding);
     border-radius: 0.25em;
     font-size: 0.85em;
-    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
   }
-  
+
   pre {
     background: var(--color-code-block-bg);
     padding: var(--code-block-padding);
@@ -260,11 +265,11 @@ const postContent = css`
     padding: 0;
     border: none;
     color: inherit;
-    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
     font-size: inherit;
     line-height: inherit;
   }
-  
+
   img {
     max-width: 100%;
     height: auto;
@@ -296,7 +301,8 @@ const postContent = css`
     }
   }
 
-  th, td {
+  th,
+  td {
     border: 1px solid var(--color-table-border);
     padding: var(--table-cell-padding);
     text-align: left;
@@ -338,7 +344,8 @@ const postNavigation = css`
     border-radius: 1rem;
     box-shadow: var(--card-shadow);
     transform: translateY(0);
-    transition: transform var(--duration-hover) var(--ease-bounce),
+    transition:
+      transform var(--duration-hover) var(--ease-bounce),
       box-shadow var(--duration-hover) var(--ease-bounce);
     flex: 1;
     color: inherit;
@@ -361,28 +368,30 @@ const postNavigation = css`
     &:active {
       transform: translateY(4px);
       box-shadow: var(--card-shadow-active);
-      transition: transform var(--duration-snap) var(--ease-out), box-shadow var(--duration-snap) var(--ease-out);
+      transition:
+        transform var(--duration-snap) var(--ease-out),
+        box-shadow var(--duration-snap) var(--ease-out);
     }
-    
+
     .nav-direction {
       font-size: var(--text-sm);
       color: var(--color-muted);
       margin-bottom: var(--spacing-sm);
       font-weight: var(--font-medium);
     }
-    
+
     .nav-title {
       font-size: var(--text-base);
       color: var(--color-foreground);
       font-weight: var(--font-semibold);
       line-height: 1.4;
-      
+
       @media (max-width: 480px) {
         font-size: var(--text-sm);
       }
     }
   }
-  
+
   .nav-placeholder {
     flex: 1;
   }
@@ -396,15 +405,7 @@ export default createRoute(async (c) => {
     return c.notFound();
   }
 
-  const {
-    title,
-    description,
-    publishedAt,
-    updatedAt,
-    tags,
-    Content,
-    headings,
-  } = post;
+  const { title, description, publishedAt, updatedAt, tags, Content, headings } = post;
 
   const { prev, next } = await getAdjacentPosts(slug);
 
