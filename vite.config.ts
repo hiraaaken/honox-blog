@@ -16,7 +16,11 @@ import { rehypeWrapTables } from "./app/lib/rehype-wrap-tables";
 const entry = "/app/server.ts";
 
 export default defineConfig({
-  fmt: {},
+  fmt: {
+    // 記事とドキュメントは文章なので整形しない。埋め込みコードまで整形され、
+    // 記事のコード例（意図して省いたセミコロン等）や揃えた桁が書き換わる。
+    ignorePatterns: ["**/*.md", "**/*.mdx"],
+  },
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },

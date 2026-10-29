@@ -9,7 +9,7 @@
     "deploy": "pnpm run build && wrangler deploy",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:theme": "node scripts/theme.check.mjs",
-    "check": "tsc --noEmit && node scripts/check-contrast.mjs && node scripts/theme.check.mjs"
+    "check": "vp check && node scripts/check-contrast.mjs && node scripts/theme.check.mjs"
   },
   "dependencies": {
     "@shikijs/rehype": "^3.23.0",
