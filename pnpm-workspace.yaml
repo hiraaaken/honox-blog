@@ -1,0 +1,10 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+
+# Node と pnpm のバージョンは Vite+（vp env）が package.json の
+# devEngines.runtime / packageManager から決める。pnpm 側でも切り替えると
+# 二重管理になり、コマンドごとに別のバージョンが選ばれうる。
+runtimeOnFail: ignore
+pmOnFail: ignore
