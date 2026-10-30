@@ -1,25 +1,22 @@
 {
   "name": "honox-blog",
   "build": { "dockerfile": "Dockerfile" },
-  "remoteUser": "vscode",
+  "remoteUser": "user",
 
-  // ローカルのフォルダ名に依存せずコンテナ内パスを固定する。
-  // devcontainers.nvim は LSP の URI をこのパス基準でホスト⇄コンテナ変換するため、
-  // 固定しておくと定義ジャンプや診断が安定する。
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/honox-blog,type=bind",
-  "workspaceFolder": "/workspaces/honox-blog",
+  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
+  "workspaceFolder": "${localWorkspaceFolder}",
 
   // node_modules はホストと共有しない。workerd / esbuild / sharp はOS・CPU別の
   // ネイティブバイナリなので、macOS ホストの node_modules を Linux で使うと壊れる。
   "mounts": [
-    "source=honox-blog-node_modules,target=/workspaces/honox-blog/node_modules,type=volume"
+    "source=honox-blog-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
   ],
 
   // forwardPorts は VS Code が実装するもので devcontainer CLI（devcontainers.nvim が使う）では効かない。
   // appPort は docker run の -p として公開されるのでどちらでも効く。
-  // 5173 = vp dev、8787 = wrangler dev
-  "appPort": [5173, 8787],
+  // 15173 → 5173 = vp dev、18787 → 8787 = wrangler dev
+  "appPort": ["15173:5173", "18787:8787"],
 
-  // named volume は root 所有で作られるので、最初に vscode に渡してから入れる
-  "postCreateCommand": "sudo chown vscode:vscode node_modules && vp install"
+  // named volume は root 所有で作られるので、最初に user に渡してから入れる
+  "postCreateCommand": "sudo chown user:user node_modules && vp install"
 }

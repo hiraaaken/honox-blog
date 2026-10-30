@@ -4,8 +4,12 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 ARG VP_VERSION=1.4.0
 
 # 非 root で入れる。root で動かすとバインドマウント先のホスト側に root 所有のファイルが残る
-USER vscode
-ENV VP_HOME=/home/vscode/.vite-plus
+RUN usermod -l user -d /home/user -m vscode \
+  && groupmod -n user vscode \
+  && mv /etc/sudoers.d/vscode /etc/sudoers.d/user \
+  && sed -i 's/^vscode /user /' /etc/sudoers.d/user
+USER user
+ENV VP_HOME=/home/user/.vite-plus
 
 # シェルの rc を読まないプロセス（devcontainers.nvim が起動する LSP など）からも
 # vp / node / pnpm を引けるよう、$VP_HOME/env と同じ並びで PATH に載せる
