@@ -75,7 +75,9 @@ const tooltipClass = css`
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity var(--duration-fast) var(--ease-out), display var(--duration-fast) var(--ease-out) allow-discrete;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    display var(--duration-fast) var(--ease-out) allow-discrete;
 
   &:popover-open {
     opacity: 1;

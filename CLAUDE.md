@@ -6,22 +6,35 @@ Honox を用いた個人技術ブログ。
 ## 技術スタック:
 - フレームワーク: HonoX（Hono 4.x ベース）
 - ランタイム: Cloudflare Workers
-- ビルドツール: Vite (7.x)
+- ツールチェーン: [Vite+](https://viteplus.dev/)（`vp`。Vite 8 / Oxlint / Oxfmt / Vitest を束ねる）
 - コンテンツ: MDX（Markdown + JSX）
 - スタイリング: CSS-in-JS（hono/css）+ CSS Custom Properties
 - デプロイ: Cloudflare Workers（Wrangler）
 
 ## 開発コマンド
 
-パッケージマネージャーは [aube](https://aube.jdx.dev/)（mise作者jdx製、pnpm-lock.yaml互換）。ツールチェーンは[mise](https://mise.jdx.dev/)で管理する（`mise.toml`にNode/aubeのバージョンを宣言）。
+Node と pnpm のバージョンは `vp` が `package.json` の `devEngines.runtime` / `packageManager` から決める。mise や corepack は使わない。
 
-- `mise install` - mise.tomlで宣言したツール（Node/aube）をインストール
-- `aube install` - 依存関係インストール
-- `aube run dev` - 開発サーバー起動（0.0.0.0でホストバインド）
-- `aube run build` - 本番ビルド（クライアント→サーバーの順で実行）
-- `aube run preview` - Wranglerでプレビュー
-- `aube run deploy` - ビルド後Cloudflare Workersにデプロイ
-- `docker compose up` - Docker開発環境（素のUbuntu + mise + aube、ポート5173）
+- `vp install` - 依存関係インストール
+- `vp run dev` - 開発サーバー起動（0.0.0.0でホストバインド）
+- `vp run build` - 本番ビルド（クライアント→サーバーの順で実行）
+- `vp run preview` - Wranglerでプレビュー
+- `vp run deploy` - ビルド後Cloudflare Workersにデプロイ
+- `vp run check` - 整形・lint・型（`vp check`）+ コントラスト + テーマ切り替え
+- `vp check --fix` - 整形と lint の自動修正
+
+`vp check`（組み込み）と `vp run check`（package.json のスクリプト）は別物。後者が前者を含む。
+
+開発環境は `.devcontainer/`（Neovim + devcontainers.nvim 想定）。
+
+### 依存の固定
+
+- `hono` は `4.11.7` に固定している。4.11.8 以降は jsx の `Context.Provider` が非同期の子の描画が終わるまで値を戻さなくなり、honox が `hono/css` を使う island の後ろに並ぶ island を `<honox-island>` で包まなくなる（`/about` の `TechStackTag` がハイドレートされない）。上げるときは `grep -o '<honox-island' dist/about.html | wc -l` が 17 のままか確認する
+- `shiki` / `@shikijs/rehype` は 3 系に留めている。4 系ではネストした CSS のコード例のハイライトが崩れる
+
+### 整形の対象外
+
+`*.md` / `*.mdx` は Oxfmt の対象外（`vite.config.ts` の `fmt.ignorePatterns`）。埋め込みコードまで整形され、記事のコード例が書き換わるため。
 
 ### ディレクトリ構成
 - `app/server.ts` - Honoアプリインスタンス作成

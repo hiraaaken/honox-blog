@@ -7,54 +7,58 @@ hiraaaken（Kenta Hirakata）のテックブログ 🥦
 
 - **フレームワーク**: [HonoX](https://github.com/honojs/honox) (フルスタックHonoフレームワーク)
 - **ランタイム**: Cloudflare Workers
-- **ビルドツール**: Vite 6.x
+- **ツールチェーン**: [Vite+](https://viteplus.dev/)（`vp`。Vite 8 / Oxlint / Oxfmt / Vitest）
 - **スタイリング**: CSS-in-JS (hono/css) 
 - **シンタックスハイライト**: Shiki
-- **ツールチェーン管理**: [mise](https://mise.jdx.dev/)
-- **パッケージマネージャー**: [aube](https://aube.jdx.dev/)（mise作者jdx製、pnpm-lock.yaml互換）
+- **パッケージマネージャー**: pnpm（バージョンは `vp` が `packageManager` から選ぶ）
 
 ## 開発
 
 ### 必要な環境
 
-- [mise](https://mise.jdx.dev/)（ツールチェーン管理。Node/aube を `mise.toml` に宣言）、または
-- Docker / Docker Compose
+- [Vite+](https://viteplus.dev/)（`curl -fsSL https://vite.plus | bash`）。Node と pnpm は `vp` が `package.json` の宣言に従って用意する、または
+- devcontainer（Docker）
 
-### ローカル開発（mise）
+### ローカル開発
 
 ```bash
-# ツールチェーン（Node/aube）をインストール
-mise install
-
-# 依存関係をインストール
-aube install
+# 依存関係をインストール（Node / pnpm も必要なら取得される）
+vp install
 
 # 開発サーバーを起動
-aube run dev
+vp run dev
 
 # 本番用ビルド
-aube run build
+vp run build
 
 # 本番ビルドをプレビュー
-aube run preview
+vp run preview
+
+# 整形・lint・型 + コントラスト + テーマ切り替えの検査
+vp run check
 ```
 
 アプリケーションは `http://localhost:5173` で利用できます。
 
-### Docker Composeでのセットアップ
+### devcontainer
 
-素の Ubuntu イメージに mise を入れ、`mise.toml` の宣言に従って Node と aube をインストールする構成（`Dockerfile`）。
+`.devcontainer/` に Ubuntu + Vite+ の構成がある。Neovim なら [devcontainers.nvim](https://github.com/jedrzejboczar/devcontainers.nvim) などで開く。
+`node_modules` は named volume（ホストの `node_modules` とは別物）。
 
-```bash
-docker compose up
-```
+コンテナ内の LSP は `node_modules` のものをそのまま使う。
+
+| 用途 | コマンド |
+|---|---|
+| TypeScript 7 | `node_modules/.bin/tsc --lsp --stdio` |
+| Oxlint | `vp lint --lsp` |
+| Oxfmt | `vp fmt --lsp` |
 
 ## デプロイ
 
-Cloudflare Workersへのデプロイ:
+Cloudflare Workersへのデプロイ（`main` への push で GitHub Actions からも実行される）:
 
 ```bash
-aube run deploy
+vp run deploy
 ```
 
 ## プロジェクト構造
@@ -100,8 +104,8 @@ MDX形式でブログ投稿のコンテンツを書きます。
 - **Wrangler**: `wrangler.jsonc` - Cloudflare Workers設定
 - **TypeScript**: `tsconfig.json` - TypeScript設定
 - **Vite**: `vite.config.ts` - ビルド設定
-- **mise**: `mise.toml` - Node/aubeのバージョン管理
-- **Docker**: `Dockerfile` / `compose.yaml` - コンテナ開発環境設定（素のUbuntu + mise + aube）
+- **Node / pnpm**: `package.json` の `devEngines.runtime` / `packageManager`（`vp` が読む）
+- **devcontainer**: `.devcontainer/` - コンテナ開発環境設定（Ubuntu + Vite+）
 
 ## ライセンス
 

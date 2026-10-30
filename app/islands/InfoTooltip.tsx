@@ -84,7 +84,9 @@ const tooltipClass = css`
   width: max-content;
   max-width: 400px;
   opacity: 0;
-  transition: opacity var(--duration-fast) var(--ease-out), display var(--duration-fast) var(--ease-out) allow-discrete;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    display var(--duration-fast) var(--ease-out) allow-discrete;
   container-type: anchored;
 
   &:popover-open {

@@ -48,10 +48,7 @@ const footerLinkClass = css`
 `;
 
 export default jsxRenderer(
-  (
-    { children, title, description, path, type, image, publishedAt, updatedAt },
-    c,
-  ) => {
+  ({ children, title, description, path, type, image, publishedAt, updatedAt }, c) => {
     const currentPath = c.req.path;
 
     const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
@@ -97,12 +94,8 @@ export default jsxRenderer(
           <meta property="og:url" content={canonicalUrl} />
           <meta property="og:image" content={ogImage} />
           <meta property="og:locale" content="ja_JP" />
-          {publishedAt && (
-            <meta property="article:published_time" content={publishedAt} />
-          )}
-          {updatedAt && (
-            <meta property="article:modified_time" content={updatedAt} />
-          )}
+          {publishedAt && <meta property="article:published_time" content={publishedAt} />}
+          {updatedAt && <meta property="article:modified_time" content={updatedAt} />}
 
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={pageTitle} />
@@ -125,11 +118,7 @@ export default jsxRenderer(
 
           <footer class={footerClass}>
             <p>&copy; {new Date().getFullYear()} hiraaaken All rights reserved.</p>
-            <a
-              href="/feed.xml"
-              class={footerLinkClass}
-              aria-label="RSSフィード"
-            >
+            <a href="/feed.xml" class={footerLinkClass} aria-label="RSSフィード">
               <RssIcon size={18} />
             </a>
           </footer>

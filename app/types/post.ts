@@ -35,7 +35,7 @@ export type MDXModule = {
   frontmatter: FrontMatter;
   headings?: Heading[];
   default?: MDXComponent;
-}
+};
 
 /** import.meta.globが返すモジュールマップ */
 export type MDXModuleMap = Record<string, () => Promise<MDXModule>>;

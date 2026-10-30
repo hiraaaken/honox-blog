@@ -1,34 +1,34 @@
-import { css } from 'hono/css'
-import { Link } from '@/components/ui/Link'
-import GithubIcon from '@/components/ui/GithubIcon'
-import XIcon from '@/components/ui/XIcon'
-import ZennIcon from '@/components/ui/ZennIcon'
+import { css } from "hono/css";
+import { Link } from "@/components/ui/Link";
+import GithubIcon from "@/components/ui/GithubIcon";
+import XIcon from "@/components/ui/XIcon";
+import ZennIcon from "@/components/ui/ZennIcon";
 
 const aboutClass = css`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-`
+`;
 
 const profileSectionClass = css`
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  
+
   img {
     width: 3rem;
     height: 3rem;
     border-radius: var(--round-full);
     border: 2px solid var(--color-profile-border);
   }
-  
+
   h3 {
     font-size: var(--text-body-lg);
     font-weight: bold;
     margin: 0;
     color: var(--color-foreground);
   }
-`
+`;
 
 const aboutCardClass = css`
   background-color: var(--color-card-background);
@@ -36,7 +36,7 @@ const aboutCardClass = css`
   border-radius: var(--round-xl);
   box-shadow: var(--card-shadow);
   padding: var(--spacing-lg);
-`
+`;
 const socialLinksClass = css`
   display: flex;
   gap: var(--spacing-sm);
@@ -53,14 +53,14 @@ const socialLinksClass = css`
       opacity: 1;
     }
   }
-`
+`;
 
 const aboutTextClass = css`
   font-size: var(--text-body-sm);
   line-height: 1.5;
   margin-bottom: 1rem;
   opacity: 0.8;
-`
+`;
 
 export const About = () => {
   return (
@@ -70,28 +70,44 @@ export const About = () => {
       </header>
       <article class={aboutCardClass}>
         <div class={profileSectionClass}>
-          <img src="icon.png" alt='Hiraaaken profile' />
+          <img src="icon.png" alt="Hiraaaken profile" />
           <div>
             <h3>hiraaaken</h3>
             <div class={socialLinksClass}>
-              <a href="https://github.com/hiraaaken" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <a
+                href="https://github.com/hiraaaken"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+              >
                 <GithubIcon />
               </a>
-              <a href="https://x.com/0512Ken" target="_blank" rel="noopener noreferrer" aria-label="X">
+              <a
+                href="https://x.com/0512Ken"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X"
+              >
                 <XIcon />
               </a>
-              <a href="https://zenn.dev/hiraaaken" target="_blank" rel="noopener noreferrer" aria-label="Zenn">
+              <a
+                href="https://zenn.dev/hiraaaken"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Zenn"
+              >
                 <ZennIcon />
               </a>
             </div>
           </div>
         </div>
         <p class={aboutTextClass}>
-        関西在住ソフトウェアエンジニア<br />
-        JS/TS, CSS周りのエコシステム、Kotlin/Java, Haskellも好き
+          関西在住ソフトウェアエンジニア
+          <br />
+          JS/TS, CSS周りのエコシステム、Kotlin/Java, Haskellも好き
         </p>
         <Link href="/about">read more...</Link>
       </article>
     </section>
-  )
-}
+  );
+};

@@ -1,0 +1,4 @@
+# 機械的な整形だけのコミット。`git config blame.ignoreRevsFile .git-blame-ignore-revs` で blame から外せる
+
+# style: Oxfmt で整形する
+8af7c569480097a3698e7c4fb353daca6709afeb

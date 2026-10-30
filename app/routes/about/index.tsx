@@ -163,7 +163,6 @@ interface TechStack {
   }[];
 }
 
-
 const techStacks: TechStack[] = [
   {
     category: "Languages",
@@ -248,9 +247,8 @@ const techStacks: TechStack[] = [
         rate: 2,
       },
     ],
-  }
+  },
 ];
-
 
 // ─── Route ────────────────────────────────────────────────────────────────────
 
@@ -270,13 +268,31 @@ export default createRoute((c) => {
             <h2>hiraaaken</h2>
 
             <div class={snsLinksClass}>
-              <a href="https://github.com/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <a
+                href="https://github.com/hiraaaken"
+                class={snsLinkClass}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+              >
                 <GithubIcon size={24} />
               </a>
-              <a href="https://x.com/0512Ken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="X">
+              <a
+                href="https://x.com/0512Ken"
+                class={snsLinkClass}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="X"
+              >
                 <XIcon size={24} />
               </a>
-              <a href="https://zenn.dev/hiraaaken" class={snsLinkClass} target="_blank" rel="noopener noreferrer" aria-label="Zenn">
+              <a
+                href="https://zenn.dev/hiraaaken"
+                class={snsLinkClass}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Zenn"
+              >
                 <ZennIcon size={24} />
               </a>
             </div>
@@ -285,10 +301,12 @@ export default createRoute((c) => {
 
         <div class={introTextClass}>
           <p>
-            関西のソフトウェアエンジニアです。現在は社内 SE として、業務アプリの開発や保守をしています。
+            関西のソフトウェアエンジニアです。現在は社内 SE
+            として、業務アプリの開発や保守をしています。
           </p>
           <p>
-            このブログでは、日々の開発で学んだことや試したこと、技術的な発見などを書き留めていきます。<br />
+            このブログでは、日々の開発で学んだことや試したこと、技術的な発見などを書き留めていきます。
+            <br />
             アウトプットする場として、気軽に更新していく予定です👀
           </p>
           <p>
@@ -300,8 +318,10 @@ export default createRoute((c) => {
           <h2 class={cardTitleClass}>
             技術スタック
             <InfoTooltip id="tech-rate" label="評価の見方">
-              ★☆☆ 入門・学習中<br />
-              ★★☆ 実務経験あり<br />
+              ★☆☆ 入門・学習中
+              <br />
+              ★★☆ 実務経験あり
+              <br />
               ★★★ 自信をもって使える
             </InfoTooltip>
           </h2>
@@ -328,8 +348,7 @@ export default createRoute((c) => {
     </section>,
     {
       title: "About",
-      description:
-        "hiraaakenのプロフィール・技術スタックを紹介しています。",
+      description: "hiraaakenのプロフィール・技術スタックを紹介しています。",
       path: "/about",
     },
   );

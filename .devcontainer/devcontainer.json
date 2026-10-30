@@ -1,0 +1,22 @@
+{
+  "name": "honox-blog",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "user",
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
+  "workspaceFolder": "${localWorkspaceFolder}",
+
+  // node_modules はホストと共有しない。workerd / esbuild / sharp はOS・CPU別の
+  // ネイティブバイナリなので、macOS ホストの node_modules を Linux で使うと壊れる。
+  "mounts": [
+    "source=honox-blog-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+
+  // forwardPorts は VS Code が実装するもので devcontainer CLI（devcontainers.nvim が使う）では効かない。
+  // appPort は docker run の -p として公開されるのでどちらでも効く。
+  // 15173 → 5173 = vp dev、18787 → 8787 = wrangler dev
+  "appPort": ["15173:5173", "18787:8787"],
+
+  // named volume は root 所有で作られるので、最初に user に渡してから入れる
+  "postCreateCommand": "sudo chown user:user node_modules && vp install"
+}

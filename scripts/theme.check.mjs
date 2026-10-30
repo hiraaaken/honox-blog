@@ -169,8 +169,7 @@ function mount({
           target: groups[group].querySelector(`[data-theme-option="${from}"]`),
         }),
       ),
-    storage: (key, newValue) =>
-      (winListeners.storage ?? []).forEach((h) => h({ key, newValue })),
+    storage: (key, newValue) => (winListeners.storage ?? []).forEach((h) => h({ key, newValue })),
     ready: () => (docListeners.DOMContentLoaded ?? []).forEach((h) => h()),
   };
 }
@@ -197,7 +196,11 @@ for (const value of VALUES) {
   );
 }
 
-check(mount({ stored: "dark-mode" }).attribute === null, "壊れた保存値は system に倒す", "属性なし");
+check(
+  mount({ stored: "dark-mode" }).attribute === null,
+  "壊れた保存値は system に倒す",
+  "属性なし",
+);
 
 heading("切り替え（リロードなし）");
 
@@ -214,7 +217,7 @@ heading("切り替え（リロードなし）");
     );
   }
 
-  // honox は1ページにつき最初の island しかハイドレートしない。
+  // hono 4.11.8+ では先頭以外の island が包まれない（ハイドレートされない）ことがある。
   // island にしていたらハンバーガー側（2組目）が死んでいた
   dom.click("dark", 1);
   check(
@@ -232,7 +235,11 @@ heading("切り替え（リロードなし）");
   } catch {
     /* 落ちたら dom は null のまま */
   }
-  check(dom !== null && dom.attribute === null, "localStorage が読めなくても落ちない", "例外を投げない");
+  check(
+    dom !== null && dom.attribute === null,
+    "localStorage が読めなくても落ちない",
+    "例外を投げない",
+  );
   if (dom) {
     dom.click("dark");
     check(dom.attribute === "dark", "保存できなくても切り替えは効く", 'data-theme="dark"');
@@ -257,7 +264,11 @@ heading("radiogroup（相互排他なので radio パターン）");
     "相互排他は aria-checked で表す",
   );
 
-  check(dom.tabStops() === 2, "タブストップは1組につき1つ", `全体で ${dom.tabStops()} 個（2組ぶん）`);
+  check(
+    dom.tabStops() === 2,
+    "タブストップは1組につき1つ",
+    `全体で ${dom.tabStops()} 個（2組ぶん）`,
+  );
 
   dom.click("dark");
   check(
@@ -383,7 +394,11 @@ check(
   "_renderer.tsx → <script>",
 );
 
-check(!/data-theme=\{/.test(renderer), "サーバは data-theme を決めない", "SSG では cookie を読めない");
+check(
+  !/data-theme=\{/.test(renderer),
+  "サーバは data-theme を決めない",
+  "SSG では cookie を読めない",
+);
 
 // モジュールは常に defer されるので、描画前に走らずちらつきを防げない
 check(
@@ -413,7 +428,7 @@ check(
   existsSync(join(ROOT, "app/components/ThemeToggle.tsx")) &&
     !existsSync(join(ROOT, "app/islands/ThemeToggle.tsx")),
   "切り替えは island ではない",
-  "honox は最初の island しか包まない",
+  "先頭以外の island は包まれないことがある",
 );
 
 // 裸のグローバルを掴むと検査が偽 DOM を差し込めなくなる
@@ -422,7 +437,11 @@ check(
   const bare = ["localStorage", "matchMedia", "addEventListener"].filter((name) =>
     new RegExp(`(^|[^.\\w])${name}\\s*[.(]`, "m").test(body.replace(/window\.\w+/g, "")),
   );
-  check(bare.length === 0, "グローバルは window 経由で触る", bare.length ? bare.join(", ") : "localStorage / matchMedia / addEventListener");
+  check(
+    bare.length === 0,
+    "グローバルは window 経由で触る",
+    bare.length ? bare.join(", ") : "localStorage / matchMedia / addEventListener",
+  );
 }
 
 /* ── CSS の出し分け ────────────────────────────────────────── */

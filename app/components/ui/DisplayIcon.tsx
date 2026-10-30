@@ -12,5 +12,5 @@ export const DisplayIcon = ({ color = "currentColor" }: { color?: string }) => {
         fill={color}
       />
     </svg>
-  )
-}
+  );
+};

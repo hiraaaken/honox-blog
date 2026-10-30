@@ -16,10 +16,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SOURCES = [
-  "app/styles/layers/tokens.css",
-  "app/styles/layers/components.css",
-];
+const SOURCES = ["app/styles/layers/tokens.css", "app/styles/layers/components.css"];
 
 /* ── 色の計算 ───────────────────────────────────────────── */
 
@@ -32,11 +29,11 @@ function oklchToLinearRgb(L, C, H) {
   const b = C * Math.sin(h);
   const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
   const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
-  const s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
   return [
     4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
     -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
   ];
 }
 
@@ -58,9 +55,16 @@ function toHex(color) {
   const enc = (v) => {
     const c = clamp01(v);
     const s = c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
-    return Math.round(s * 255).toString(16).padStart(2, "0");
+    return Math.round(s * 255)
+      .toString(16)
+      .padStart(2, "0");
   };
-  return "#" + oklchToLinearRgb(...color).map(enc).join("");
+  return (
+    "#" +
+    oklchToLinearRgb(...color)
+      .map(enc)
+      .join("")
+  );
 }
 
 function parseOklch(text) {
@@ -96,9 +100,7 @@ function findCrossFileDuplicates() {
   const seen = new Map();
   for (const file of SOURCES) {
     const css = readFileSync(join(ROOT, file), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-    const inFile = new Set(
-      [...css.matchAll(/(--[a-zA-Z0-9-]+)\s*:\s*[^;]+;/g)].map((m) => m[1]),
-    );
+    const inFile = new Set([...css.matchAll(/(--[a-zA-Z0-9-]+)\s*:\s*[^;]+;/g)].map((m) => m[1]));
     for (const name of inFile) {
       if (!seen.has(name)) seen.set(name, []);
       seen.get(name).push(file);
@@ -123,7 +125,10 @@ function resolve(tokens, name, theme, seen = new Set()) {
     for (let i = 0; i < inner.length; i++) {
       if (inner[i] === "(") depth++;
       else if (inner[i] === ")") depth--;
-      else if (inner[i] === "," && depth === 0) { split = i; break; }
+      else if (inner[i] === "," && depth === 0) {
+        split = i;
+        break;
+      }
     }
     const arm = (theme === "dark" ? inner.slice(split + 1) : inner.slice(0, split)).trim();
     return resolveValue(tokens, arm, theme, seen);
@@ -146,37 +151,47 @@ function resolveValue(tokens, value, theme, seen) {
 
 /* ── 検証したい組み合わせ ────────────────────────────────── */
 
-const AA_TEXT = 4.5;   // WCAG 1.4.3 通常の文字
-const AA_UI = 3.0;     // WCAG 1.4.11 非テキスト（枠線・UI部品）
+const AA_TEXT = 4.5; // WCAG 1.4.3 通常の文字
+const AA_UI = 3.0; // WCAG 1.4.11 非テキスト（枠線・UI部品）
 
 const CHECKS = [
-  ["本文",              "--ink",            "--ground",  AA_TEXT],
-  ["本文 / 面",          "--ink",            "--surface", AA_TEXT],
-  ["補助的な文字",        "--ink-muted",      "--ground",  AA_TEXT],
-  ["補助的な文字 / 面",    "--ink-muted",      "--surface", AA_TEXT],
-  ["リンク",             "--link",           "--ground",  AA_TEXT],
-  ["リンク / 面",         "--link",           "--surface", AA_TEXT],
-  ["カードの輪郭",        "--edge",           "--surface", AA_UI],
-  ["カードの輪郭 / 地",    "--edge",           "--ground",  AA_UI],
-  ["ヘッダーの文字",       "--color-header-foreground", "--color-header-background", AA_TEXT],
-  ["ツールチップの文字",    "--on-inverse",     "--inverse", AA_TEXT],
-  ["アクセント上の文字",    "--on-accent",      "--accent",  AA_TEXT],
-  ["タグの文字",          "--color-tag-foreground", "--color-tag-background", AA_TEXT],
+  ["本文", "--ink", "--ground", AA_TEXT],
+  ["本文 / 面", "--ink", "--surface", AA_TEXT],
+  ["補助的な文字", "--ink-muted", "--ground", AA_TEXT],
+  ["補助的な文字 / 面", "--ink-muted", "--surface", AA_TEXT],
+  ["リンク", "--link", "--ground", AA_TEXT],
+  ["リンク / 面", "--link", "--surface", AA_TEXT],
+  ["カードの輪郭", "--edge", "--surface", AA_UI],
+  ["カードの輪郭 / 地", "--edge", "--ground", AA_UI],
+  ["ヘッダーの文字", "--color-header-foreground", "--color-header-background", AA_TEXT],
+  ["ツールチップの文字", "--on-inverse", "--inverse", AA_TEXT],
+  ["アクセント上の文字", "--on-accent", "--accent", AA_TEXT],
+  ["タグの文字", "--color-tag-foreground", "--color-tag-background", AA_TEXT],
   /* ライムに接する前景。ライトでは --ink ≒ --on-accent で偶然通るため、
      地や面を背景にして検査するとダーク側の破綻を取りこぼす */
-  ["記事タイトル / 輪郭",   "--post-title-color", "--accent",  AA_TEXT],
-  ["目次の選択項目",       "--toc-selected-item-color", "--color-primary", AA_TEXT],
-  ["年別リンクのホバー",    "--on-accent",      "--color-primary", AA_TEXT],
-  ["引用の文字",          "--color-blockquote-fg", "--color-blockquote-bg", AA_TEXT],
-  ["インラインコード",     "--color-code-inline-fg", "--color-code-inline-bg", AA_TEXT],
-  ["カードのホバー面",      "--ink",            "--color-card-background-hover", AA_TEXT],
-  ["テーマ切替の未選択",    "--color-theme-switch-foreground", "--color-theme-switch-track", AA_UI],
-  ["テーマ切替の選択中",    "--color-theme-switch-selected-foreground", "--color-theme-switch-selected-background", AA_TEXT],
+  ["記事タイトル / 輪郭", "--post-title-color", "--accent", AA_TEXT],
+  ["目次の選択項目", "--toc-selected-item-color", "--color-primary", AA_TEXT],
+  ["年別リンクのホバー", "--on-accent", "--color-primary", AA_TEXT],
+  ["引用の文字", "--color-blockquote-fg", "--color-blockquote-bg", AA_TEXT],
+  ["インラインコード", "--color-code-inline-fg", "--color-code-inline-bg", AA_TEXT],
+  ["カードのホバー面", "--ink", "--color-card-background-hover", AA_TEXT],
+  ["テーマ切替の未選択", "--color-theme-switch-foreground", "--color-theme-switch-track", AA_UI],
+  [
+    "テーマ切替の選択中",
+    "--color-theme-switch-selected-foreground",
+    "--color-theme-switch-selected-background",
+    AA_TEXT,
+  ],
   /* どのセグメントが選択中かは塗りの差だけで示す。面が track から立たないと
      「今どれなのか」が分からなくなるので UI 部品として 3:1 を課す */
-  ["テーマ切替の選択面",    "--color-theme-switch-selected-background", "--color-theme-switch-track", AA_UI],
-  ["区切り線",           "--rule",           "--ground",  1.3],
-  ["吹き出しの文字",       "--speech-bubble-fg", "--speech-bubble-bg", AA_TEXT],
+  [
+    "テーマ切替の選択面",
+    "--color-theme-switch-selected-background",
+    "--color-theme-switch-track",
+    AA_UI,
+  ],
+  ["区切り線", "--rule", "--ground", 1.3],
+  ["吹き出しの文字", "--speech-bubble-fg", "--speech-bubble-bg", AA_TEXT],
 ];
 
 /**
@@ -215,8 +230,8 @@ for (const theme of ["light", "dark"]) {
     const gamut = inGamut(oklchToLinearRgb(...a)) ? "" : "  ⚠ sRGB 色域外";
     console.log(
       `  ${ok ? "✓" : "✗"} ${label.padEnd(20)}` +
-      `${r.toFixed(2).padStart(6)} / ${min.toFixed(1)}  ` +
-      `${toHex(a)} on ${toHex(b)}${gamut}`,
+        `${r.toFixed(2).padStart(6)} / ${min.toFixed(1)}  ` +
+        `${toHex(a)} on ${toHex(b)}${gamut}`,
     );
   }
 
@@ -229,8 +244,8 @@ for (const theme of ["light", "dark"]) {
     const who = rFill >= rEdge ? "塗り" : "輪郭";
     console.log(
       `  ${ok ? "✓" : "✗"} ${(label + "の形").padEnd(20)}` +
-      `${who} ${Math.max(rFill, rEdge).toFixed(2).padStart(5)} / ${AA_UI.toFixed(1)}  ` +
-      `（塗り ${rFill.toFixed(2)} / 輪郭 ${rEdge.toFixed(2)}）`,
+        `${who} ${Math.max(rFill, rEdge).toFixed(2).padStart(5)} / ${AA_UI.toFixed(1)}  ` +
+        `（塗り ${rFill.toFixed(2)} / 輪郭 ${rEdge.toFixed(2)}）`,
     );
   }
 
@@ -241,7 +256,7 @@ for (const theme of ["light", "dark"]) {
     if (!darker) failed++;
     console.log(
       `  ${darker ? "✓" : "✗"} ${label.padEnd(20)}` +
-      `${darker ? "地より暗い" : "地より明るい（影は必ず地より暗い）"}`.padStart(6),
+        `${darker ? "地より暗い" : "地より明るい（影は必ず地より暗い）"}`.padStart(6),
     );
   }
 }
@@ -250,8 +265,8 @@ for (const theme of ["light", "dark"]) {
 console.log("\n  構造");
 console.log("  " + "─".repeat(62));
 for (const theme of ["light", "dark"]) {
-  const lighter = luminance(resolve(tokens, "--surface", theme)) >
-                  luminance(resolve(tokens, "--ground", theme));
+  const lighter =
+    luminance(resolve(tokens, "--surface", theme)) > luminance(resolve(tokens, "--ground", theme));
   if (!lighter) failed++;
   console.log(`  ${lighter ? "✓" : "✗"} 面が地より明るい（${theme}）`);
 }
@@ -270,8 +285,6 @@ if (dups.length === 0) {
 }
 
 console.log(
-  failed === 0
-    ? "\n  すべて基準を満たしている\n"
-    : `\n  ${failed} 件が基準を満たしていない\n`,
+  failed === 0 ? "\n  すべて基準を満たしている\n" : `\n  ${failed} 件が基準を満たしていない\n`,
 );
 process.exit(failed === 0 ? 0 : 1);

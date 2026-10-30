@@ -6,17 +6,17 @@ const popularTagsSectionClass = css`
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-`
+`;
 const tagsClass = css`
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-base);
-`
+`;
 
 const footerClass = css`
   text-align: right;
   font-size: var(--text-2xl);
-`
+`;
 
 interface TagData {
   tag: string;
@@ -42,5 +42,5 @@ export const PopularTags = ({ tags }: PopularTagsProps) => {
         <Link href="/tags">see more...</Link>
       </footer>
     </section>
-  )
-}
+  );
+};
