@@ -81,6 +81,8 @@ const postContent = css`
   font-size: var(--text-article-body);
   line-height: 1.9;
   text-autospace: normal;
+  /* body の auto-phrase は文節でしか折らず、本文では行末が大きく空く。見出しだけ戻す */
+  word-break: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
   box-sizing: border-box;
@@ -111,6 +113,7 @@ const postContent = css`
     color: var(--color-foreground);
     line-height: 1.3;
     word-wrap: break-word;
+    word-break: auto-phrase;
     scroll-margin-top: 6rem;
 
     &:first-child {
