@@ -77,7 +77,10 @@ const postHeader = css`
 
 const postContent = css`
   color: var(--color-foreground);
+  font-family: var(--font-article);
   font-size: var(--text-article-body);
+  line-height: 1.9;
+  text-autospace: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
   box-sizing: border-box;
@@ -183,7 +186,7 @@ const postContent = css`
   p {
     margin-bottom: var(--spacing-lg);
     text-align: justify;
-    line-height: 1.8;
+    line-height: 1.9;
 
     @media (max-width: 480px) {
       text-align: left;
@@ -213,7 +216,7 @@ const postContent = css`
   }
 
   li {
-    line-height: 1.6;
+    line-height: 1.7;
   }
 
   blockquote {
@@ -239,6 +242,7 @@ const postContent = css`
     border-radius: 0.25em;
     font-size: 0.85em;
     font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    text-autospace: no-autospace;
   }
 
   pre {
