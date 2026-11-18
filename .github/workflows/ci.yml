@@ -1,0 +1,33 @@
+name: CI
+
+# main 以外のブランチへの push で検証する。PR の状態表示にもこの結果が出る。
+# main は deploy.yml が同じ検証をしてからデプロイするので、ここでは二重に走らせない。
+on:
+  push:
+    branches-ignore:
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # deploy.yml と同じ固定。v1 タグは更新が止まっているので SHA で固定する
+      - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
+        with:
+          cache: true
+
+      # 整形・lint・型・単体テスト・コントラスト・テーマ切り替え
+      - run: vp run check
+
+      - run: vp run build
+
+      # island のハイドレーション漏れや id の重複など、ビルド結果を見ないと分からない退行
+      - run: vp run check:build

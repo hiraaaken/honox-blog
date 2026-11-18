@@ -10,7 +10,8 @@ export interface FrontMatter {
   publishedAt: string;
   updatedAt: string;
   tags: string[];
-  image: string;
+  /** OGP画像。未指定ならサイト既定の画像になる */
+  image?: string;
   /** trueの場合、本番環境では一覧・詳細・タグ・アーカイブに表示されない */
   draft?: boolean;
 }
@@ -46,7 +47,7 @@ export type MDXModuleMap = Record<string, () => Promise<MDXModule>>;
 export interface PostSummary {
   slug: string;
   title: string;
-  image: string;
+  image?: string;
   tags: string[];
   description: string;
   publishedAt: string;

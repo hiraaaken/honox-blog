@@ -31,9 +31,15 @@ test("slug が重複しない（ディレクトリが違っても URL は /posts
   expect(new Set(slugs).size).toBe(slugs.length);
 });
 
-describe.each(entries)("$path", ({ slug, frontmatter, mod }) => {
+describe.each(entries)("$path", ({ path, slug, frontmatter, mod }) => {
   test("slug が URL にそのまま使える", () => {
     expect(slug).toMatch(/^[a-z0-9][a-z0-9_-]*$/);
+  });
+
+  // 公開日を変えたらディレクトリも動かす。食い違うと記事を探すときに迷う
+  test("app/posts/YYYY/YYYYMM/ が公開日と一致する", () => {
+    const [year, month] = frontmatter.publishedAt.split("-");
+    expect(path).toMatch(new RegExp(`^/app/posts/${year}/${year}${month}/[^/]+\\.mdx$`));
   });
 
   test("title と description がある", () => {

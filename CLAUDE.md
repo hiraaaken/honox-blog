@@ -52,7 +52,8 @@ Node と pnpm のバージョンは `vp` が `package.json` の `devEngines.runt
 - `app/lib/post.ts` は純粋関数（`sortPostsByDate` など）と `import.meta.glob` を読む `get*` に分けてある。ロジックは前者に足し、前者をテストする
 - `app/posts/posts.test.ts` は実在の記事を検査する（frontmatter の形式、slug の重複、本文に h1 が無いこと）。記事を足して落ちたら記事側を直す
 - 日付は `Asia/Tokyo` で解釈する。実行環境の TZ（Workers・CI は UTC）に依存させない
-- CI（`.github/workflows/deploy.yml`）は `check` → `build` → `check:build` → デプロイ。どれかが落ちればデプロイしない
+- `app/posts/posts.test.ts` は記事の置き場所が `app/posts/YYYY/YYYYMM/` で `publishedAt` と一致することも見る。公開日を変えたらファイルも移す
+- CI は `check` → `build` → `check:build`。main 以外への push は `ci.yml`、main は `deploy.yml` が同じ検証の後にデプロイする
 
 ## 設計方針
 - CSS-in-JS（`hono/css`）とCSS Custom Propertiesでスタイリング

@@ -96,6 +96,7 @@ function mount({
   const pending = [];
   const docListeners = {};
   const winListeners = {};
+  /** @type {Record<string, string>} */
   const dataset = {};
 
   const document = {
@@ -131,6 +132,8 @@ function mount({
     },
   };
 
+  // 実物のスクリプト文字列をそのまま走らせるのがこの検査の目的なので、eval 相当は意図どおり
+  // oxlint-disable-next-line typescript/no-implied-eval
   new Function("document", "window", THEME_INIT_SCRIPT)(document, window);
 
   const flush = () => {

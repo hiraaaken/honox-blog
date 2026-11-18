@@ -18,7 +18,6 @@ const post = (slug: string, publishedAt: string, tags: string[] = []): PostSumma
   tags,
   title: slug,
   description: "",
-  image: "",
   updatedAt: publishedAt,
 });
 
