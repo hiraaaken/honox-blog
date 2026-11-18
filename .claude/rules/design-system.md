@@ -119,6 +119,8 @@ Safari 18）。非対応なら即座に切り替わるだけで、壊れない�
 > ```
 >
 > 今は hono を 4.11.7 に固定して避けている（CLAUDE.md「依存の固定」）。
+> 固定を外したときの退行は `scripts/build.check.mjs` が「描画された数 ≠ 包まれた数」として検出する
+> （4.11.8 で実測: TechStackTag 描画 16 / 包まれた 0）。
 > それでも切り替えは `document` でクリックを委譲する。ハイドレーションに一切依存しないので、
 > 固定が外れても全部が動く。
 
@@ -270,6 +272,7 @@ overflow-x: hidden + overflow-y: visible
 vp run check             # 整形・lint・型 + コントラスト + テーマ切り替え
 vp run check:contrast    # コントラストのみ
 vp run check:theme       # テーマ切り替えのみ
+vp run check:build       # ビルド成果物（island の包み漏れ・id の重複）。build の後に
 ```
 
 `scripts/check-contrast.mjs` は **`app/styles/` に実際に書かれた値を読んで** OKLCH → OKLab → linear sRGB → 相対輝度 → WCAG 2.x の比を計算する。ハードコードした色ではないので、トークンを書き換えれば結果もそのまま追従する。

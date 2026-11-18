@@ -1,12 +1,9 @@
 import type {
   MDXModule,
-  Heading,
-  groupedHeading,
-  PostSummary,
+  MDXModuleMap,
   PostWithContent,
   TagCount,
   Archive,
-  AdjacentPosts,
   GetPosts,
   GetPostBySlug,
   GetPostsByTag,
@@ -14,13 +11,34 @@ import type {
   GetAllTags,
   GetArchives,
   GetAdjacentPosts,
+  ExtractSlugFromPath,
+  SortPostsByDate,
+  IsPublished,
+  GroupHeadings,
+  ToYearMonth,
+  CountTags,
+  BuildArchives,
+  FindAdjacent,
+  FindModuleBySlug,
 } from "@/types";
 
-/**
- * 見出しを階層構造にグループ化する
- */
-function groupHeadings(headings: Heading[]): groupedHeading[] {
-  return headings.reduce<groupedHeading[]>((groups, heading) => {
+// ─── 純粋関数 ────────────────────────────────────────────────────────────────
+// import.meta.glob に触れない部分。下の get* はこれらを組み合わせるだけにする。
+
+export const extractSlugFromPath: ExtractSlugFromPath = (path) =>
+  path.match(/([^/]+)\.mdx$/)?.[1] ?? "";
+
+export const sortPostsByDate: SortPostsByDate = (posts) =>
+  [...posts].sort(
+    (a, b) =>
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime() ||
+      a.slug.localeCompare(b.slug),
+  );
+
+export const isPublished: IsPublished = (frontmatter, isDev) => !frontmatter.draft || isDev;
+
+export const groupHeadings: GroupHeadings = (headings) =>
+  headings.reduce<ReturnType<GroupHeadings>>((groups, heading) => {
     if (heading.level === 2) {
       return [...groups, { parent: heading, children: [] }];
     }
@@ -33,52 +51,87 @@ function groupHeadings(headings: Heading[]): groupedHeading[] {
     }
     return groups;
   }, []);
-}
+
+// 実行環境のタイムゾーン（Workers は UTC、手元は JST）に結果を左右させない
+const yearMonthFormat = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+});
+
+export const toYearMonth: ToYearMonth = (iso) => {
+  const parts = yearMonthFormat.formatToParts(new Date(iso));
+  const pick = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${pick("year")}-${pick("month")}`;
+};
+
+export const countTags: CountTags = (posts) => {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return Array.from(counts, ([tag, count]): TagCount => ({ tag, count })).sort((a, b) =>
+    a.tag.localeCompare(b.tag),
+  );
+};
+
+export const buildArchives: BuildArchives = (posts) => {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    const key = toYearMonth(post.publishedAt);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Array.from(counts, ([yearMonth, count]): Archive => {
+    const [year, month] = yearMonth.split("-");
+    return { year: Number(year), month: Number(month), yearMonth, count };
+  }).sort((a, b) => b.yearMonth.localeCompare(a.yearMonth));
+};
+
+export const findAdjacent: FindAdjacent = (posts, slug) => {
+  const index = posts.findIndex((post) => post.slug === slug);
+  if (index === -1) {
+    return { prev: null, next: null };
+  }
+  return {
+    prev: posts[index - 1] ?? null,
+    next: posts[index + 1] ?? null,
+  };
+};
+
+export const findModuleBySlug: FindModuleBySlug = (modules, slug) =>
+  Object.entries(modules).find(([path]) => extractSlugFromPath(path) === slug)?.[1];
+
+// ─── import.meta.glob を読む層 ───────────────────────────────────────────────
+
+const loadModules = (): MDXModuleMap => import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
 
 /**
  * ポストの一覧を取得する
  */
 export const getPosts: GetPosts = async () => {
-  const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
-
-  const allPosts = await Promise.all(
-    Object.entries(modules).map(async ([path, resolver]) => {
+  const entries = await Promise.all(
+    Object.entries(loadModules()).map(async ([path, resolver]) => {
       const mod = await resolver();
-      const slug = path.match(/([^\/]+)\.mdx$/)?.[1] || "";
-      return {
-        ...mod.frontmatter,
-        slug,
-      };
+      return { ...mod.frontmatter, slug: extractSlugFromPath(path) };
     }),
   );
-
-  const posts: PostSummary[] = allPosts.filter((post) => !post.draft || import.meta.env.DEV);
-
-  return posts.sort(
-    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
-  );
+  return sortPostsByDate(entries.filter((post) => isPublished(post, import.meta.env.DEV)));
 };
 
 /**
  * 特定のポストを取得する
  */
 export const getPostBySlug: GetPostBySlug = async (slug) => {
-  const modules = import.meta.glob<MDXModule>("/app/posts/**/*.mdx");
-
-  const entry = Object.entries(modules).find(([path]) => path.endsWith(`${slug}.mdx`));
-
-  if (!entry) {
+  const resolver = findModuleBySlug(loadModules(), slug);
+  if (!resolver) {
     return null;
   }
 
-  const [, resolver] = entry;
   const mod = await resolver();
-
-  if (!mod.default) {
-    return null;
-  }
-
-  if (mod.frontmatter.draft && !import.meta.env.DEV) {
+  if (!mod.default || !isPublished(mod.frontmatter, import.meta.env.DEV)) {
     return null;
   }
 
@@ -88,82 +141,18 @@ export const getPostBySlug: GetPostBySlug = async (slug) => {
     Content: mod.default,
     headings: groupHeadings(mod.headings ?? []),
   };
-
   return post;
 };
 
-export const getAllTags: GetAllTags = async () => {
-  const posts = await getPosts();
-  const tagCounts = new Map<string, number>();
+export const getAllTags: GetAllTags = async () => countTags(await getPosts());
 
-  posts.forEach((post) => {
-    post.tags.forEach((tag) => {
-      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
-    });
-  });
+export const getPostsByTag: GetPostsByTag = async (tag) =>
+  (await getPosts()).filter((post) => post.tags.includes(tag));
 
-  const tags: TagCount[] = Array.from(tagCounts.entries())
-    .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => a.tag.localeCompare(b.tag));
+export const getArchives: GetArchives = async () => buildArchives(await getPosts());
 
-  return tags;
-};
+export const getPostsByYearMonth: GetPostsByYearMonth = async (yearMonth) =>
+  (await getPosts()).filter((post) => toYearMonth(post.publishedAt) === yearMonth);
 
-export const getPostsByTag: GetPostsByTag = async (tag) => {
-  const posts = await getPosts();
-  return posts.filter((post) => post.tags.includes(tag));
-};
-
-export const getArchives: GetArchives = async () => {
-  const posts = await getPosts();
-  const archiveMap = new Map<string, number>();
-
-  posts.forEach((post) => {
-    const date = new Date(post.publishedAt);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const key = `${year}-${month.toString().padStart(2, "0")}`;
-    archiveMap.set(key, (archiveMap.get(key) || 0) + 1);
-  });
-
-  const archives: Archive[] = Array.from(archiveMap.entries())
-    .map(([yearMonth, count]) => {
-      const [year, month] = yearMonth.split("-");
-      return {
-        year: parseInt(year),
-        month: parseInt(month),
-        yearMonth,
-        count,
-      };
-    })
-    .sort((a, b) => b.yearMonth.localeCompare(a.yearMonth));
-
-  return archives;
-};
-
-export const getPostsByYearMonth: GetPostsByYearMonth = async (yearMonth) => {
-  const posts = await getPosts();
-  return posts.filter((post) => {
-    const date = new Date(post.publishedAt);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const postYearMonth = `${year}-${month.toString().padStart(2, "0")}`;
-    return postYearMonth === yearMonth;
-  });
-};
-
-export const getAdjacentPosts: GetAdjacentPosts = async (currentSlug) => {
-  const posts = await getPosts();
-  const currentIndex = posts.findIndex((post) => post.slug === currentSlug);
-
-  if (currentIndex === -1) {
-    return { prev: null, next: null };
-  }
-
-  const adjacentPosts: AdjacentPosts = {
-    prev: currentIndex > 0 ? posts[currentIndex - 1] : null,
-    next: currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null,
-  };
-
-  return adjacentPosts;
-};
+export const getAdjacentPosts: GetAdjacentPosts = async (slug) =>
+  findAdjacent(await getPosts(), slug);
