@@ -7,8 +7,12 @@ export const AUTHOR_NAME = "hiraaaken";
 export const DEFAULT_DESCRIPTION =
   "hiraaakenのテックブログ。日々の学びや気づきを書き留めています。";
 
-/** カスタムドメイン導入（#49）までの暫定フォールバック画像 */
-export const DEFAULT_OG_IMAGE_PATH = "/icon.png";
+/**
+ * frontmatter に image が無いページの OGP 画像（1200x630）。
+ * twitter:card が summary_large_image なので横長でなければならない。
+ * scripts/og-image.mjs が実物のトークンから生成する。
+ */
+export const DEFAULT_OG_IMAGE_PATH = "/og.png";
 
 /**
  * 本番サイトのURL。VITE_SITE_URLが未設定の場合はリクエストのoriginにフォールバックする。

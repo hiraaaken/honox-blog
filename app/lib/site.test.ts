@@ -1,6 +1,13 @@
 import { describe, expect, test } from "vite-plus/test";
 import type { Context } from "hono";
-import { AUTHOR_NAME, SITE_NAME, buildJsonLd, resolveOgImage, serializeJsonLd } from "./site";
+import {
+  AUTHOR_NAME,
+  DEFAULT_OG_IMAGE_PATH,
+  SITE_NAME,
+  buildJsonLd,
+  resolveOgImage,
+  serializeJsonLd,
+} from "./site";
 
 // getSiteUrl が読むのは c.req.url だけ
 const ctx = (url: string) => ({ req: { url } }) as unknown as Context;
@@ -69,11 +76,29 @@ describe("serializeJsonLd", () => {
   });
 });
 
+// node:fs はアプリの tsconfig に型が無いので、Vite に base64 の data URL として読ませる
+const publicPngs = import.meta.glob<string>("/public/*.png", {
+  query: "?inline",
+  import: "default",
+  eager: true,
+});
+
 describe("resolveOgImage", () => {
   const c = ctx("https://example.com/posts/a?x=1");
 
   test("指定が無ければ既定画像を絶対URLで", () => {
-    expect(resolveOgImage(c)).toBe("https://example.com/icon.png");
+    expect(resolveOgImage(c)).toBe(`https://example.com${DEFAULT_OG_IMAGE_PATH}`);
+  });
+
+  // 消したり正方形に差し替えたりしても、エラーは出ずシェアのカードが壊れるだけなので検査する
+  test("既定画像は public/ に実在し、summary_large_image 向けの 1200x630 PNG", () => {
+    const dataUrl = publicPngs[`/public${DEFAULT_OG_IMAGE_PATH}`];
+    expect(dataUrl).toBeDefined();
+    const bytes = Uint8Array.from(atob(dataUrl.split(",")[1]), (ch) => ch.charCodeAt(0));
+    const view = new DataView(bytes.buffer);
+    expect(String.fromCharCode(...bytes.subarray(1, 4))).toBe("PNG");
+    // IHDR の幅・高さ（ビッグエンディアン）
+    expect([view.getUint32(16), view.getUint32(20)]).toEqual([1200, 630]);
   });
 
   test("相対パスはオリジンを付ける", () => {

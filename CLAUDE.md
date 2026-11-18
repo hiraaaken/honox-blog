@@ -24,6 +24,7 @@ Node と pnpm のバージョンは `vp` が `package.json` の `devEngines.runt
 - `vp run test` - 単体テストのみ（`vp test run`。`vp test` 単体は watch しない）
 - `vp run check:build` - ビルド成果物の検査（island の包み漏れ・id の重複）。`vp run build` の後に実行する
 - `vp check --fix` - 整形と lint の自動修正
+- `vp run og:image` - 既定 OGP 画像 `public/og.png` を再生成する。トークンやマスコットを変えたら実行してコミットする（Playwright を使う。ビルドには含めない）
 
 `vp check`（組み込み）と `vp run check`（package.json のスクリプト）は別物。後者が前者を含む。
 
