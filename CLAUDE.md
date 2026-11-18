@@ -20,7 +20,9 @@ Node と pnpm のバージョンは `vp` が `package.json` の `devEngines.runt
 - `vp run build` - 本番ビルド（クライアント→サーバーの順で実行）
 - `vp run preview` - Wranglerでプレビュー
 - `vp run deploy` - ビルド後Cloudflare Workersにデプロイ
-- `vp run check` - 整形・lint・型（`vp check`）+ コントラスト + テーマ切り替え
+- `vp run check` - 整形・lint・型（`vp check`）+ 単体テスト + コントラスト + テーマ切り替え
+- `vp run test` - 単体テストのみ（`vp test run`。`vp test` 単体は watch しない）
+- `vp run check:build` - ビルド成果物の検査（island の包み漏れ・id の重複）。`vp run build` の後に実行する
 - `vp check --fix` - 整形と lint の自動修正
 
 `vp check`（組み込み）と `vp run check`（package.json のスクリプト）は別物。後者が前者を含む。
@@ -29,7 +31,7 @@ Node と pnpm のバージョンは `vp` が `package.json` の `devEngines.runt
 
 ### 依存の固定
 
-- `hono` は `4.11.7` に固定している。4.11.8 以降は jsx の `Context.Provider` が非同期の子の描画が終わるまで値を戻さなくなり、honox が `hono/css` を使う island の後ろに並ぶ island を `<honox-island>` で包まなくなる（`/about` の `TechStackTag` がハイドレートされない）。上げるときは `grep -o '<honox-island' dist/about.html | wc -l` が 17 のままか確認する
+- `hono` は `4.11.7` に固定している。4.11.8 以降は jsx の `Context.Provider` が非同期の子の描画が終わるまで値を戻さなくなり、honox が `hono/css` を使う island の後ろに並ぶ island を `<honox-island>` で包まなくなる（`/about` の `TechStackTag` がハイドレートされない）。上げるときは `vp run build && vp run check:build` が通るか確認する（CI でも走る）
 - `shiki` / `@shikijs/rehype` は 3 系に留めている。4 系ではネストした CSS のコード例のハイライトが崩れる
 
 ### 整形の対象外
@@ -43,6 +45,14 @@ Node と pnpm のバージョンは `vp` が `package.json` の `devEngines.runt
 - `app/routes/_renderer.tsx` - グローバルJSXレンダラー（HTMLレイアウト）
 - `app/islands/` - インタラクティブコンポーネント（`useState`, `useEffect`使用）
 - `app/components/` - サーバーレンダリング専用コンポーネント
+
+## テスト
+
+- 単体テストは対象の隣に `*.test.ts` で置く。import は `vite-plus/test`（lint が `vitest` 直参照を禁じている）
+- `app/lib/post.ts` は純粋関数（`sortPostsByDate` など）と `import.meta.glob` を読む `get*` に分けてある。ロジックは前者に足し、前者をテストする
+- `app/posts/posts.test.ts` は実在の記事を検査する（frontmatter の形式、slug の重複、本文に h1 が無いこと）。記事を足して落ちたら記事側を直す
+- 日付は `Asia/Tokyo` で解釈する。実行環境の TZ（Workers・CI は UTC）に依存させない
+- CI（`.github/workflows/deploy.yml`）は `check` → `build` → `check:build` → デプロイ。どれかが落ちればデプロイしない
 
 ## 設計方針
 - CSS-in-JS（`hono/css`）とCSS Custom Propertiesでスタイリング

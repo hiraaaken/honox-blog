@@ -7,9 +7,11 @@
     "build": "vp build --mode client && vp build",
     "preview": "wrangler dev --ip 0.0.0.0",
     "deploy": "vp run build && wrangler deploy",
+    "test": "vp test run",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:theme": "node scripts/theme.check.mjs",
-    "check": "vp check && node scripts/check-contrast.mjs && node scripts/theme.check.mjs"
+    "check:build": "node scripts/build.check.mjs",
+    "check": "vp check && vp test run && node scripts/check-contrast.mjs && node scripts/theme.check.mjs"
   },
   "dependencies": {
     "@shikijs/rehype": "^3.23.0",

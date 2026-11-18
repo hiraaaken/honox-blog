@@ -107,5 +107,29 @@ export type GetAdjacentPosts = (slug: string) => Promise<AdjacentPosts>;
 /** パスからslugを抽出 */
 export type ExtractSlugFromPath = (path: string) => string;
 
-/** 投稿を公開日降順でソート */
-export type SortPostsByDate = (posts: PostSummary[]) => PostSummary[];
+/** 投稿を公開日降順でソート（同日はslug昇順。入力は変更しない） */
+export type SortPostsByDate = <T extends PostSummary>(posts: readonly T[]) => T[];
+
+/** 下書きを表示してよいか（開発時のみ下書きも出す） */
+export type IsPublished = (frontmatter: Pick<FrontMatter, "draft">, isDev: boolean) => boolean;
+
+/** h2/h3 の並びを h2 ごとの階層にまとめる（h2 より前の h3 は捨てる） */
+export type GroupHeadings = (headings: readonly Heading[]) => groupedHeading[];
+
+/** 公開日を日本時間の "YYYY-MM" にする */
+export type ToYearMonth = (iso: string) => string;
+
+/** タグごとの投稿数（タグ名の昇順） */
+export type CountTags = (posts: readonly PostSummary[]) => TagCount[];
+
+/** 年月ごとの投稿数（新しい順） */
+export type BuildArchives = (posts: readonly PostSummary[]) => Archive[];
+
+/** 一覧（新しい順）の中での前後。prev が新しい側、next が古い側 */
+export type FindAdjacent = (posts: readonly PostSummary[], slug: string) => AdjacentPosts;
+
+/** slug に完全一致するモジュールのローダーを探す */
+export type FindModuleBySlug = (
+  modules: MDXModuleMap,
+  slug: string,
+) => (() => Promise<MDXModule>) | undefined;

@@ -20,11 +20,17 @@ jobs:
         with:
           cache: true
 
+      # 整形・lint・型・単体テスト・コントラスト・テーマ切り替え。落ちたらデプロイしない
+      - run: vp run check
+
       # canonical / OGP / sitemap / feed / JSON-LD の絶対URLを本番ドメインで埋め込む。
       # SSGで事前生成されるページはビルド時のこの値が使われる（未設定だとlocalhostになる）。
       - run: vp run build
         env:
           VITE_SITE_URL: https://hiraaaken.dev
+
+      # island のハイドレーション漏れや id の重複など、ビルド結果を見ないと分からない退行
+      - run: vp run check:build
 
       - run: vp exec wrangler deploy
         env:
